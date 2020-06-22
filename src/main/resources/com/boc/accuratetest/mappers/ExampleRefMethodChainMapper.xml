@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boc.accuratetest.mappers.ExampleRefMethodChainMapper">
+  <resultMap id="BaseResultMap" type="com.boc.accuratetest.pojo.ExampleRefMethodChain">
+    <result column="testing_example_id" jdbcType="INTEGER" property="testingExampleId" />
+    <result column="method_chain_original_id" jdbcType="INTEGER" property="methodChainOriginalId" />
+  </resultMap>
+  <insert id="insert" parameterType="com.boc.accuratetest.pojo.ExampleRefMethodChain">
+    insert into example_ref_method_chain (testing_example_id, method_chain_original_id
+      )
+    values (#{testingExampleId,jdbcType=INTEGER}, #{methodChainOriginalId,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.boc.accuratetest.pojo.ExampleRefMethodChain">
+    insert into example_ref_method_chain
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="testingExampleId != null">
+        testing_example_id,
+      </if>
+      <if test="methodChainOriginalId != null">
+        method_chain_original_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="testingExampleId != null">
+        #{testingExampleId,jdbcType=INTEGER},
+      </if>
+      <if test="methodChainOriginalId != null">
+        #{methodChainOriginalId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+</mapper>

@@ -19,12 +19,12 @@
             <property name="forceBigDecimals" value="false"/>
         </javaTypeResolver>
         <!--生成Model类存放位置-->
-        <javaModelGenerator targetPackage="com.example.pojo" targetProject="src/main/java">
+        <javaModelGenerator targetPackage="com.boc.accuratetest.pojo" targetProject="src/main/java">
             <property name="enableSubPackages" value="true"/>
             <property name="trimStrings" value="true"/>
         </javaModelGenerator>
         <!--生成映射文件存放位置-->
-        <sqlMapGenerator targetPackage="com.example.mappers" targetProject="src/main/resources">
+        <sqlMapGenerator targetPackage="com.boc.accuratetest.mappers" targetProject="src/main/resources">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
         <!--生成Dao类存放位置-->
@@ -33,14 +33,14 @@
                 type="MIXEDMAPPER",生成基于注解的Java Model 和相应的Mapper对象
                 type="XMLMAPPER",生成SQLMap XML文件和独立的Mapper接口
         -->
-        <javaClientGenerator type="XMLMAPPER" targetPackage="com.example.mappers" 
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.boc.accuratetest.mappers" 
         	targetProject="src/main/java">
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
         <!--生成对应表及类名-->
         <!--tableName为数据库中表的名称，domainObjectName为映射的实体类的名称    mybatis-generator:generate  -->
-        <table tableName="change_code" 
-	        domainObjectName="ChangeCode" 
+        <table tableName="example_ref_method_chain" 
+	        domainObjectName="ExampleRefMethodChain" 
 	        enableCountByExample="false"         
 	        enableUpdateByExample="false" 
         	enableDeleteByExample="false" 

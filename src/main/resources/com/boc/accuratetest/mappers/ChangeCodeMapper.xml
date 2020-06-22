@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boc.accuratetest.mappers.ChangeCodeMapper">
+  <resultMap id="BaseResultMap" type="com.boc.accuratetest.pojo.ChangeCode">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="git_url" jdbcType="VARCHAR" property="gitUrl" />
+    <result column="package_name" jdbcType="VARCHAR" property="packageName" />
+    <result column="javabean_name" jdbcType="VARCHAR" property="javabeanName" />
+    <result column="method_name" jdbcType="VARCHAR" property="methodName" />
+    <result column="param_type" jdbcType="VARCHAR" property="paramType" />
+    <result column="change_type" jdbcType="TINYINT" property="changeType" />
+    <result column="method_body" jdbcType="VARCHAR" property="methodBody" />
+    <result column="testing_or_not" jdbcType="TINYINT" property="testingOrNot" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, git_url, package_name, javabean_name, method_name, param_type, change_type, method_body, 
+    testing_or_not
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from change_code
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from change_code
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.boc.accuratetest.pojo.ChangeCode">
+    insert into change_code (id, git_url, package_name, 
+      javabean_name, method_name, param_type, 
+      change_type, method_body, testing_or_not
+      )
+    values (#{id,jdbcType=INTEGER}, #{gitUrl,jdbcType=VARCHAR}, #{packageName,jdbcType=VARCHAR}, 
+      #{javabeanName,jdbcType=VARCHAR}, #{methodName,jdbcType=VARCHAR}, #{paramType,jdbcType=VARCHAR}, 
+      #{changeType,jdbcType=TINYINT}, #{methodBody,jdbcType=VARCHAR}, #{testingOrNot,jdbcType=TINYINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.boc.accuratetest.pojo.ChangeCode">
+    insert into change_code
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="gitUrl != null">
+        git_url,
+      </if>
+      <if test="packageName != null">
+        package_name,
+      </if>
+      <if test="javabeanName != null">
+        javabean_name,
+      </if>
+      <if test="methodName != null">
+        method_name,
+      </if>
+      <if test="paramType != null">
+        param_type,
+      </if>
+      <if test="changeType != null">
+        change_type,
+      </if>
+      <if test="methodBody != null">
+        method_body,
+      </if>
+      <if test="testingOrNot != null">
+        testing_or_not,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="gitUrl != null">
+        #{gitUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="packageName != null">
+        #{packageName,jdbcType=VARCHAR},
+      </if>
+      <if test="javabeanName != null">
+        #{javabeanName,jdbcType=VARCHAR},
+      </if>
+      <if test="methodName != null">
+        #{methodName,jdbcType=VARCHAR},
+      </if>
+      <if test="paramType != null">
+        #{paramType,jdbcType=VARCHAR},
+      </if>
+      <if test="changeType != null">
+        #{changeType,jdbcType=TINYINT},
+      </if>
+      <if test="methodBody != null">
+        #{methodBody,jdbcType=VARCHAR},
+      </if>
+      <if test="testingOrNot != null">
+        #{testingOrNot,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.boc.accuratetest.pojo.ChangeCode">
+    update change_code
+    <set>
+      <if test="gitUrl != null">
+        git_url = #{gitUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="packageName != null">
+        package_name = #{packageName,jdbcType=VARCHAR},
+      </if>
+      <if test="javabeanName != null">
+        javabean_name = #{javabeanName,jdbcType=VARCHAR},
+      </if>
+      <if test="methodName != null">
+        method_name = #{methodName,jdbcType=VARCHAR},
+      </if>
+      <if test="paramType != null">
+        param_type = #{paramType,jdbcType=VARCHAR},
+      </if>
+      <if test="changeType != null">
+        change_type = #{changeType,jdbcType=TINYINT},
+      </if>
+      <if test="methodBody != null">
+        method_body = #{methodBody,jdbcType=VARCHAR},
+      </if>
+      <if test="testingOrNot != null">
+        testing_or_not = #{testingOrNot,jdbcType=TINYINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.boc.accuratetest.pojo.ChangeCode">
+    update change_code
+    set git_url = #{gitUrl,jdbcType=VARCHAR},
+      package_name = #{packageName,jdbcType=VARCHAR},
+      javabean_name = #{javabeanName,jdbcType=VARCHAR},
+      method_name = #{methodName,jdbcType=VARCHAR},
+      param_type = #{paramType,jdbcType=VARCHAR},
+      change_type = #{changeType,jdbcType=TINYINT},
+      method_body = #{methodBody,jdbcType=VARCHAR},
+      testing_or_not = #{testingOrNot,jdbcType=TINYINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="page" resultMap="BaseResultMap">
+    select * from change_code
+    <if test="search != null">
+        method_name = #{search,jdbcType=VARCHAR}
+    </if>
+    <if test="dataOfPart == 0">
+    </if>
+    <if test="dataOfPart != 0">
+       where change_type = #{dataOfPart,jdbcType=TINYINT}
+    </if>
+    limit #{limit} , #{pageSize}
+  </select>
+  
+  <select id="findTotal" resultType="java.lang.Integer">
+    select count(*) from change_code
+    <if test="search != null">
+        where method_name = #{search,jdbcType=VARCHAR}
+    </if>
+    <if test="dataOfPart == 0">
+    </if>
+    <if test="dataOfPart != 0">
+       where change_type = #{dataOfPart,jdbcType=TINYINT}
+    </if>
+  </select>
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into change_code (git_url,package_name, javabean_name, 
+      method_name, param_type, change_type, method_body, testing_or_not)
+    values 
+    <foreach collection="list" index="index" item="item" separator=",">
+	    (#{item.gitUrl,jdbcType=VARCHAR},#{item.packageName,jdbcType=VARCHAR}, #{item.javabeanName,jdbcType=VARCHAR}, 
+	      #{item.methodName,jdbcType=VARCHAR}, #{item.paramType,jdbcType=VARCHAR}, #{item.changeType,jdbcType=TINYINT}, 
+	      #{item.methodBody,jdbcType=VARCHAR}, #{item.testingOrNot,jdbcType=TINYINT})
+    </foreach>
+  </insert>
+  <delete id="deleteByGitUrlAndBranchs" parameterType="java.lang.String">
+    delete from change_code
+    where git_url = #{gitUrlAndBranchs,jdbcType=VARCHAR}
+  </delete>
+  
+  <select id="countByChangeType" resultMap="BaseResultMap">
+    select change_type,COUNT(*) AS id from change_code GROUP BY change_type
+  </select>
+</mapper>

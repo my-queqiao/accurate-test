@@ -9,8 +9,8 @@
 		<version>2.1.4.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>springboot-saolei</artifactId>
+	<groupId>com.boc</groupId>
+	<artifactId>accurate-test</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>demo</name>
 	<description>Demo project for Spring Boot</description>
@@ -169,18 +169,7 @@
 		</execution>
 	</executions>
 </plugin>
-		
 		</plugins>
-		<!-- 不需要指定位置
-		<resources>
-            <resource>
-                <directory>src/main/java</directory>
-                <includes>                     
-                    <include>**/*.xml</include>
-                </includes>
-                <filtering>false</filtering>
-            </resource>
-        </resources> -->
 	</build>
 
 </project>

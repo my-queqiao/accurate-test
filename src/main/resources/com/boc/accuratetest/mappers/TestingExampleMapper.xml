@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boc.accuratetest.mappers.TestingExampleMapper">
+  <resultMap id="BaseResultMap" type="com.boc.accuratetest.pojo.TestingExample">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="testing_example_name" jdbcType="VARCHAR" property="testingExampleName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, testing_example_name
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from testing_example
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from testing_example
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.boc.accuratetest.pojo.TestingExample">
+    insert into testing_example (id, testing_example_name)
+    values (#{id,jdbcType=INTEGER}, #{testingExampleName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.boc.accuratetest.pojo.TestingExample">
+    insert into testing_example
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="testingExampleName != null">
+        testing_example_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="testingExampleName != null">
+        #{testingExampleName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.boc.accuratetest.pojo.TestingExample">
+    update testing_example
+    <set>
+      <if test="testingExampleName != null">
+        testing_example_name = #{testingExampleName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.boc.accuratetest.pojo.TestingExample">
+    update testing_example
+    set testing_example_name = #{testingExampleName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+    <select id="page" resultMap="BaseResultMap">
+    select * from testing_example
+    <if test="search != null">
+        testing_example_name = #{search,jdbcType=VARCHAR}
+    </if>
+    limit #{limit} , #{pageSize}
+  </select>
+  
+  <select id="findTotal" resultType="java.lang.Integer">
+    select count(*) from testing_example
+    <if test="search != null">
+        where testing_example_name = #{search,jdbcType=VARCHAR}
+    </if>
+  </select>
+</mapper>

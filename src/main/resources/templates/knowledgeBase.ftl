@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width" />
-    <title>精准测试</title>
+    <title>精准测试-知识库创建、查看</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css"/>
     <link rel="stylesheet" href="../css/bootstrap-table/bootstrap-table.css"/>
     <link rel="stylesheet" href="../css/font-awesome.min.css"/>
@@ -22,113 +22,48 @@
     -->
 </head>
 <body class="container-fiuled" style="background-color: aliceblue;">
+<div id="loading" style="color:blue; display:none; position:absolute;
+	    		top:22px; left:1em;z-index:9999;font-size: 25px;font-family: 宋体;" >上传成功</div>
     <div class="panel-body" style="padding-bottom:0px;">
 	    <div class="row text-center">
-	    	<span class="col-xs-8 " style="font-size: xx-large;">
-	    		<span style="margin-left: 45%;">精准测试项目</span>
-	    	</span>
-	    	<span class="col-xs-3 text-right" style="font-size:large;bottom:-20px;">
-	    		<a href="${request.contextPath}/coveragereport/index.html" target="_blank" style="margin-left: 60%;color: blue;
-	    			cursor: pointer;text-decoration:underline;float:left;">覆盖率报告</a>
-	    	</span>
-	    	<span class="col-xs-1 " style="font-size:large;bottom:-20px;">
-	    		<a href="${request.contextPath}/testingExample/knowledgeBase" target="_blank" style="margin-left: ;color: blue;
-	    			cursor: pointer;text-decoration:underline;float:left;">知识库</a>
-	    	</span>
-	    	
+	    	<!--  <span class="col-xs-8 " style="font-size: xx-large;position:fixed;top: 85px;">
+	    		<span style="margin-left: 45%;">知识库创建与查看</span>
+	    	</span>-->
 	    </div>
-	    <div id="loading" style="color:blue; display:none; position:absolute;
-	    		top:120px; left:12em;z-index:9999;font-size: 38px;font-family: 宋体;" >正在请求数据，请稍等...</div>
-        <div class="panel panel-default" style="height: 50px;">
-            <div class="panel-body">
-                <form id="formSearch" class="form-horizontal">
-                    <div class="form-group" style="margin-top:-6px">
-                        <label class="control-label col-sm-1" for="txt_search_departmentname">git仓库</label>
-                        <div class="col-sm-3" style="width:30%;">
-                            <input type="text" class="form-control" id="git_url" onBlur=getBranchs(this)>
-                        </div>
-                        <label class="control-label col-sm-1" for="txt_search_statu">稳定分支</label>
-                        <div class="col-sm-2" style="width:12%;">
-                            <select id="master_branch" class="form-control">
-								<option value=""></option>
-							</select>
-                        </div>
-                        <label class="control-label col-sm-1" for="txt_search_statu">测试分支</label>
-                        <div class="col-sm-2" style="width:12%;">
-                        	<select id="test_branch" class="form-control">
-								<option value=""></option>
-							</select>
-                        </div>
-                        <div class="col-sm-2" style="text-align:left;">
-                            <button type="button" style="margin-left:50px" id="btn_query" class="btn btn-primary">获取变更代码</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <!--  
-        <div id="toolbar" class="btn-group">
-            <button id="btn_add" type="button" class="btn btn-success">
-                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
-            </button>
-            <button id="btn_edit" type="button" class="btn btn-primary">
-                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>修改
-            </button>
-            <button id="btn_delete" type="button" class="btn btn-danger">
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>删除
-            </button>
-        </div>
-        -->
-        
-        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                    <h4 class="modal-title" id="myModalLabel">方法详情</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <div id="methodDetail"></div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- 用于列表点击下一页时传值，点击button按钮时赋值 -->
-        <input id="dataOfPart" value="1" style="display:none;"/>
-        <div>
-        	<span style="font-size: 18px;">方法变更统计：</span>
-            <a id="btn_add" class="btn btn-success">
-                <span>新增：0个</span>
-            </a>
-            <a id="btn_edit" class="btn btn-primary">
-                <span>修改：0个</span>
-            </a>
-            <a id="btn_delete" class="btn btn-danger">
-                <span>删除：0个</span>
-            </a>
-            <a id="btn_all" class="btn btn-info">
-                <span>总计：0个</span>
-            </a>
-        </div>
-        <table id="tb_departments"></table>
+	    <div class="row text-center">
+	    	<div class="col-xs-3" style="position:fixed;top: 15px;">
+	    		<button style="background-color: #5cb85c;color: white;" onclick="guanlian()">确认关联</button>
+		        <table id="tb_testingExample"></table>
+	    	</div>
+	    	<div class="col-xs-3">
+	    	</div>
+	    	<div class="col-xs-9">
+	    		<form style=""
+	    			action="${request.contextPath}/testingExample/upload" method="post" enctype="multipart/form-data">
+					<input type="file" name="file" style="float: left;" required/>
+					<input type="submit" value="上传记录方法链的文件"	style="margin-left: -50%;"/>
+				</form>
+		        <table id="tb_methodChainOriginal"></table>
+	    	</div>
+	    </div>
     </div>
     <script>
+    if(true == ${success}){
+		alert("上传成功");
+    }else if(false == ${success}){
+		alert("上传失败");
+    }
     $(function () {
-
+    	/*方法链*/
+    	var tfte = TableInit_forTestingExample();
+    	tfte.Init();
+    	/*测试用例列表*/
         //1.初始化Table
         var oTable = new TableInit();
         oTable.Init();
-        
         //2.初始化Button的点击事件
         var oButtonInit = new ButtonInit();
         oButtonInit.Init();
-        // 统计方法的增删改的个数
-        statistics();
     });
 
 
@@ -136,8 +71,8 @@
         var oTableInit = new Object();
         //初始化Table
         oTableInit.Init = function () {
-            $('#tb_departments').bootstrapTable({
-                url: '/changeCode/getAll',         //请求后台的URL（*）
+            $('#tb_testingExample').bootstrapTable({
+                url: '/testingExample/getAll',         //请求后台的URL（*）
                 method: 'get',                      //请求方式（*）
                 dataType: 'json',  
                 toolbar: '#toolbar',                //工具按钮用哪个容器
@@ -158,8 +93,8 @@
                 search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
                 strictSearch: true,
                 minimumCountColumns: 2,             //最少允许的列数
-                singleSelect: false,                 //是否单选模式
-                height: $(window).height() - 200,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                singleSelect: true,                 //是否单选模式
+                height: $(window).height()-100,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
                 showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
                 cardView: false,                    //是否显示详细视图
                 detailView: false,                   //是否显示父子表
@@ -172,43 +107,16 @@
                 columns: [{
                     checkbox: true
                 }, 
-                /* {
+                {
                     field: 'id',
                     title: '主键id'
-                }, */
+                },
                 {
-                    field: 'packageName',
-                    title: '包路径', //align: 'center'
+                    field: 'testingExampleName',
+                    title: '测试用例名称', //align: 'center'
                 	//events: operateEvents1
                 	//formatter: operateFormatter1
-                }, 
-                {
-                    field: 'javabeanName',
-                    title: '类',
-                }, 
-                {
-                    field: 'methodName',
-                    title: '方法',
-                    formatter: methodNameFormatter
-                }, 
-                {
-                    field: 'paramType',
-                    title: '参数类型',
-                }, 
-                {
-                    field: 'changeType',
-                    title: '变更类型',
-                    formatter: changeTypeFormatter
-                }, 
-                {
-                    field: 'testingOrNot',
-                    title: '是否已完成测试',
-                    formatter: testOrNotFormatter
-                }, 
-                {
-                    field: 'testingOrNot',
-                    title: '关联测试用例',
-                }, 
+                } 
                 ]
             });
         };
@@ -219,15 +127,14 @@
             //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
     　　　　　// 如果queryParamsType=limit,params包含{limit, offset, search, sort, order}
     　　　　　// 如果queryParamsType!=limit,params包含{pageSize, pageNumber, searchText, sortName, sortOrder}
-            var temp = {   
+            var temp = {
                 pageSize: params.pageSize,   //页面大小
                 pageNumber: params.pageNumber,  //页码
-                dataOfPart: $("#dataOfPart").val(),
+                departmentname: $("#txt_search_departmentname").val(),
                 statu: $("#txt_search_statu").val()
             };
             return temp;
         };
-        //var tb_rows=$('#tb_departments').bootstrapTable("getData").length; // 总行数
         return oTableInit;
     };
     /**function operateFormatter(value, row, index) {
@@ -255,19 +162,7 @@
     function method_body_details(id){
     	for(j = 0; j < list.length; j++) {
     		if(list[j].id == id){
-    			var md = list[j].methodBody;
-    			var reg = new RegExp("\n","g");//g,表示全部替换。
-    			var md2 = md.replace(reg,"<br>");
-	    		$('#myModal').on('show.bs.modal', function (event) {
-	           	 //var a = $(event.relatedTarget) // a that triggered the modal
-	           	 //var id = a.data('id'), title = a.data('title'), description = a.data('description'); 
-	           	 var modal = $(this);
-	           	 //modal.find('#cm-modal-title').val(title);
-	           	 modal.find('#methodDetail').html(md2);
-	           	});
-	           $("#myModalLabel").text("方法详情");
-	           $('#myModal').modal();
-	    		
+	    		alert(list[j].methodBody);
 	    		break;
     		}
     	}
@@ -325,54 +220,65 @@
     var ButtonInit = function () {
         var oInit = new Object();
         var postdata = {};
-		
+
         oInit.Init = function () {
             $("#btn_add").click(function () {
-            	 var opt = {
-            		        url: "/changeCode/getAll",
-            		        silent: true,
-            		        query:{
-            		            dataOfPart:1,
-            		        }
-            		    };
-                $("#tb_departments").bootstrapTable('refresh',opt);//带参数 刷新
-                $("#dataOfPart").val(1);
+                alert("add")
             });
 
             $("#btn_edit").click(function () {
-               	 var opt = {
-               		        url: "/changeCode/getAll",
-               		        silent: true,
-               		        query:{
-               		            dataOfPart:3,
-               		        }
-               		    };
-                $("#tb_departments").bootstrapTable('refresh',opt);//带参数 刷新
-                $("#dataOfPart").val(3);
+                var arrselections = $("#tb_departments").bootstrapTable('getSelections');
+                if (arrselections.length > 1) {
+                    alert('只能选择一行进行编辑');
+
+                    return;
+                }
+                if (arrselections.length <= 0) {
+                    alert('请选择有效数据');
+                    return;
+                }
+                alert("edit")
+                //$("#myModalLabel").text("编辑");
+                //$("#txt_departmentname").val(arrselections[0].DEPARTMENT_NAME);
+                //$("#txt_parentdepartment").val(arrselections[0].PARENT_ID);
+                //$("#txt_departmentlevel").val(arrselections[0].DEPARTMENT_LEVEL);
+                //$("#txt_statu").val(arrselections[0].STATUS);
+
+                //postdata.DEPARTMENT_ID = arrselections[0].DEPARTMENT_ID;
+                //$('#myModal').modal();
             });
 
             $("#btn_delete").click(function () {
-                  	 var opt = {
-                  		        url: "/changeCode/getAll",
-                  		        silent: true,
-                  		        query:{
-                  		            dataOfPart:2,
-                  		        }
-                  		    };
-                $("#tb_departments").bootstrapTable('refresh',opt);//带参数 刷新
-                $("#dataOfPart").val(2);
+                var arrselections = $("#tb_departments").bootstrapTable('getSelections');
+                if (arrselections.length <= 0) {
+                    alert('请选择有效数据');
+                    return;
+                }
+
+                Ewin.confirm({ message: "确认要删除选择的数据吗？" }).on(function (e) {
+                    if (!e) {
+                        return;
+                    }
+                    $.ajax({
+                        type: "post",
+                        url: "/Home/Delete",
+                        data: { "": JSON.stringify(arrselections) },
+                        success: function (data, status) {
+                            if (status == "success") {
+                                toastr.success('提交数据成功');
+                                $("#tb_departments").bootstrapTable('refresh');
+                            }
+                        },
+                        error: function () {
+                            toastr.error('Error');
+                        },
+                        complete: function () {
+
+                        }
+
+                    });
+                });
             });
-           	$("#btn_all").click(function () {
-                     	 var opt = {
-                     		        url: "/changeCode/getAll",
-                     		        silent: true,
-                     		        query:{
-                     		            dataOfPart:0,
-                     		        }
-                     		    };
-                   $("#tb_departments").bootstrapTable('refresh',opt);//带参数 刷新
-                   $("#dataOfPart").val(0);
-               });
 
             $("#btn_submit").click(function () {
                 //postdata.DEPARTMENT_NAME = $("#txt_departmentname").val();
@@ -466,27 +372,98 @@
     				}
 		});
     }
-    function zhishiku(){
-    	
-    }
-    function statistics(){
-    	$.post('/changeCode/statistics',
-			function(json){
-   				//alert(json.data);
-   				var ccs = json.data;
-   				var heji = 0;
-   				for(var i = 0;i<ccs.length;i++){
-   					var cc = ccs[i];
-   					if(cc.changeType == 1){
-   						$("#btn_add").html("<span>新增："+cc.id+"个</span>");
-   					}else if(cc.changeType == 2){
-   						$("#btn_delete").html("<span>删除："+cc.id+"个</span>");
-   					}else if(cc.changeType == 3){
-   						$("#btn_edit").html("<span>修改："+cc.id+"个</span>");
-   					}
-   					heji = heji + cc.id;
-   				}
-   				$("#btn_all").html("<span>总计："+heji+"个</span>");
+    
+    var TableInit_forTestingExample = function () {
+        var oTableInit = new Object();
+        //初始化Table
+        oTableInit.Init = function () {
+            $('#tb_methodChainOriginal').bootstrapTable({
+                url: '/testingExample/getAllMethodChainOriginal',         //请求后台的URL（*）
+                method: 'get',                      //请求方式（*）
+                dataType: 'json',  
+                toolbar: '#toolbar',                //工具按钮用哪个容器
+                theadClasses:'.thead-light',
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                showPaginationSwitch: false,        //是否显示分页数
+                sortable: false,                     //是否启用排序
+                sortName: "title",                     //是否启用排序
+                sortOrder: "desc",                   //排序方式
+                queryParams: oTableInit.queryParams,//传递参数（*）
+                queryParamsType: '',                //如果要在oTableInit.queryParams方法获取pageNumber和pageSize的值，需要将此值设置为空字符串（*）
+                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber:1,                       //初始化加载第一页，默认第一页
+                pageSize: 10000,                       //每页的记录行数（*）
+                pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                strictSearch: true,
+                minimumCountColumns: 2,             //最少允许的列数
+                singleSelect: false,                 //是否单选模式
+                //height: $(window).height()-200,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: false,                   //是否显示父子表
+                showColumns: false,                  //是否显示所有的列
+                uniqueId: "ID",                     //每一行的唯一标识，一般为主键列
+                showRefresh: false,                  //是否显示刷新按钮
+                clickToSelect: true,                //是否启用点击选中行
+                paginationPreText: "上一页",
+                paginationNextText: "下一页",
+                columns: [{
+                    checkbox: true
+                }, 
+                {
+                    field: 'id',
+                    title: '主键id'
+                },
+                {
+                    field: 'packageUrl',
+                    title: '包路径', //align: 'center'
+                	//events: operateEvents1
+                	//formatter: operateFormatter1
+                } 
+                ]
+            });
+        };
+
+        //得到查询的参数
+        oTableInit.queryParams = function (params) {
+            // 特别说明：
+            //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+    　　　　　// 如果queryParamsType=limit,params包含{limit, offset, search, sort, order}
+    　　　　　// 如果queryParamsType!=limit,params包含{pageSize, pageNumber, searchText, sortName, sortOrder}
+            var temp = {   
+                pageSize: params.pageSize,   //页面大小
+                pageNumber: params.pageNumber,  //页码
+                departmentname: $("#txt_search_departmentname").val(),
+                statu: $("#txt_search_statu").val()
+            };
+            return temp;
+        };
+        return oTableInit;
+    };
+    function guanlian(){
+    	var arrselections1 = $("#tb_testingExample").bootstrapTable('getSelections'); // 测试用例列表
+    	var arrselections2 = $("#tb_methodChainOriginal").bootstrapTable('getSelections'); // 方法链
+        if (arrselections1.length > 1) {
+            alert('只能选择一行进行编辑');
+            return;
+        }
+        if (arrselections1.length <= 0 || arrselections2.length <= 0) {
+            alert('请选择有效数据');
+            return;
+        }
+        var ms = [];
+        for(var i=0;i<arrselections2.length;i++){
+        	ms.push(arrselections2[i].id);
+        }
+        
+        var testingExampleId = arrselections1[0].id;
+        var methodChainOriginalId = JSON.stringify(ms);
+        $.post('/testingExample/exampleLinkMethodChain?testingExampleId='+testingExampleId+'&methodChainOriginalId='+methodChainOriginalId,
+				function(json){
+        	
 		});
     }
     </script>

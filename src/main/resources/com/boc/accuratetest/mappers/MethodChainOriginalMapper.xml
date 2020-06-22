@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boc.accuratetest.mappers.MethodChainOriginalMapper">
+  <resultMap id="BaseResultMap" type="com.boc.accuratetest.pojo.MethodChainOriginal">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="package_url" jdbcType="VARCHAR" property="packageUrl" />
+    <result column="javabean_name" jdbcType="VARCHAR" property="javabeanName" />
+    <result column="method_name" jdbcType="VARCHAR" property="methodName" />
+    <result column="param_type" jdbcType="VARCHAR" property="paramType" />
+    <result column="call_time" jdbcType="VARCHAR" property="callTime" />
+    <result column="call_time_long" jdbcType="BIGINT" property="callTimeLong" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, package_url, javabean_name, method_name, param_type, call_time, call_time_long
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from method_chain_original
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from method_chain_original
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.boc.accuratetest.pojo.MethodChainOriginal">
+    insert into method_chain_original (id, package_url, javabean_name, 
+      method_name, param_type, call_time, 
+      call_time_long)
+    values (#{id,jdbcType=INTEGER}, #{packageUrl,jdbcType=VARCHAR}, #{javabeanName,jdbcType=VARCHAR}, 
+      #{methodName,jdbcType=VARCHAR}, #{paramType,jdbcType=VARCHAR}, #{callTime,jdbcType=VARCHAR}, 
+      #{callTimeLong,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.boc.accuratetest.pojo.MethodChainOriginal">
+    insert into method_chain_original
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="packageUrl != null">
+        package_url,
+      </if>
+      <if test="javabeanName != null">
+        javabean_name,
+      </if>
+      <if test="methodName != null">
+        method_name,
+      </if>
+      <if test="paramType != null">
+        param_type,
+      </if>
+      <if test="callTime != null">
+        call_time,
+      </if>
+      <if test="callTimeLong != null">
+        call_time_long,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="packageUrl != null">
+        #{packageUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="javabeanName != null">
+        #{javabeanName,jdbcType=VARCHAR},
+      </if>
+      <if test="methodName != null">
+        #{methodName,jdbcType=VARCHAR},
+      </if>
+      <if test="paramType != null">
+        #{paramType,jdbcType=VARCHAR},
+      </if>
+      <if test="callTime != null">
+        #{callTime,jdbcType=VARCHAR},
+      </if>
+      <if test="callTimeLong != null">
+        #{callTimeLong,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.boc.accuratetest.pojo.MethodChainOriginal">
+    update method_chain_original
+    <set>
+      <if test="packageUrl != null">
+        package_url = #{packageUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="javabeanName != null">
+        javabean_name = #{javabeanName,jdbcType=VARCHAR},
+      </if>
+      <if test="methodName != null">
+        method_name = #{methodName,jdbcType=VARCHAR},
+      </if>
+      <if test="paramType != null">
+        param_type = #{paramType,jdbcType=VARCHAR},
+      </if>
+      <if test="callTime != null">
+        call_time = #{callTime,jdbcType=VARCHAR},
+      </if>
+      <if test="callTimeLong != null">
+        call_time_long = #{callTimeLong,jdbcType=BIGINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.boc.accuratetest.pojo.MethodChainOriginal">
+    update method_chain_original
+    set package_url = #{packageUrl,jdbcType=VARCHAR},
+      javabean_name = #{javabeanName,jdbcType=VARCHAR},
+      method_name = #{methodName,jdbcType=VARCHAR},
+      param_type = #{paramType,jdbcType=VARCHAR},
+      call_time = #{callTime,jdbcType=VARCHAR},
+      call_time_long = #{callTimeLong,jdbcType=BIGINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <select id="getAll" resultMap="BaseResultMap">
+    select *
+    from method_chain_original
+  </select>
+  <select id="findTotal" resultType="java.lang.Integer">
+    select count(*)
+    from method_chain_original
+  </select>
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into method_chain_original (package_url, javabean_name, 
+      method_name, param_type, call_time, call_time_long)
+    values 
+    <foreach collection="list" index="index" item="item" separator=",">
+	    (#{item.packageUrl,jdbcType=VARCHAR}, #{item.javabeanName,jdbcType=VARCHAR}, 
+      #{item.methodName,jdbcType=VARCHAR}, #{item.paramType,jdbcType=VARCHAR}, #{item.callTime,jdbcType=VARCHAR}, 
+      #{item.callTimeLong,jdbcType=BIGINT})
+    </foreach>
+  </insert>
+  
+</mapper>
