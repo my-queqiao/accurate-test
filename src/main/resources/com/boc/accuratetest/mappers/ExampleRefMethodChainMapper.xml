@@ -30,4 +30,17 @@
       </if>
     </trim>
   </insert>
+  
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into example_ref_method_chain (testing_example_id, method_chain_original_id)
+    values 
+    <foreach collection="list" index="index" item="item" separator=",">
+	    (#{item.testingExampleId,jdbcType=INTEGER}, #{item.methodChainOriginalId,jdbcType=INTEGER})
+    </foreach>
+  </insert>
+  
+  <delete id="deleteByTestingExampleId" parameterType="java.lang.Integer">
+  	delete from example_ref_method_chain where testing_example_id = #{testingExampleId}
+  </delete>
+  
 </mapper>

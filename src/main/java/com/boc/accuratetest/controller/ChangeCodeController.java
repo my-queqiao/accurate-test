@@ -179,10 +179,10 @@ public class ChangeCodeController {
 		for (JSONObject js : values) {
 			ChangeCode cc = new ChangeCode();
 			cc.setGitUrl(gitUrl);
-			cc.setPackageName(js.getString("package").replace("/", "."));
+			cc.setPackageName(js.getString("package_name").replace("\\", "."));
 			cc.setJavabeanName(js.getString("class_name"));
 			cc.setMethodName(js.getString("func_name"));
-			JSONArray jsonArray = js.getJSONArray("args");
+			JSONArray jsonArray = js.getJSONArray("agrs");
 			if(jsonArray.isEmpty()) {
 				cc.setParamType("");
 			}else if(jsonArray.size() == 1){

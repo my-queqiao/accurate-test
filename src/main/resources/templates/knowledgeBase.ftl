@@ -48,9 +48,10 @@
 	    </div>
     </div>
     <script>
-    if(true == ${success}){
+    var suc2 = "${success}";
+    if("uploadSuccess" == suc2){
 		alert("上传成功");
-    }else if(false == ${success}){
+    }else if("uploadFail" == suc2){
 		alert("上传失败");
     }
     $(function () {
@@ -395,7 +396,7 @@
                 sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
                 pageNumber:1,                       //初始化加载第一页，默认第一页
                 pageSize: 10000,                       //每页的记录行数（*）
-                pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                pageList: [10000],        //可供选择的每页的行数（*）
                 search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
                 strictSearch: true,
                 minimumCountColumns: 2,             //最少允许的列数
@@ -414,15 +415,27 @@
                     checkbox: true
                 }, 
                 {
-                    field: 'id',
-                    title: '主键id'
+                    field: 'callTime',
+                    title: '调用时间(正序)'
                 },
                 {
                     field: 'packageUrl',
                     title: '包路径', //align: 'center'
                 	//events: operateEvents1
                 	//formatter: operateFormatter1
-                } 
+                },
+                {
+                    field: 'javabeanName',
+                    title: '类',
+                } ,
+                {
+                    field: 'methodName',
+                    title: '方法名',
+                },
+                {
+                    field: 'paramType',
+                    title: '参数类型',
+                }   
                 ]
             });
         };
@@ -460,10 +473,23 @@
         }
         
         var testingExampleId = arrselections1[0].id;
-        var methodChainOriginalId = JSON.stringify(ms);
-        $.post('/testingExample/exampleLinkMethodChain?testingExampleId='+testingExampleId+'&methodChainOriginalId='+methodChainOriginalId,
+        //var methodChainOriginalIds = JSON.stringify(ms); // 大概是tomcat版本的原因，后台接收数组时报错
+        var methodChainOriginalIds	=	"";
+        for(var i=0;i<ms.length;i++){
+        	methodChainOriginalIds+=ms[i];
+        	if(i != ms.length-1){
+        		methodChainOriginalIds+=",";
+        	}
+        }
+        $.post('/testingExample/exampleLinkMethodChain?testingExampleId='+testingExampleId
+        		+'&methodChainOriginalIds='+methodChainOriginalIds,
 				function(json){
-        	
+        			if(json.success == true){
+        				alert("关联成功");
+        				window.location.href='/testingExample/knowledgeBase';
+        			}else{
+        				alert("关联失败");
+        			}
 		});
     }
     </script>

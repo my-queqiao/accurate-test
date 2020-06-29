@@ -26,9 +26,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.boc.accuratetest.annotation.SecurityIgnoreHandler;
 import com.boc.accuratetest.biz.MethodChainOriginalBiz;
 import com.boc.accuratetest.biz.TestingExampleBiz;
+import com.boc.accuratetest.pojo.ExampleRefMethodChain;
 import com.boc.accuratetest.pojo.MethodChainOriginal;
 import com.boc.accuratetest.pojo.TestingExample;
-
+import com.boc.accuratetest.biz.ExampleRefMethodChainBiz;
 import net.sf.json.JSONObject;
 
 @Controller
@@ -38,6 +39,8 @@ public class TestingExampleController {
 	private TestingExampleBiz testingExampleBiz;
 	@Autowired
 	private MethodChainOriginalBiz methodChainOriginalBiz;
+	@Autowired
+	private ExampleRefMethodChainBiz exampleRefMethodChainBiz;
 	
 	/**
 	 * 	跳转到知识库页面
@@ -78,7 +81,7 @@ public class TestingExampleController {
 	@SecurityIgnoreHandler
 	@PostMapping("/upload")
     public String upload(@RequestParam("file") MultipartFile file,RedirectAttributes model) {
-		model.addFlashAttribute("success", false);
+		model.addFlashAttribute("success", "uploadFail");
         if (file.isEmpty() || !file.getOriginalFilename().endsWith(".txt")) {
         	return "redirect:/testingExample/knowledgeBase";
         }
@@ -90,7 +93,7 @@ public class TestingExampleController {
 			reader = new BufferedReader(new InputStreamReader(inputStream));
 			String tempStr = null;
 			while(null != ( tempStr=reader.readLine() ) ) {
-				if(tempStr.length() > 13) { // 改行确定有内容，不仅仅含有一个回车符
+				if(tempStr.length() > 13) { // 该行确定有内容，不仅仅含有一个换行符
 					MethodChainOriginal m = insertPrepare(tempStr);
 					ms.add(m);
 				}
@@ -106,7 +109,7 @@ public class TestingExampleController {
 			} catch (IOException e) {
 			}
 		}
-        model.addFlashAttribute("success", true);
+        model.addFlashAttribute("success", "uploadSuccess");
         return "redirect:/testingExample/knowledgeBase";
     }
 	private MethodChainOriginal insertPrepare(String tempStr) {
@@ -145,13 +148,37 @@ public class TestingExampleController {
 		return json;
 	}
 	/**
-	 * 	测试用例关联方法链
+	 * 	测试用例关联方法链（建立知识库）
+	 * @param testingExampleId	测试用例表主键
+	 * @param methodChainOriginalIds	稳定版代码的方法链主键
+	 * @return 
 	 */
 	@SecurityIgnoreHandler
 	@RequestMapping("exampleLinkMethodChain")
 	@ResponseBody
-	public void exampleLinkMethodChain() {
-		
+	public JSONObject exampleLinkMethodChain(String testingExampleId,String methodChainOriginalIds) {
+		JSONObject json = new JSONObject();
+		try {
+			// 如果该测试用例已关联方法链，先取消关联
+			exampleRefMethodChainBiz.deleteByTestingExampleId(Integer.valueOf(testingExampleId));
+			
+			String[] methodChainOriginalIds2 = methodChainOriginalIds.split(",");
+			// 测试用例关联方法链，建立知识库
+			List<ExampleRefMethodChain> refs = new ArrayList<>();
+			for(String id:methodChainOriginalIds2) {
+				ExampleRefMethodChain ref = new ExampleRefMethodChain();
+				ref.setTestingExampleId(Integer.valueOf(testingExampleId));
+				ref.setMethodChainOriginalId(Integer.valueOf(id));
+				refs.add(ref);
+			}
+			// 存储
+			exampleRefMethodChainBiz.insertBatch(refs);
+		} catch (Exception e) {
+			e.printStackTrace();
+			json.put("success", false);
+		}
+		json.put("success", true);
+	    return json;
 	}
 }
 

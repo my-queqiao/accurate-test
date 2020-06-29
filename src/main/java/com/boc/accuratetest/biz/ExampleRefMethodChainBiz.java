@@ -1,15 +1,13 @@
-package com.boc.accuratetest.mappers;
+package com.boc.accuratetest.biz;
 
 import java.util.List;
 
 import com.boc.accuratetest.pojo.ExampleRefMethodChain;
 
-public interface ExampleRefMethodChainMapper {
-    int insert(ExampleRefMethodChain record);
-
-    int insertSelective(ExampleRefMethodChain record);
+public interface ExampleRefMethodChainBiz {
 
 	void insertBatch(List<ExampleRefMethodChain> refs);
 
 	void deleteByTestingExampleId(Integer testingExampleId);
+
 }

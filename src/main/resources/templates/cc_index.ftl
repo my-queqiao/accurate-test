@@ -421,6 +421,7 @@
             		getData_after();
             				alert(json.res);
             				if(json.success == true){
+            					statistics();
 	                			$("#tb_departments").bootstrapTable('refresh');
             				}
         		});

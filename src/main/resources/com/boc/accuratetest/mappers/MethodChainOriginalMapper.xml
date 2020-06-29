@@ -120,7 +120,7 @@
   </select>
   <select id="findTotal" resultType="java.lang.Integer">
     select count(*)
-    from method_chain_original
+    from method_chain_original order by call_time_long asc
   </select>
   <insert id="insertBatch" parameterType="java.util.List">
     insert into method_chain_original (package_url, javabean_name, 
