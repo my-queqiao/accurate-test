@@ -31,20 +31,36 @@
 	    	</span>-->
 	    </div>
 	    <div class="row text-center">
-	    	<div class="col-xs-3" style="position:fixed;top: 15px;">
-	    		<button style="background-color: #5cb85c;color: white;" onclick="guanlian()">确认关联</button>
-		        <table id="tb_testingExample"></table>
-	    	</div>
-	    	<div class="col-xs-3">
-	    	</div>
-	    	<div class="col-xs-9">
+	    	<div class="col-xs-12" style="">
 	    		<form style=""
 	    			action="${request.contextPath}/testingExample/upload" method="post" enctype="multipart/form-data">
 					<input type="file" name="file" style="float: left;" required/>
-					<input type="submit" value="上传记录方法链的文件"	style="margin-left: -50%;"/>
+					<input type="submit" value="上传测试用例（文件类型xls）"	style="margin-left: -45%;"/>
 				</form>
-		        <table id="tb_methodChainOriginal"></table>
+		        <table id="tb_testingExample"></table>
 	    	</div>
+	    	
+	    </div>
+	    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	        <div class="modal-dialog" role="document">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+	                    <h4 class="modal-title" id="myModalLabel">该测试用例对应的服务器ip地址：</h4>
+	                </div>
+	                <div class="modal-body">
+	                    <div class="form-group">
+	                        <input id="testExampleIp" placeholder="#.#.#.#" />
+	                    </div>
+	                </div>
+	                <div class="modal-footer">
+	                	<button type="button" id="btn_save" class="btn btn-primary" data-dismiss="modal">
+	                		<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>保存</button>
+	                    <button type="button" class="btn btn-default" data-dismiss="modal">
+	                    	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
+	                </div>
+	            </div>
+	        </div>
 	    </div>
     </div>
     <script>
@@ -55,10 +71,6 @@
 		alert("上传失败");
     }
     $(function () {
-    	/*方法链*/
-    	var tfte = TableInit_forTestingExample();
-    	tfte.Init();
-    	/*测试用例列表*/
         //1.初始化Table
         var oTable = new TableInit();
         oTable.Init();
@@ -110,14 +122,24 @@
                 }, 
                 {
                     field: 'id',
-                    title: '主键id'
+                    title: '主键id',
+                    align: 'center',
                 },
                 {
                     field: 'testingExampleName',
                     title: '测试用例名称', //align: 'center'
-                	//events: operateEvents1
-                	//formatter: operateFormatter1
-                } 
+                    align: 'center',
+                	//events: operateEvents1,
+                	formatter: operateFormatter
+                }
+                ,
+                {
+                    field: '',
+                    title: '操作', //align: 'center'
+                    align: 'center',
+                	//events: operateEvents1,
+                	formatter: operateFormatter1
+                }
                 ]
             });
         };
@@ -138,13 +160,64 @@
         };
         return oTableInit;
     };
-    /**function operateFormatter(value, row, index) {
+    function operateFormatter(value, row, index) {
     	return [
-    	'<div id="btn_detail" type="button" class="RoleOfA btn-default bt-select">详情/div>',  
-    	].join('');
-    		'<a title="查看方法变更详情" onclick="method_body_details(\''+row.methodBody+'\')"'
-    }*/
-
+    		"<a title='查看关联的方法链' 	onclick='method_body_details("+row.id+")'"
+    		+"style='background-color: ;cursor: pointer;text-decoration:underline;'>"+value+"</a>",  
+    		].join("");
+    }
+    function operateFormatter1(value, row, index) {
+    	return [
+    		"<a class='btn btn-success' id='"+row.id+"start"+"' onclick='startTestExample("+row.id+");'>开始执行</a>"
+    		+"&nbsp&nbsp&nbsp&nbsp<a class='btn btn-success' id='"+row.id+"end"+"' onclick='endTestExample("+row.id+");'>结束</a>",  
+    		].join("");
+    }
+    var currentTestExampleId; // 当前正在操作的用例id
+    var testExampleIp2; // 当前用例对应的服务器ip
+    function checkIp(ip) {
+        var strRegex = '[0-9]+\.{1}[0-9]+\.{1}[0-9]+\.{1}[0-9]+'; // 22.11.3.23.adf.df也可以匹配。
+        return new RegExp(strRegex).test(ip);
+    }
+    $("#btn_save").click(function(){ 
+    	var testExampleIp = $("#testExampleIp").val();
+    	if(null != testExampleIp  && null != currentTestExampleId) {
+    		if(checkIp(testExampleIp)){
+    			sendStart(testExampleIp);
+    		}else{
+    			alert("ip地址格式有误");
+    		}
+    	}
+    });
+	function startTestExample(id){
+		currentTestExampleId = id;
+		$("#myModalLabel").text("请输入 该测试用例所在的服务器ip地址：");
+        $('#myModal').modal();
+	}
+	function sendStart(testExampleIp){
+		$.post('/testingExample/testExampleStart?testExampleId='+currentTestExampleId+'&ipOnTestExample='+testExampleIp,
+				function(json){
+    				if(json.success == true){
+    					testExampleIp2 = testExampleIp;
+    					alert("开始成功");
+            			//$("#tb_departments").bootstrapTable('refresh');
+            			$("#"+currentTestExampleId+"start").html("执行中。。");
+    				}else{
+    					alert("开始失败");
+    				}
+		});
+	}
+	function endTestExample(id){
+		$.post('/testingExample/testExampleEnd?testExampleId='+id+'&ipOnTestExample='+testExampleIp2,
+			function(json){
+   				if(json.success == true){
+   					alert("结束成功");
+           			//$("#tb_departments").bootstrapTable('refresh');
+           			$("#"+currentTestExampleId+"end").html("已结束");
+   				}else{
+   					alert("结束失败");
+   				}
+		});
+	}
     var list = []; // 数组，存放bootstrap-table的行数据。
     var ids = []; // 存放行数据的id
     function methodNameFormatter(value, row, index) {
@@ -336,162 +409,7 @@
 
         return oInit;
     };
-    function getData_before(){
-    	$("#git_url").attr("disabled", "disabled");
-    	$("#btn_query").attr("disabled", "disabled");
-    	$("#loading").show();
-    }
-	function getData_after(){
-		$("#git_url").attr("disabled", false);
-		$("#btn_query").attr("disabled", false);
-		$("#loading").hide();
-    }
-    function getBranchs(obj){
-    	if(obj.value == ""){
-    		alert("git仓库不能为空");
-    		return;
-    	}
-    	getData_before();
-    	$.ajaxSettings.async = true; //异步,默认就是异步
-    	$.post('/changeCode/getBranchList?git_url='+obj.value,
-				function(json){
-    		getData_after();
-    				if(json.success == false){
-    					alert(json.res);
-    				}else{
-    					var data = json.list;
-    					var opt=$("<option value='0' selected>请选择</option>");
-    					var opt2=$("<option value='0' selected>请选择</option>");
-			            $("#master_branch").append(opt);
-    			        $("#test_branch").append(opt2);
-    					$.each(data,function(index,item){
-    			            var opt=$("<option value="+item+">"+item+"</option>");
-    			            var opt2=$("<option value="+item+">"+item+"</option>");
-    			            $("#master_branch").append(opt);
-    			            $("#test_branch").append(opt2);
-    			        });
-    				}
-		});
-    }
     
-    var TableInit_forTestingExample = function () {
-        var oTableInit = new Object();
-        //初始化Table
-        oTableInit.Init = function () {
-            $('#tb_methodChainOriginal').bootstrapTable({
-                url: '/testingExample/getAllMethodChainOriginal',         //请求后台的URL（*）
-                method: 'get',                      //请求方式（*）
-                dataType: 'json',  
-                toolbar: '#toolbar',                //工具按钮用哪个容器
-                theadClasses:'.thead-light',
-                striped: true,                      //是否显示行间隔色
-                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
-                pagination: true,                   //是否显示分页（*）
-                showPaginationSwitch: false,        //是否显示分页数
-                sortable: false,                     //是否启用排序
-                sortName: "title",                     //是否启用排序
-                sortOrder: "desc",                   //排序方式
-                queryParams: oTableInit.queryParams,//传递参数（*）
-                queryParamsType: '',                //如果要在oTableInit.queryParams方法获取pageNumber和pageSize的值，需要将此值设置为空字符串（*）
-                sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
-                pageNumber:1,                       //初始化加载第一页，默认第一页
-                pageSize: 10000,                       //每页的记录行数（*）
-                pageList: [10000],        //可供选择的每页的行数（*）
-                search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
-                strictSearch: true,
-                minimumCountColumns: 2,             //最少允许的列数
-                singleSelect: false,                 //是否单选模式
-                //height: $(window).height()-200,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
-                showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
-                cardView: false,                    //是否显示详细视图
-                detailView: false,                   //是否显示父子表
-                showColumns: false,                  //是否显示所有的列
-                uniqueId: "ID",                     //每一行的唯一标识，一般为主键列
-                showRefresh: false,                  //是否显示刷新按钮
-                clickToSelect: true,                //是否启用点击选中行
-                paginationPreText: "上一页",
-                paginationNextText: "下一页",
-                columns: [{
-                    checkbox: true
-                }, 
-                {
-                    field: 'callTime',
-                    title: '调用时间(正序)'
-                },
-                {
-                    field: 'packageUrl',
-                    title: '包路径', //align: 'center'
-                	//events: operateEvents1
-                	//formatter: operateFormatter1
-                },
-                {
-                    field: 'javabeanName',
-                    title: '类',
-                } ,
-                {
-                    field: 'methodName',
-                    title: '方法名',
-                },
-                {
-                    field: 'paramType',
-                    title: '参数类型',
-                }   
-                ]
-            });
-        };
-
-        //得到查询的参数
-        oTableInit.queryParams = function (params) {
-            // 特别说明：
-            //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
-    　　　　　// 如果queryParamsType=limit,params包含{limit, offset, search, sort, order}
-    　　　　　// 如果queryParamsType!=limit,params包含{pageSize, pageNumber, searchText, sortName, sortOrder}
-            var temp = {   
-                pageSize: params.pageSize,   //页面大小
-                pageNumber: params.pageNumber,  //页码
-                departmentname: $("#txt_search_departmentname").val(),
-                statu: $("#txt_search_statu").val()
-            };
-            return temp;
-        };
-        return oTableInit;
-    };
-    function guanlian(){
-    	var arrselections1 = $("#tb_testingExample").bootstrapTable('getSelections'); // 测试用例列表
-    	var arrselections2 = $("#tb_methodChainOriginal").bootstrapTable('getSelections'); // 方法链
-        if (arrselections1.length > 1) {
-            alert('只能选择一行进行编辑');
-            return;
-        }
-        if (arrselections1.length <= 0 || arrselections2.length <= 0) {
-            alert('请选择有效数据');
-            return;
-        }
-        var ms = [];
-        for(var i=0;i<arrselections2.length;i++){
-        	ms.push(arrselections2[i].id);
-        }
-        
-        var testingExampleId = arrselections1[0].id;
-        //var methodChainOriginalIds = JSON.stringify(ms); // 大概是tomcat版本的原因，后台接收数组时报错
-        var methodChainOriginalIds	=	"";
-        for(var i=0;i<ms.length;i++){
-        	methodChainOriginalIds+=ms[i];
-        	if(i != ms.length-1){
-        		methodChainOriginalIds+=",";
-        	}
-        }
-        $.post('/testingExample/exampleLinkMethodChain?testingExampleId='+testingExampleId
-        		+'&methodChainOriginalIds='+methodChainOriginalIds,
-				function(json){
-        			if(json.success == true){
-        				alert("关联成功");
-        				window.location.href='/testingExample/knowledgeBase';
-        			}else{
-        				alert("关联失败");
-        			}
-		});
-    }
     </script>
     
     

@@ -1,5 +1,7 @@
 package com.boc.accuratetest.pojo;
 
+import org.springframework.util.StringUtils;
+
 public class ChangeCode {
     private Integer id;
 
@@ -18,8 +20,18 @@ public class ChangeCode {
     private String methodBody;
 
     private Byte testingOrNot;
+    
+    private String linkTestExample; // 非数据库字段，关联多个测试用例时，用英文逗号分割
+    
+    public String getLinkTestExample() {
+		return linkTestExample;
+	}
 
-    public Integer getId() {
+	public void setLinkTestExample(String linkTestExample) {
+		this.linkTestExample = linkTestExample;
+	}
+
+	public Integer getId() {
         return id;
     }
 

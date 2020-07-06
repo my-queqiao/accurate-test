@@ -1,12 +1,34 @@
 package com.boc.accuratetest.controller;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.swing.text.ChangedCharSetException;
 
+import org.eclipse.jgit.api.CheckoutCommand;
+import org.eclipse.jgit.api.CloneCommand;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ListBranchCommand;
+import org.eclipse.jgit.api.ListBranchCommand.ListMode;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRemoteException;
+import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ObjectReader;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -16,10 +38,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.boc.accuratetest.annotation.SecurityIgnoreHandler;
 import com.boc.accuratetest.biz.ChangeCodeBiz;
@@ -44,6 +70,9 @@ public class ChangeCodeController {
 	@SecurityIgnoreHandler
 	@RequestMapping("index")
 	public String index() {
+		HttpServletRequest request = ( (ServletRequestAttributes)RequestContextHolder.getRequestAttributes() ).getRequest();
+		String remoteAddr = request.getRemoteAddr();
+		System.out.println("remoteAddr:"+remoteAddr);
 		return "cc_index";
 	}
 	/**
@@ -61,6 +90,23 @@ public class ChangeCodeController {
 		JSONObject json = new JSONObject();
 		List<ChangeCode> page = changeCodeBiz.page(pageNumber, pageSize, search,dataOfPart);
 		Integer total = changeCodeBiz.findTotal(search,dataOfPart);
+		
+		// 查找关联的测试用例。变更表——方法链表——方法链ref用例表——用例表(package_name暂存测试用例名称)
+		List<ChangeCode> links = changeCodeBiz.findChangeCodeLinkTestExample();
+		for (ChangeCode pg : page) {
+			StringBuilder sb = new StringBuilder();
+			for (ChangeCode link : links) {
+				if(pg.getId().intValue() == link.getId().intValue()) {
+					sb.append(link.getPackageName()+",");
+				}
+			}
+			String linkTestExample = sb.toString();
+			if(!StringUtils.isEmpty(linkTestExample)) {
+				String substring = linkTestExample.substring(0, linkTestExample.lastIndexOf(","));
+				pg.setLinkTestExample(substring);
+			}
+		}
+		
 		json.put("rows", page);
 		json.put("total", total);
 		return json;
@@ -76,6 +122,7 @@ public class ChangeCodeController {
 	@RequestMapping("getChangeData")
 	@ResponseBody
 	public JSONObject getChangeData(String git_url,String master_branch,String test_branch) {
+		git_url = git_url.trim();
 		// 如果数据库中已有该git仓库、版本号下的差异代码，先全部删除
 		changeCodeBiz.deleteByGitUrlAndBranchs(git_url+","+master_branch+","+test_branch);
 		JSONObject jsonRes = new JSONObject();
@@ -109,6 +156,89 @@ public class ChangeCodeController {
 		jsonRes.put("success", true);
 		jsonRes.put("res", "获取数据成功！");
 		return jsonRes;
+		
+		// java实现
+		// 1、再次克隆目标项目，单独存放，并且检出测试版分支代码
+//		String gen = System.getProperty("user.dir");
+//		gen = "C:\\Users\\tom\\Desktop"; // 测试，上线后需要修改
+//		String targetProjectName = git_url.substring(git_url.lastIndexOf("/")+1, git_url.lastIndexOf(".git"));
+//		String fileSaveUrl = gen+"/"+targetProjectName+"_"+test_branch; // 重命名
+//		deleteFolder(fileSaveUrl);// fileSaveUrl，目标文件夹如果已存在，先删掉
+//		CloneCommand cloneCommand = Git.cloneRepository();
+//		cloneCommand.setURI(git_url);
+//		cloneCommand.setDirectory(new File(fileSaveUrl)); // saolei是项目根目录
+//		cloneCommand.setBare(false);
+//		cloneCommand.setCloneAllBranches(true); // 克隆了所有分支，但默认只是检出了master分支，其余分支需要分别检出。
+//		try {
+//			cloneCommand.call();
+//			
+//			Git git2 = Git.open(new File(fileSaveUrl));
+//			CheckoutCommand checkout = git2.checkout(); // 检出命令
+//			test_branch = "origin/"+test_branch; // 克隆之后，本地分支的名称默认示例：master、origin/test
+//			checkout.setName(test_branch); // 指定检出的分支
+//			checkout.call();
+//		} catch (InvalidRemoteException e) {
+//			e.printStackTrace();
+//		} catch (TransportException e) {
+//			e.printStackTrace();
+//		} catch (GitAPIException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		// 2、获取差异文件(fileSaveUrl中有master、和已经检出的测试分支代码)
+//		String diffMethod = diffMethod(fileSaveUrl, master_branch, test_branch);
+//		System.out.println("diffMethod============="+diffMethod);
+//		// 解析差异文件，并和源码对比，找出新增、删除、和修改的方法
+//		return null;
+		
+	}
+	public static void main(String[] args) {
+		String diffMethod = diffMethod("C:\\Users\\tom\\Desktop\\springboot-saolei_test", "master", "origin/test");
+		System.out.println("diffMethod==="+diffMethod);
+	}
+	public static String diffMethod(String URL,String masterBranch, String testBranch){
+		StringBuilder sb = new StringBuilder();
+		Git git = null;
+		try {
+			git=Git.open(new File(URL));
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		Repository repository=git.getRepository();
+		ObjectReader reader = repository.newObjectReader();
+		CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
+	
+		try {
+			ObjectId old = repository.resolve(masterBranch + "^{tree}");
+			ObjectId head = repository.resolve(testBranch+"^{tree}");
+			oldTreeIter.reset(reader, old);
+			CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
+			newTreeIter.reset(reader, head);
+			List<DiffEntry> diffs= git.diff()
+                    .setNewTree(newTreeIter)
+                    .setOldTree(oldTreeIter)
+                    .call();
+			
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			DiffFormatter df = new DiffFormatter(out);
+			df.setRepository(git.getRepository());
+			System.out.println("差异文件个数："+diffs.size());
+			for (DiffEntry diffEntry : diffs) {
+		         df.format(diffEntry);
+		         String diffText = out.toString("UTF-8");
+			     sb.append(diffText+"\n");
+			     out.reset();
+			}
+			
+		} catch (IncorrectObjectTypeException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (GitAPIException e) {
+			e.printStackTrace();
+		}
+		return sb.toString();
 	}
 	/**
 	 * 获取指定仓库的所有分支
@@ -141,7 +271,70 @@ public class ChangeCodeController {
 		jsonRes.put("success", true);
 		jsonRes.put("list", branchs);
 		return jsonRes;
+		
+		// java实现
+//		JSONObject jsonRes = new JSONObject();
+//		jsonRes.put("success", false);
+//		String gen = System.getProperty("user.dir");
+//		gen = "C:\\Users\\tom\\Desktop"; // 测试，上线后需要修改
+//		String targetProjectName = git_url.substring(git_url.lastIndexOf("/")+1, git_url.lastIndexOf(".git"));
+//		String fileSaveUrl = gen+"/"+targetProjectName;
+//		deleteFolder(fileSaveUrl);// fileSaveUrl，目标文件夹如果已存在，先删掉
+//		CloneCommand cloneCommand = Git.cloneRepository();
+//		cloneCommand.setURI(git_url);
+//		cloneCommand.setDirectory(new File(fileSaveUrl)); // saolei是项目根目录
+//		cloneCommand.setBare(false);
+//		cloneCommand.setCloneAllBranches(true); // 克隆了所有分支，但默认只是检出了master分支，其余分支需要分别检出。
+//		try {
+//			cloneCommand.call();
+//		} catch (InvalidRemoteException e) {
+//			e.printStackTrace();
+//		} catch (TransportException e) {
+//			e.printStackTrace();
+//		} catch (GitAPIException e) {
+//			e.printStackTrace();
+//		}
+//		// 获得远程分支
+//		List<String> branchs = new ArrayList<>();
+//		try {
+//			Git git2 = Git.open(new File(fileSaveUrl));
+//			ListBranchCommand listBranchCommand = git2.branchList();
+//			listBranchCommand.setListMode(ListMode.REMOTE); // 远程仓库
+//			List<Ref> call = listBranchCommand.call();
+//			for (Ref ref : call) {
+//				// refs/remotes/origin/test
+//				String name = ref.getName();
+//				String name2 = name.substring(name.lastIndexOf("/")+1);
+//				branchs.add(name2);
+//			}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		} catch (GitAPIException e) {
+//			e.printStackTrace();
+//		}
+//		jsonRes.put("success", true);
+//		jsonRes.put("list", branchs);
+//		return jsonRes;
 	}
+	public static boolean deleteFolder(String url) {
+        File file = new File(url);
+        if (!file.exists()) {
+            return false;
+        }
+        if (file.isFile()) {
+            file.delete();
+            return true;
+        } else {
+            File[] files = file.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                String root = files[i].getAbsolutePath();//得到子文件或文件夹的绝对路径
+                //System.out.println(root);
+                deleteFolder(root);
+            }
+            file.delete();
+            return true;
+        }
+    }
 	private ResponseEntity<String> conn(String git_url,String master_branch,String test_branch) throws RestClientException{
 		RestTemplate restTemplate = new RestTemplate();
 	    HttpHeaders headers = new HttpHeaders();

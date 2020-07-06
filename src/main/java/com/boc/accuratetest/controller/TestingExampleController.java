@@ -2,19 +2,29 @@ package com.boc.accuratetest.controller;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.Reader;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +39,12 @@ import com.boc.accuratetest.biz.TestingExampleBiz;
 import com.boc.accuratetest.pojo.ExampleRefMethodChain;
 import com.boc.accuratetest.pojo.MethodChainOriginal;
 import com.boc.accuratetest.pojo.TestingExample;
+
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.read.biff.BiffException;
+
 import com.boc.accuratetest.biz.ExampleRefMethodChainBiz;
 import net.sf.json.JSONObject;
 
@@ -41,7 +57,8 @@ public class TestingExampleController {
 	private MethodChainOriginalBiz methodChainOriginalBiz;
 	@Autowired
 	private ExampleRefMethodChainBiz exampleRefMethodChainBiz;
-	
+	// <测试用例主键,最后一行数据@测试用例所在的服务器ip>
+	Map<Integer,String> testExampleIdRef = new ConcurrentHashMap<Integer, String>();
 	/**
 	 * 	跳转到知识库页面
 	 * @return
@@ -73,45 +90,156 @@ public class TestingExampleController {
 		return json;
 	}
 	/**
-	 * 	上传记录方法链的文件
-	 * @param file
-	 * @param model
+	 * 	开始执行测试用例。获取最后一行数据，记录下来
+	 * @param testExampleId
 	 * @return
 	 */
 	@SecurityIgnoreHandler
-	@PostMapping("/upload")
-    public String upload(@RequestParam("file") MultipartFile file,RedirectAttributes model) {
-		model.addFlashAttribute("success", "uploadFail");
-        if (file.isEmpty() || !file.getOriginalFilename().endsWith(".txt")) {
-        	return "redirect:/testingExample/knowledgeBase";
-        }
-        List<MethodChainOriginal> ms = new ArrayList<>();
-        InputStream inputStream = null;
-        BufferedReader reader = null;
-        try {
-			inputStream = file.getInputStream();
-			reader = new BufferedReader(new InputStreamReader(inputStream));
-			String tempStr = null;
-			while(null != ( tempStr=reader.readLine() ) ) {
-				if(tempStr.length() > 13) { // 该行确定有内容，不仅仅含有一个换行符
-					MethodChainOriginal m = insertPrepare(tempStr);
-					ms.add(m);
-				}
-			}
-			methodChainOriginalBiz.insertBatch(ms);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return "redirect:/testingExample/knowledgeBase";
-		}finally {
-			try {
-				inputStream.close();
-				reader.close();
-			} catch (IOException e) {
-			}
+	@RequestMapping("testExampleStart")
+	@ResponseBody
+	public JSONObject testExampleStart(String ipOnTestExample, Integer testExampleId) {
+		JSONObject json = new JSONObject();
+		json.put("success", false);
+		if(StringUtils.isEmpty(ipOnTestExample) || StringUtils.isEmpty(testExampleId) ) {
+			return json;
 		}
-        model.addFlashAttribute("success", "uploadSuccess");
-        return "redirect:/testingExample/knowledgeBase";
-    }
+		ipOnTestExample = ipOnTestExample.trim();
+		Socket client = null;
+    	OutputStream os = null;        
+    	PrintWriter pw = null;
+        InputStream is = null;
+        InputStreamReader isr = null;
+        BufferedReader br = null;
+		try {
+        	client = new Socket(ipOnTestExample, 8765);
+        	os = client.getOutputStream();
+        	pw = new PrintWriter(os);
+            pw.write("chazhuang.txt");
+            pw.flush();
+            client.shutdownOutput();// 关闭输出流
+            is = client.getInputStream();
+            isr = new InputStreamReader(is);
+            br = new BufferedReader(isr);
+            String lastLine = null;
+            String info = null;
+            while ((info = br.readLine()) != null) {
+            	lastLine=info;// 记录最后一行
+            }
+            if(null == lastLine)lastLine = "";
+            testExampleIdRef.put(testExampleId, lastLine+"@"+ipOnTestExample);
+            System.out.println("最后一行："+lastLine);
+        } catch (UnknownHostException e) {
+        	e.printStackTrace();
+        	return json;
+        } catch (IOException e) {
+        	e.printStackTrace();
+        	return json;
+        }finally {
+            try {
+            	br.close();
+            	isr.close();
+            	is.close();
+            	pw.close();
+            	os.close();
+				client.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+        }
+		json.put("success", true);
+		return json;
+	}
+	/**
+	 * 结束测试用例。建立知识库
+	 * @param ipOnTestExample
+	 * @param testExampleId
+	 * @return
+	 */
+	@SecurityIgnoreHandler
+	@RequestMapping("testExampleEnd")
+	@ResponseBody
+	public JSONObject testExampleEnd(String ipOnTestExample, Integer testExampleId) {
+		JSONObject json = new JSONObject();
+		json.put("success", false);
+		if(StringUtils.isEmpty(testExampleId) ) {
+			return json;
+		}
+		Socket client = null;
+    	OutputStream os = null;
+    	PrintWriter pw = null;
+        InputStream is = null;
+        InputStreamReader isr = null;
+        BufferedReader br = null;
+		try {
+			String[] split = testExampleIdRef.get(testExampleId).split("@");
+        	client = new Socket(split[1], 8765);
+        	os = client.getOutputStream();
+        	pw = new PrintWriter(os);
+            pw.write("chazhuang.txt");
+            pw.flush();
+            client.shutdownOutput();// 关闭输出流
+            is = client.getInputStream();
+            isr = new InputStreamReader(is);
+            br = new BufferedReader(isr);
+            List<MethodChainOriginal> ms = new ArrayList<>();
+            if(StringUtils.isEmpty(split[0])) { // 只可能是第一个测试用例
+            	String info = null;
+            	while ((info = br.readLine()) != null) {
+            		// 全部读取，保存到数据库
+            		MethodChainOriginal chainOriginal = insertPrepare(info);
+            		ms.add(chainOriginal);
+            	}
+            }else {
+            	int start = 0;
+            	String info = null;
+            	while ((info = br.readLine()) != null) {
+            		if(start == 1) { // 读取，保存到数据库
+            			MethodChainOriginal chainOriginal = insertPrepare(info);
+                		ms.add(chainOriginal);
+            		}
+            		if(info.equals(split[0])) { // 从下一行开始读取
+            			start = 1;
+            		}
+            	}
+            }
+            methodChainOriginalBiz.insertBatch(ms); // 批量存储方法链数据
+            // 收集方法链表主键，测试用例、方法链，做关联
+            // 如果该测试用例已关联方法链，先取消关联
+            exampleRefMethodChainBiz.deleteByTestingExampleId(testExampleId);
+            List<ExampleRefMethodChain> refs = new ArrayList<>();
+            for (MethodChainOriginal m : ms) {
+            	ExampleRefMethodChain ref = new ExampleRefMethodChain();
+				ref.setTestingExampleId(testExampleId);
+				ref.setMethodChainOriginalId(m.getId());
+				refs.add(ref);
+			}
+            exampleRefMethodChainBiz.insertBatch(refs);
+        } catch (UnknownHostException e) {
+        	e.printStackTrace();
+        	return json;
+        } catch (IOException e) {
+        	e.printStackTrace();
+        	return json;
+        }finally {
+            try {
+            	br.close();
+            	isr.close();
+            	is.close();
+            	pw.close();
+            	os.close();
+				client.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+        }
+		json.put("success", true);
+		return json;
+	}
+	/**
+	 * 解析方法链中的一行
+	 * @param tempStr 1594003355480.com.boc.accuratetest.biz.impl.TestingExampleBizImpl.page(Integer,Integer,String)
+	 * @return
+	 */
 	private MethodChainOriginal insertPrepare(String tempStr) {
 		MethodChainOriginal m = new MethodChainOriginal();
     	String params = tempStr.substring(tempStr.indexOf("(")+1, tempStr.indexOf(")")); // 参数
@@ -133,52 +261,73 @@ public class TestingExampleController {
     	return m;
 	}
 	/**
-	 * 	获取方法链
+	 * 	上传测试用例excel
+	 * @param file
+	 * @param model
 	 * @return
 	 */
 	@SecurityIgnoreHandler
-	@RequestMapping("getAllMethodChainOriginal")
-	@ResponseBody
-	public JSONObject getAllMethodChainOriginal() {
-		JSONObject json = new JSONObject();
-		List<MethodChainOriginal> ms = methodChainOriginalBiz.getAll();
-		int total = methodChainOriginalBiz.findTotal();
-		json.put("rows", ms);
-		json.put("total", total);
-		return json;
-	}
-	/**
-	 * 	测试用例关联方法链（建立知识库）
-	 * @param testingExampleId	测试用例表主键
-	 * @param methodChainOriginalIds	稳定版代码的方法链主键
-	 * @return 
-	 */
-	@SecurityIgnoreHandler
-	@RequestMapping("exampleLinkMethodChain")
-	@ResponseBody
-	public JSONObject exampleLinkMethodChain(String testingExampleId,String methodChainOriginalIds) {
-		JSONObject json = new JSONObject();
-		try {
-			// 如果该测试用例已关联方法链，先取消关联
-			exampleRefMethodChainBiz.deleteByTestingExampleId(Integer.valueOf(testingExampleId));
-			
-			String[] methodChainOriginalIds2 = methodChainOriginalIds.split(",");
-			// 测试用例关联方法链，建立知识库
-			List<ExampleRefMethodChain> refs = new ArrayList<>();
-			for(String id:methodChainOriginalIds2) {
-				ExampleRefMethodChain ref = new ExampleRefMethodChain();
-				ref.setTestingExampleId(Integer.valueOf(testingExampleId));
-				ref.setMethodChainOriginalId(Integer.valueOf(id));
-				refs.add(ref);
-			}
-			// 存储
-			exampleRefMethodChainBiz.insertBatch(refs);
-		} catch (Exception e) {
-			e.printStackTrace();
-			json.put("success", false);
-		}
-		json.put("success", true);
-	    return json;
+	@PostMapping("/upload")
+    public String upload(@RequestParam("file") MultipartFile file,RedirectAttributes model) {
+		model.addFlashAttribute("success", "uploadFail");
+        if (file.isEmpty() || !file.getOriginalFilename().endsWith(".xls")) {
+        	return "redirect:/testingExample/knowledgeBase";
+        }
+        
+        try{
+            jxl.Workbook wb = Workbook.getWorkbook(file.getInputStream());
+            wb.getNumberOfSheets(); // sheet数量
+            Sheet sheet = wb.getSheet(0); // 读取第一个sheet
+            int row_total = sheet.getRows();
+            for (int j = 0; j < row_total; j++) {
+                if(j == 0)continue; // 不读标题行
+                    Cell[] cells = sheet.getRow(j);
+                    System.out.println(cells[1].getContents()); // 所属产品
+                    System.out.println(cells[3].getContents()); // 功能
+                    System.out.println(cells[4].getContents()); // 子功能
+                    System.out.println(cells[9].getContents()); // 测试项 
+                    System.out.println(cells[10].getContents()); // 测试点 
+                    System.out.println(cells[11].getContents()); // 测试案例编号 
+                    System.out.println(cells[13].getContents()); // 测试操作说明
+                    System.out.println(cells[14].getContents()); // 预期结果
+                    System.out.println(cells[15].getContents()); // 生产任务编号
+            }
+        }catch (IOException e) {
+            e.printStackTrace();
+            return "redirect:/testingExample/knowledgeBase";
+        } catch (BiffException e){
+            e.printStackTrace();
+            return "redirect:/testingExample/knowledgeBase";
+        }
+        
+        model.addFlashAttribute("success", "uploadSuccess");
+        return "redirect:/testingExample/knowledgeBase";
+    }
+	public static void main(String[] args) {
+		try{
+            InputStream is = new FileInputStream("C:\\Users\\tom\\Desktop\\P2003新银行卡交换系统功能测试案例T-P2003-CS1-0008_02评审.xls");
+            jxl.Workbook wb = Workbook.getWorkbook(is);
+            wb.getNumberOfSheets(); // sheet数量
+            Sheet sheet = wb.getSheet(0); // 读取第一个sheet
+            int row_total = sheet.getRows();
+            for (int j = 0; j < row_total; j++) {
+                if(j == 0)continue; // 不读标题行
+                    Cell[] cells = sheet.getRow(j);
+                    System.out.println(cells[1].getContents()); // 所属产品
+                    System.out.println(cells[3].getContents()); // 功能
+                    System.out.println(cells[4].getContents()); // 子功能
+                    System.out.println(cells[9].getContents()); // 测试项 
+                    System.out.println(cells[10].getContents()); // 测试点 
+                    System.out.println(cells[11].getContents()); // 测试案例编号 
+                    System.out.println(cells[13].getContents()); // 测试操作说明
+                    System.out.println(cells[14].getContents()); // 预期结果
+                    System.out.println(cells[15].getContents()); // 生产任务编号
+            }
+        }catch (IOException e) {
+            e.printStackTrace();
+        } catch (BiffException e){
+            e.printStackTrace();
+        }
 	}
 }
 

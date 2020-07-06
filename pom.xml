@@ -109,7 +109,11 @@
 	    <artifactId>javassist</artifactId>
 	    <version>3.20.0-GA</version>
 	</dependency>
-		
+	<dependency>
+	    <groupId>org.eclipse.jgit</groupId>
+	    <artifactId>org.eclipse.jgit</artifactId>
+	    <version>5.7.0.202003110725-r</version>
+	</dependency>	
 	</dependencies>
 
 	<build>
@@ -165,6 +169,7 @@
 		    <phase>compile</phase>
 		    <goals>
 		        <goal>chazhuang</goal>
+		        <goal>runtimeOutPutMethodLinkMojo</goal>
 		    </goals>
 		</execution>
 	</executions>

@@ -63,7 +63,6 @@ public final class ExecutionDataClient {
 		socket.close();
 		localFile.close();
 	}
-
 	private ExecutionDataClient() {
 	}
 }

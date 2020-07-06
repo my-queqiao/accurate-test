@@ -24,42 +24,46 @@ import org.springframework.web.client.RestTemplate;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
+import javassist.CtBehavior;
 import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtField;
+import javassist.CtMember;
 import javassist.CtMethod;
+import javassist.CtNewConstructor;
+import javassist.CtNewMethod;
 import javassist.LoaderClassPath;
 import javassist.NotFoundException;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.ClassFile;
+import javassist.bytecode.ConstPool;
+import javassist.bytecode.MethodInfo;
+import javassist.bytecode.analysis.ControlFlow.Block;
+import javassist.bytecode.annotation.Annotation;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 public class User {
-	public static void main(String[] args) {
-//		RestTemplate restTemplate = new RestTemplate();
-////		String url = "http://192.168.8.100:8000/deal_diff";
-//		String url = "http://192.168.8.100:8000/branch_list";
-//	    HttpHeaders headers = new HttpHeaders();
-//	    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//	    MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
-//	    map.add("git_url", "https://github.com/my-queqiao/springboot-saolei.git");
-////	    map.add("master", "master");
-////	    map.add("dev", "dev");
-//	    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
-//	    ResponseEntity<String> response = null;
-//		try {
-//			response = restTemplate.postForEntity( url, request , String.class );
-//		} catch (RestClientException e) {
-//			e.printStackTrace();
-//		}
-//	    String res = response.getBody(); // 返回数据
-//	    System.out.println(res);
-		// {"dev": "dev", "master": "master"}
-		JSONObject json = JSONObject.fromObject("{\"dev\": \"dev\", \"master\": \"master\"}");
-		Collection values = json.values();
-		Iterator iter = values.iterator();
-		List<String> branchs = new ArrayList<>();
-		while(iter.hasNext()) {
-			String v = (String)iter.next();
-			branchs.add(v);
-		}
+	public static void main(String[] args) throws CannotCompileException, NotFoundException, IOException {
+		//字节码操作创建一个类
+		ClassPool cp = ClassPool.getDefault();
+		// 扫描不到怎么办？
+		CtClass cc = cp.makeClass("tcpServer.Student");
+		// add a annotation on class
+		ClassFile classFile = cc.getClassFile();
+	    ConstPool constpool = classFile.getConstPool();
+	    AnnotationsAttribute annotationsAttribute = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+	    Annotation annotation = new Annotation("org.springframework.stereotype.Component", constpool);
+	    annotationsAttribute.setAnnotation(annotation);
+	    classFile.addAttribute(annotationsAttribute);
 		
+		//添加自定义方法
+//		CtMethod cm01 = CtMethod.make("static{//静态代码块}", cc);
+//		cc.addMethod(cm01);
+		
+		
+		String gen = System.getProperty("user.dir");
+		cc.writeFile(gen+"/target/classes");
+		System.out.println("创建成功");
 	}
 }

@@ -122,7 +122,7 @@
     select count(*)
     from method_chain_original order by call_time_long asc
   </select>
-  <insert id="insertBatch" parameterType="java.util.List">
+  <insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys = "true" keyProperty = "id">
     insert into method_chain_original (package_url, javabean_name, 
       method_name, param_type, call_time, call_time_long)
     values 

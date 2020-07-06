@@ -16,4 +16,6 @@ public interface ChangeCodeBiz {
 	void deleteByGitUrlAndBranchs(String gitUrlAndBranchs);
 
 	List<ChangeCode> countByChangeType();
+
+	List<ChangeCode> findChangeCodeLinkTestExample();
 }

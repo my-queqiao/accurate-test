@@ -26,4 +26,6 @@ public interface ChangeCodeMapper {
 	void deleteByGitUrlAndBranchs(String gitUrlAndBranchs);
 
 	List<ChangeCode> countByChangeType();
+
+	List<ChangeCode> findChangeCodeLinkTestExample();
 }
