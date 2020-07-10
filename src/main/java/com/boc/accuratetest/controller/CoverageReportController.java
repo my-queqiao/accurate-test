@@ -50,10 +50,7 @@ public class CoverageReportController {
 	 */
 	@SecurityIgnoreHandler
 	@RequestMapping("index")
-	public String knowledgeBase(String ipOnTestExample) {
-		if(!StringUtils.isEmpty(ipOnTestExample)) {
-			getAllMethodInfo(ipOnTestExample);
-		}
+	public String index() {
 		return "coverageReport";
 	}
 	/**
@@ -76,9 +73,20 @@ public class CoverageReportController {
 		json.put("total", statisticClassNumber.size());
 		return json;
 	}
-	public void getAllMethodInfo(String ipOnTestExample) {
+	/**
+	 * 	获取目标项目的所有方法
+	 * @param ipOnTestExample
+	 * @return
+	 */
+	@SecurityIgnoreHandler
+	@RequestMapping("getAllMethodInfo")
+	@ResponseBody
+	public JSONObject getAllMethodInfo(String ipOnTestExample) {
+		JSONObject json = new JSONObject();
+		json.put("success", false);
 		if(StringUtils.isEmpty(ipOnTestExample) ) {
-			return ;
+			json.put("msg", "ip地址为空");
+			return json;
 		}
 		ipOnTestExample = ipOnTestExample.trim();
 		Socket client = null;
@@ -107,8 +115,16 @@ public class CoverageReportController {
             allMethodsBiz.insertBatch(ms);
         } catch (UnknownHostException e) {
         	e.printStackTrace();
+        	json.put("msg", "未知主机");
+			return json;
         } catch (IOException e) {
         	e.printStackTrace();
+        	json.put("msg", e.getMessage());
+			return json;
+        }catch(Exception e){
+        	e.printStackTrace();
+        	json.put("msg", e.getMessage());
+			return json;
         }finally {
             try {
             	br.close();
@@ -121,6 +137,8 @@ public class CoverageReportController {
 				e.printStackTrace();
 			}
         }
+		json.put("success", true);
+		return json;
 	}
 	/**
 	 * 解析方法链中的一行

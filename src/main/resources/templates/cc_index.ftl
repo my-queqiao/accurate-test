@@ -36,7 +36,7 @@
 	    			cursor: pointer;text-decoration:underline;float:left;">获取已测试方法</a>
 	    	</span>
 	    	<span class="" style="font-size:large;bottom:-20px;position: absolute;left: 92%;top: 33px;">
-	    		<a target="_blank" onclick="coverageReport();" style="margin-left: ;color: blue;
+	    		<a href="${request.contextPath}/coverageReport/index" target="_blank" style="margin-left: ;color: blue;
 	    			cursor: pointer;text-decoration:underline;float:left;">覆盖率报告</a>
 	    	</span>
 	    	
@@ -98,27 +98,6 @@
 	                </div>
 	                <div class="modal-footer">
 	                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
-	                </div>
-	            </div>
-	        </div>
-	    </div>
-	    <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
-	        <div class="modal-dialog" role="document">
-	            <div class="modal-content">
-	                <div class="modal-header">
-	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-	                    <h4 class="modal-title" id="myModalLabel2">请输入目标服务器ip地址：</h4>
-	                </div>
-	                <div class="modal-body">
-	                    <div class="form-group">
-	                        <input id="testExampleIp" placeholder="#.#.#.#" />
-	                    </div>
-	                </div>
-	                <div class="modal-footer">
-	                	<button type="button" id="btn_save" class="btn btn-primary" data-dismiss="modal">
-	                		<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>确认</button>
-	                    <button type="button" class="btn btn-default" data-dismiss="modal">
-	                    	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
 	                </div>
 	            </div>
 	        </div>
@@ -565,27 +544,12 @@
    				$("#btn_all").html("<span>总计："+heji+"个</span>");
 		});
     }
-    function coverageReport(){
-          $("#myModalLabel2").text("请输入目标服务器ip地址");
-          $('#myModal2').modal();
-    }
+    
     function checkIp(ip) {
         var strRegex = '[0-9]+\.{1}[0-9]+\.{1}[0-9]+\.{1}[0-9]+'; // 22.11.3.23.adf.df也可以匹配。
         return new RegExp(strRegex).test(ip);
     }
-    $("#btn_save").click(function(){
-    	var testExampleIp = $("#testExampleIp").val();
-    	if(null != testExampleIp  && "" != testExampleIp) {
-    		if(checkIp(testExampleIp)){
-    			//sendStart(testExampleIp);
-    			window.location.href="${request.contextPath}/coverageReport/index?ipOnTestExample="+testExampleIp;
-    		}else{
-    			alert("ip地址格式有误");
-    		}
-    	}else{
-    		alert("输入不能为空");
-    	}
-    });
+    
     function getTestedMethods(){
     	$("#myModalLabel3").text("请输入测试服务器ip地址");
         $('#myModal3').modal();
