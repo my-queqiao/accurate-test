@@ -43,7 +43,7 @@ public class MethodChainOriginal_insert_util {
 				stmt = conn.prepareStatement(
 						"INSERT INTO method_chain_original(package_url,javabean_name,method_name,"
 						+ "param_type,call_time,call_time_long) VALUES(?,?,?,?,?,?)");
-				stmt.setString(1, m.getPackageUrl()); // 包路径
+				stmt.setString(1, m.getPackageName()); // 包路径
 				stmt.setString(2, m.getJavabeanName()); // 类名称
 				stmt.setString(3, m.getMethodName()); // 方法名称
 				stmt.setString(4, m.getParamType()==null || m.getParamType().equals("")?"empty":m.getParamType()); // 参数类型
@@ -108,7 +108,7 @@ public class MethodChainOriginal_insert_util {
 	        	String className = split2[split2.length-2]; // 类名
 	        	String packageName = tempStr.substring(tempStr.indexOf(callTime)+callTime.length()+1, 
 	        			tempStr.indexOf(className)-1); // 包路径
-	        	m.setPackageUrl(packageName);
+	        	m.setPackageName(packageName);
 	        	m.setJavabeanName(className);
 	        	m.setMethodName(methodName);
 	        	m.setParamType(params);

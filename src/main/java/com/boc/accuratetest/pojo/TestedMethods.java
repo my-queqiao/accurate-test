@@ -1,6 +1,6 @@
 package com.boc.accuratetest.pojo;
 
-public class MethodChainOriginal {
+public class TestedMethods {
     private Integer id;
 
     private String packageName;

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boc.accuratetest.mappers.AllMethodsMapper">
+  <resultMap id="BaseResultMap" type="com.boc.accuratetest.pojo.AllMethods">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="package_name" jdbcType="VARCHAR" property="packageName" />
+    <result column="javabean_name" jdbcType="VARCHAR" property="javabeanName" />
+    <result column="method_name" jdbcType="VARCHAR" property="methodName" />
+    <result column="param_type" jdbcType="VARCHAR" property="paramType" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, package_name, javabean_name, method_name, param_type
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from all_methods
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from all_methods
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.boc.accuratetest.pojo.AllMethods">
+    insert into all_methods (id, package_name, javabean_name, 
+      method_name, param_type)
+    values (#{id,jdbcType=INTEGER}, #{packageName,jdbcType=VARCHAR}, #{javabeanName,jdbcType=VARCHAR}, 
+      #{methodName,jdbcType=VARCHAR}, #{paramType,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.boc.accuratetest.pojo.AllMethods">
+    insert into all_methods
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="packageName != null">
+        package_name,
+      </if>
+      <if test="javabeanName != null">
+        javabean_name,
+      </if>
+      <if test="methodName != null">
+        method_name,
+      </if>
+      <if test="paramType != null">
+        param_type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="packageName != null">
+        #{packageName,jdbcType=VARCHAR},
+      </if>
+      <if test="javabeanName != null">
+        #{javabeanName,jdbcType=VARCHAR},
+      </if>
+      <if test="methodName != null">
+        #{methodName,jdbcType=VARCHAR},
+      </if>
+      <if test="paramType != null">
+        #{paramType,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.boc.accuratetest.pojo.AllMethods">
+    update all_methods
+    <set>
+      <if test="packageName != null">
+        package_name = #{packageName,jdbcType=VARCHAR},
+      </if>
+      <if test="javabeanName != null">
+        javabean_name = #{javabeanName,jdbcType=VARCHAR},
+      </if>
+      <if test="methodName != null">
+        method_name = #{methodName,jdbcType=VARCHAR},
+      </if>
+      <if test="paramType != null">
+        param_type = #{paramType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.boc.accuratetest.pojo.AllMethods">
+    update all_methods
+    set package_name = #{packageName,jdbcType=VARCHAR},
+      javabean_name = #{javabeanName,jdbcType=VARCHAR},
+      method_name = #{methodName,jdbcType=VARCHAR},
+      param_type = #{paramType,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into all_methods (package_name, javabean_name, method_name, param_type)
+    values 
+    <foreach collection="list" index="index" item="item" separator=",">
+	    (#{item.packageName,jdbcType=VARCHAR}, #{item.javabeanName,jdbcType=VARCHAR}, 
+         #{item.methodName,jdbcType=VARCHAR}, #{item.paramType,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  <select id="page" resultMap="BaseResultMap">
+    select * from all_methods
+    <if test="search != null">
+        method_name = #{search,jdbcType=VARCHAR}
+    </if>
+    limit #{limit} , #{pageSize}
+  </select>
+  <select id="findTotal" resultType="java.lang.Integer">
+    select count(*) from all_methods
+    <if test="search != null">
+        where method_name = #{search,jdbcType=VARCHAR}
+    </if>
+  </select>
+  
+  <select id="getAll" resultMap="BaseResultMap">
+    select DISTINCT package_name,javabean_name,method_name,param_type from all_methods
+  </select>
+  
+  <select id="statisticClassNumber" resultMap="BaseResultMap">
+    SELECT m.package_name,m.classNumber,n.testedClassNumber ,o.methodNumber,p.methodTestedNumber,
+    		q.addFunNumber,r.addFunTestedNumber
+    from 
+    	<!-- 从句1，每个包、及其各自类的数量 -->
+		(SELECT package_name, COUNT(DISTINCT package_name,javabean_name) as classNumber
+		 from all_methods
+		GROUP BY package_name) m 
+	LEFT JOIN
+		<!-- 从句2，每个包、及其各自已测试类的数量 -->
+		(SELECT a.package_name, COUNT(DISTINCT a.package_name,a.javabean_name) as testedClassNumber
+		 from all_methods a,tested_methods t
+		 WHERE a.package_name=t.package_name
+		 and a.javabean_name = t.javabean_name
+		GROUP BY a.package_name) n
+	on 	m.package_name = n.package_name
+	LEFT JOIN
+		<!-- 从句3，每个包、及其各自方法的数量 -->
+		(SELECT package_name, COUNT(DISTINCT package_name,javabean_name,method_name,param_type) as methodNumber
+		from all_methods
+		GROUP BY package_name) o
+	on m.package_name = o.package_name
+	LEFT JOIN
+		<!-- 从句4，每个包、及其各自已测试方法的数量 -->
+		(SELECT package_name, COUNT(DISTINCT package_name,javabean_name,method_name,param_type) as methodTestedNumber
+		from tested_methods
+		GROUP BY package_name) p
+	on m.package_name = p.package_name
+	LEFT JOIN
+		<!-- 从句5，每个包、及其各自新增方法的数量 -->
+		(SELECT package_name, COUNT(DISTINCT package_name,javabean_name,method_name,param_type) as addFunNumber
+		from change_code
+		where change_type=1 GROUP BY package_name) q
+	on m.package_name = q.package_name
+	LEFT JOIN
+		<!-- 从句6，每个包、及其各自已测试新增方法的数量 -->
+		(SELECT c.package_name, COUNT(DISTINCT c.package_name,c.javabean_name,c.method_name,c.param_type) as addFunTestedNumber
+		from change_code c,tested_methods t
+		where c.package_name=t.package_name
+			and c.javabean_name=t.javabean_name 
+      		and c.method_name=t.method_name
+      		and c.param_type=t.param_type
+      		and c.change_type=1 
+			GROUP BY c.package_name) r
+	on m.package_name = r.package_name ORDER BY m.package_name
+;
+  </select>
+</mapper>

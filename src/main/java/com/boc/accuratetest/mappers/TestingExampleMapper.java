@@ -20,4 +20,8 @@ public interface TestingExampleMapper {
 	List<TestingExample> page(String search, int limit, Integer pageSize);
 
 	int findTotal(String search);
+
+	void batchSave(List<TestingExample> tes);
+
+	List<TestingExample> findByIds(List<Integer> teids);
 }

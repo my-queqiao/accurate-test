@@ -250,7 +250,7 @@ public class TestingExampleController {
     	String className = split2[split2.length-2]; // 类名
     	String packageName = tempStr.substring(tempStr.indexOf(callTime)+callTime.length()+1, 
     			tempStr.indexOf(className)-1); // 包路径
-    	m.setPackageUrl(packageName);
+    	m.setPackageName(packageName);
     	m.setJavabeanName(className);
     	m.setMethodName(methodName);
     	m.setParamType(params);
@@ -279,19 +279,23 @@ public class TestingExampleController {
             wb.getNumberOfSheets(); // sheet数量
             Sheet sheet = wb.getSheet(0); // 读取第一个sheet
             int row_total = sheet.getRows();
+            List<TestingExample> tes = new ArrayList<>();
             for (int j = 0; j < row_total; j++) {
                 if(j == 0)continue; // 不读标题行
                     Cell[] cells = sheet.getRow(j);
-                    System.out.println(cells[1].getContents()); // 所属产品
-                    System.out.println(cells[3].getContents()); // 功能
-                    System.out.println(cells[4].getContents()); // 子功能
-                    System.out.println(cells[9].getContents()); // 测试项 
-                    System.out.println(cells[10].getContents()); // 测试点 
-                    System.out.println(cells[11].getContents()); // 测试案例编号 
-                    System.out.println(cells[13].getContents()); // 测试操作说明
-                    System.out.println(cells[14].getContents()); // 预期结果
-                    System.out.println(cells[15].getContents()); // 生产任务编号
+                    TestingExample te = new TestingExample();
+                    te.setBelongProduct(cells[1].getContents());// 所属产品
+                    te.setFunction(cells[3].getContents());// 功能
+                    te.setSubfunction(cells[4].getContents());// 子功能
+                    te.setTestItem(cells[9].getContents());// 测试项 
+                    te.setTestPoint(cells[10].getContents());// 测试点 
+                    te.setTestCaseNumber(cells[11].getContents());// 测试案例编号
+                    te.setTestOperationExplain(cells[13].getContents());// 测试操作说明
+                    te.setExpectedResults(cells[14].getContents());// 预期结果
+                    te.setProductionTaskNumber(cells[15].getContents());// 生产任务编号
+                    tes.add(te);
             }
+            testingExampleBiz.batchSave(tes);
         }catch (IOException e) {
             e.printStackTrace();
             return "redirect:/testingExample/knowledgeBase";

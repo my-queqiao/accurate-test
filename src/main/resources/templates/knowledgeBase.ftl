@@ -46,7 +46,7 @@
 	            <div class="modal-content">
 	                <div class="modal-header">
 	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-	                    <h4 class="modal-title" id="myModalLabel">该测试用例对应的服务器ip地址：</h4>
+	                    <h4 class="modal-title" id="myModalLabel">请输入目标服务器ip地址：</h4>
 	                </div>
 	                <div class="modal-body">
 	                    <div class="form-group">
@@ -121,16 +121,51 @@
                     checkbox: true
                 }, 
                 {
-                    field: 'id',
-                    title: '主键id',
-                    align: 'center',
-                },
-                {
-                    field: 'testingExampleName',
-                    title: '测试用例名称', //align: 'center'
+                    field: 'belongProduct',
+                    title: '所属产品', //align: 'center'
                     align: 'center',
                 	//events: operateEvents1,
                 	formatter: operateFormatter
+                },
+                {
+                    field: 'function',
+                    title: '功能', //align: 'center'
+                    align: 'center',
+                },
+                {
+                    field: 'subfunction',
+                    title: '子功能', //align: 'center'
+                    align: 'center',
+                },
+                {
+                    field: 'testItem',
+                    title: '测试项', //align: 'center'
+                    align: 'center',
+                },
+                {
+                    field: 'testPoint',
+                    title: '测试点', //align: 'center'
+                    align: 'center',
+                },
+                {
+                    field: 'testCaseNumber',
+                    title: '测试案例编号', //align: 'center'
+                    align: 'center',
+                },
+                {
+                    field: 'testOperationExplain',
+                    title: '测试操作说明', //align: 'center'
+                    align: 'center',
+                },
+                {
+                    field: 'expectedResults',
+                    title: '预期结果', //align: 'center'
+                    align: 'center',
+                },
+                {
+                    field: 'productionTaskNumber',
+                    title: '生产任务编号', //align: 'center'
+                    align: 'center',
                 }
                 ,
                 {
@@ -190,7 +225,7 @@
     });
 	function startTestExample(id){
 		currentTestExampleId = id;
-		$("#myModalLabel").text("请输入 该测试用例所在的服务器ip地址：");
+		$("#myModalLabel").text("请输入目标服务器ip地址：");
         $('#myModal').modal();
 	}
 	function sendStart(testExampleIp){

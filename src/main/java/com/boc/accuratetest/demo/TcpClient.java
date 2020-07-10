@@ -16,6 +16,7 @@ import java.net.UnknownHostException;
 * */
 public class TcpClient{
 	private static String chazhuang = "chazhuang.txt";
+	private static String allMethodInfo = "allMethodInfo.txt";
 	public static void main(String[] args) {
         try {
             // 1.创建 socket 指定服务器地址和端            
@@ -23,7 +24,7 @@ public class TcpClient{
             // 2.客户端向服务器发送登录信息      
         	OutputStream os = client.getOutputStream();// 字节输出流           
         	PrintWriter pw = new PrintWriter(os);
-            pw.write(chazhuang);
+            pw.write(allMethodInfo);
             pw.flush();
             client.shutdownOutput();// 关闭输出流           
             InputStream is = client.getInputStream();  // 3. 获取输入流

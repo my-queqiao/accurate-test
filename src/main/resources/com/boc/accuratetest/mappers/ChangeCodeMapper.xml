@@ -183,14 +183,14 @@
   </select>
   
   <select id="findChangeCodeLinkTestExample" resultMap="BaseResultMap">
-    SELECT cc.id as id,te.testing_example_name as package_name
-				 from change_code cc,
+    SELECT cc.id as id,te.id as package_name
+				 	from 	change_code cc,
 							method_chain_original mco,
 							example_ref_method_chain ermc,
 							testing_example te
-		where cc.package_name=mco.package_url and cc.javabean_name=mco.javabean_name and cc.method_name=mco.method_name
+		where cc.package_name=mco.package_name and cc.javabean_name=mco.javabean_name and cc.method_name=mco.method_name
 			and cc.param_type=mco.param_type
 			and mco.id=ermc.method_chain_original_id and ermc.testing_example_id=te.id
-		GROUP BY cc.id,te.testing_example_name
+		GROUP BY cc.id,te.id
   </select>
 </mapper>

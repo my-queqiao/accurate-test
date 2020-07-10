@@ -24,16 +24,20 @@
 <body class="container-fiuled" style="background-color: aliceblue;">
     <div class="panel-body" style="padding-bottom:0px;">
 	    <div class="row text-center">
-	    	<span class="col-xs-8 " style="font-size: xx-large;">
-	    		<span style="margin-left: 45%;">精准测试项目</span>
+	    	<span class="col-xs-12 " style="font-size: xx-large;">
+	    		<span style="margin-left: ;">精准测试项目</span>
 	    	</span>
-	    	<span class="col-xs-3 text-right" style="font-size:large;bottom:-20px;">
-	    		<a href="${request.contextPath}/coveragereport/index.html" target="_blank" style="margin-left: 60%;color: blue;
-	    			cursor: pointer;text-decoration:underline;float:left;">覆盖率报告</a>
-	    	</span>
-	    	<span class="col-xs-1 " style="font-size:large;bottom:-20px;">
+	    	<span class="" style="font-size:large;bottom:-20px;position: absolute;left: 68%;top: 33px;">
 	    		<a href="${request.contextPath}/testingExample/knowledgeBase" target="_blank" style="margin-left: ;color: blue;
 	    			cursor: pointer;text-decoration:underline;float:left;">知识库</a>
+	    	</span>
+	    	<span class="" style="font-size:large;bottom:-20px;position: absolute; left: 78%;top: 33px;">
+	    		<a target="_blank" onclick="getTestedMethods();" style="margin-left: ;color: blue;
+	    			cursor: pointer;text-decoration:underline;float:left;">获取已测试方法</a>
+	    	</span>
+	    	<span class="" style="font-size:large;bottom:-20px;position: absolute;left: 92%;top: 33px;">
+	    		<a target="_blank" onclick="coverageReport();" style="margin-left: ;color: blue;
+	    			cursor: pointer;text-decoration:underline;float:left;">覆盖率报告</a>
 	    	</span>
 	    	
 	    </div>
@@ -81,23 +85,65 @@
         -->
         
         <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                    <h4 class="modal-title" id="myModalLabel">方法详情</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <div id="methodDetail"></div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
-                </div>
-            </div>
-        </div>
-    </div>
+	        <div class="modal-dialog" role="document">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+	                    <h4 class="modal-title" id="myModalLabel">方法详情</h4>
+	                </div>
+	                <div class="modal-body">
+	                    <div class="form-group">
+	                        <div id="methodDetail"></div>
+	                    </div>
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+	        <div class="modal-dialog" role="document">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+	                    <h4 class="modal-title" id="myModalLabel2">请输入目标服务器ip地址：</h4>
+	                </div>
+	                <div class="modal-body">
+	                    <div class="form-group">
+	                        <input id="testExampleIp" placeholder="#.#.#.#" />
+	                    </div>
+	                </div>
+	                <div class="modal-footer">
+	                	<button type="button" id="btn_save" class="btn btn-primary" data-dismiss="modal">
+	                		<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>确认</button>
+	                    <button type="button" class="btn btn-default" data-dismiss="modal">
+	                    	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="modal fade" id="myModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3">
+	        <div class="modal-dialog" role="document">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+	                    <h4 class="modal-title" id="myModalLabel3">请输入测试服务器ip地址：</h4>
+	                </div>
+	                <div class="modal-body">
+	                    <div class="form-group">
+	                        <input id="testServerIp" placeholder="#.#.#.#" />
+	                    </div>
+	                </div>
+	                <div class="modal-footer">
+	                	<button type="button" id="btn_save_testserverip" class="btn btn-primary" data-dismiss="modal">
+	                		<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>确认</button>
+	                    <button type="button" class="btn btn-default" data-dismiss="modal">
+	                    	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
     <!-- 用于列表点击下一页时传值，点击button按钮时赋值 -->
         <input id="dataOfPart" value="1" style="display:none;"/>
         <div>
@@ -207,7 +253,8 @@
                 }, 
                 {
                     field: 'linkTestExample',
-                    title: '关联测试用例',
+                    title: '关联的测试用例数量',
+                    formatter: linkTestExampleFormatter
                 }, 
                 ]
             });
@@ -300,6 +347,34 @@
     	}else{
 	    	return ['<span style="color:red";>未测试</span>',].join('');
     	}
+    }
+    function linkTestExampleFormatter(value, row, index) {
+    	if(value == ""){
+	    	return ['',].join('');
+    	}else{
+    		var arr = value.split(",");
+    		// js函数参数传递字符串，需要转义
+	    	return ["<a title='查看测试用例详情' onclick='linkTestExample_details(\""+value+"\")'"
+	    		+"style='background-color: ;cursor: pointer;text-decoration:underline;'>"+arr.length+" 个</a>",].join('');
+    	}
+    }
+    function linkTestExample_details(value){
+    	$.post('/changeCode/getLinkTestExample?testExampleIds='+value,
+				function(json){
+    				if(json.success == true){
+    					var list = json.list; //遍历集合，model展示
+    					var yonglis="";
+    					for(var j = 0; j < list.length; j++) {
+    						yonglis+=yonglis+list[j].testCaseNumber+"<br/>";
+				    	}
+    					$('#myModal').on('show.bs.modal', function (event) {
+				           	 var modal = $(this);
+				           	 modal.find('#methodDetail').html(yonglis);
+			           	});
+			           $("#myModalLabel").text("关联的测试用例详情");
+			           $('#myModal').modal();
+				    }
+		});
     }
     function allParams(value){
     	var a = value;
@@ -490,6 +565,53 @@
    				$("#btn_all").html("<span>总计："+heji+"个</span>");
 		});
     }
+    function coverageReport(){
+          $("#myModalLabel2").text("请输入目标服务器ip地址");
+          $('#myModal2').modal();
+    }
+    function checkIp(ip) {
+        var strRegex = '[0-9]+\.{1}[0-9]+\.{1}[0-9]+\.{1}[0-9]+'; // 22.11.3.23.adf.df也可以匹配。
+        return new RegExp(strRegex).test(ip);
+    }
+    $("#btn_save").click(function(){
+    	var testExampleIp = $("#testExampleIp").val();
+    	if(null != testExampleIp  && "" != testExampleIp) {
+    		if(checkIp(testExampleIp)){
+    			//sendStart(testExampleIp);
+    			window.location.href="${request.contextPath}/coverageReport/index?ipOnTestExample="+testExampleIp;
+    		}else{
+    			alert("ip地址格式有误");
+    		}
+    	}else{
+    		alert("输入不能为空");
+    	}
+    });
+    function getTestedMethods(){
+    	$("#myModalLabel3").text("请输入测试服务器ip地址");
+        $('#myModal3').modal();
+    }
+    $("#btn_save_testserverip").click(function(){
+    	var testServerIp = $("#testServerIp").val();
+    	if(null != testServerIp  && "" != testServerIp) {
+    		if(checkIp(testServerIp)){
+    			$("#loading").show();
+    			//sendStart(testExampleIp);
+    			$.post('/coverageReport/getTestedMethods?testServerIp='+testServerIp,
+    					function(json){
+    						$("#loading").hide();
+    						if(json.success == true){
+    							alert("获取成功，数据已存储到后台");
+    						}else{
+    							alert("获取失败");
+    						}
+    				});
+    		}else{
+    			alert("ip地址格式有误");
+    		}
+    	}else{
+    		alert("输入不能为空");
+    	}
+    });
     </script>
     
     

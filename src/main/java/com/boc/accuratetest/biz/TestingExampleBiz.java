@@ -9,4 +9,8 @@ public interface TestingExampleBiz {
 	List<TestingExample> page(Integer pageNumber, Integer pageSize, String search);
 
 	Integer findTotal(String search);
+
+	void batchSave(List<TestingExample> tes);
+
+	List<TestingExample> findByIds(List<Integer> teids);
 }

@@ -3,10 +3,19 @@
 <mapper namespace="com.boc.accuratetest.mappers.TestingExampleMapper">
   <resultMap id="BaseResultMap" type="com.boc.accuratetest.pojo.TestingExample">
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="testing_example_name" jdbcType="VARCHAR" property="testingExampleName" />
+    <result column="belong_product" jdbcType="VARCHAR" property="belongProduct" />
+    <result column="function" jdbcType="VARCHAR" property="function" />
+    <result column="subfunction" jdbcType="VARCHAR" property="subfunction" />
+    <result column="test_item" jdbcType="VARCHAR" property="testItem" />
+    <result column="test_point" jdbcType="VARCHAR" property="testPoint" />
+    <result column="test_case_number" jdbcType="VARCHAR" property="testCaseNumber" />
+    <result column="test_operation_explain" jdbcType="VARCHAR" property="testOperationExplain" />
+    <result column="expected_results" jdbcType="VARCHAR" property="expectedResults" />
+    <result column="production_task_number" jdbcType="VARCHAR" property="productionTaskNumber" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, testing_example_name
+    id, belong_product, function, subfunction, test_item, test_point, test_case_number, 
+    test_operation_explain, expected_results, production_task_number
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -19,8 +28,14 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.boc.accuratetest.pojo.TestingExample">
-    insert into testing_example (id, testing_example_name)
-    values (#{id,jdbcType=INTEGER}, #{testingExampleName,jdbcType=VARCHAR})
+    insert into testing_example (id, belong_product, function, 
+      subfunction, test_item, test_point, 
+      test_case_number, test_operation_explain, expected_results, 
+      production_task_number)
+    values (#{id,jdbcType=INTEGER}, #{belongProduct,jdbcType=VARCHAR}, #{function,jdbcType=VARCHAR}, 
+      #{subfunction,jdbcType=VARCHAR}, #{testItem,jdbcType=VARCHAR}, #{testPoint,jdbcType=VARCHAR}, 
+      #{testCaseNumber,jdbcType=VARCHAR}, #{testOperationExplain,jdbcType=VARCHAR}, #{expectedResults,jdbcType=VARCHAR}, 
+      #{productionTaskNumber,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.boc.accuratetest.pojo.TestingExample">
     insert into testing_example
@@ -28,38 +43,117 @@
       <if test="id != null">
         id,
       </if>
-      <if test="testingExampleName != null">
-        testing_example_name,
+      <if test="belongProduct != null">
+        belong_product,
+      </if>
+      <if test="function != null">
+        function,
+      </if>
+      <if test="subfunction != null">
+        subfunction,
+      </if>
+      <if test="testItem != null">
+        test_item,
+      </if>
+      <if test="testPoint != null">
+        test_point,
+      </if>
+      <if test="testCaseNumber != null">
+        test_case_number,
+      </if>
+      <if test="testOperationExplain != null">
+        test_operation_explain,
+      </if>
+      <if test="expectedResults != null">
+        expected_results,
+      </if>
+      <if test="productionTaskNumber != null">
+        production_task_number,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
         #{id,jdbcType=INTEGER},
       </if>
-      <if test="testingExampleName != null">
-        #{testingExampleName,jdbcType=VARCHAR},
+      <if test="belongProduct != null">
+        #{belongProduct,jdbcType=VARCHAR},
+      </if>
+      <if test="function != null">
+        #{function,jdbcType=VARCHAR},
+      </if>
+      <if test="subfunction != null">
+        #{subfunction,jdbcType=VARCHAR},
+      </if>
+      <if test="testItem != null">
+        #{testItem,jdbcType=VARCHAR},
+      </if>
+      <if test="testPoint != null">
+        #{testPoint,jdbcType=VARCHAR},
+      </if>
+      <if test="testCaseNumber != null">
+        #{testCaseNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="testOperationExplain != null">
+        #{testOperationExplain,jdbcType=VARCHAR},
+      </if>
+      <if test="expectedResults != null">
+        #{expectedResults,jdbcType=VARCHAR},
+      </if>
+      <if test="productionTaskNumber != null">
+        #{productionTaskNumber,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.boc.accuratetest.pojo.TestingExample">
     update testing_example
     <set>
-      <if test="testingExampleName != null">
-        testing_example_name = #{testingExampleName,jdbcType=VARCHAR},
+      <if test="belongProduct != null">
+        belong_product = #{belongProduct,jdbcType=VARCHAR},
+      </if>
+      <if test="function != null">
+        function = #{function,jdbcType=VARCHAR},
+      </if>
+      <if test="subfunction != null">
+        subfunction = #{subfunction,jdbcType=VARCHAR},
+      </if>
+      <if test="testItem != null">
+        test_item = #{testItem,jdbcType=VARCHAR},
+      </if>
+      <if test="testPoint != null">
+        test_point = #{testPoint,jdbcType=VARCHAR},
+      </if>
+      <if test="testCaseNumber != null">
+        test_case_number = #{testCaseNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="testOperationExplain != null">
+        test_operation_explain = #{testOperationExplain,jdbcType=VARCHAR},
+      </if>
+      <if test="expectedResults != null">
+        expected_results = #{expectedResults,jdbcType=VARCHAR},
+      </if>
+      <if test="productionTaskNumber != null">
+        production_task_number = #{productionTaskNumber,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.boc.accuratetest.pojo.TestingExample">
     update testing_example
-    set testing_example_name = #{testingExampleName,jdbcType=VARCHAR}
+    set belong_product = #{belongProduct,jdbcType=VARCHAR},
+      function = #{function,jdbcType=VARCHAR},
+      subfunction = #{subfunction,jdbcType=VARCHAR},
+      test_item = #{testItem,jdbcType=VARCHAR},
+      test_point = #{testPoint,jdbcType=VARCHAR},
+      test_case_number = #{testCaseNumber,jdbcType=VARCHAR},
+      test_operation_explain = #{testOperationExplain,jdbcType=VARCHAR},
+      expected_results = #{expectedResults,jdbcType=VARCHAR},
+      production_task_number = #{productionTaskNumber,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  
-    <select id="page" resultMap="BaseResultMap">
+  <select id="page" resultMap="BaseResultMap">
     select * from testing_example
     <if test="search != null">
-        testing_example_name = #{search,jdbcType=VARCHAR}
+        belong_product = #{search,jdbcType=VARCHAR}
     </if>
     limit #{limit} , #{pageSize}
   </select>
@@ -67,7 +161,26 @@
   <select id="findTotal" resultType="java.lang.Integer">
     select count(*) from testing_example
     <if test="search != null">
-        where testing_example_name = #{search,jdbcType=VARCHAR}
+        where belong_product = #{search,jdbcType=VARCHAR}
     </if>
+  </select>
+  <insert id="batchSave" parameterType="java.util.List">
+    insert into testing_example (belong_product, function, subfunction, test_item, test_point, 
+    	test_case_number, test_operation_explain, expected_results, 
+      production_task_number)
+    values 
+    <foreach collection="list" index="index" item="item" separator=",">
+	    (#{item.belongProduct,jdbcType=VARCHAR}, #{item.function,jdbcType=VARCHAR}, #{item.subfunction,jdbcType=VARCHAR}, 
+	    #{item.testItem,jdbcType=VARCHAR}, #{item.testPoint,jdbcType=VARCHAR}, 
+      #{item.testCaseNumber,jdbcType=VARCHAR}, #{item.testOperationExplain,jdbcType=VARCHAR}, 
+      #{item.expectedResults,jdbcType=VARCHAR}, #{item.productionTaskNumber,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  <select id="findByIds" resultMap="BaseResultMap" parameterType="java.util.List">
+    select * from testing_example
+        where id in 
+        <foreach collection="list" item="id" index="index" open="(" close=")" separator=",">
+		  #{id}
+		</foreach>
   </select>
 </mapper>

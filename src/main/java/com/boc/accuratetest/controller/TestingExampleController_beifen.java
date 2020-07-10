@@ -122,7 +122,7 @@ public class TestingExampleController_beifen {
     	String className = split2[split2.length-2]; // 类名
     	String packageName = tempStr.substring(tempStr.indexOf(callTime)+callTime.length()+1, 
     			tempStr.indexOf(className)-1); // 包路径
-    	m.setPackageUrl(packageName);
+    	m.setPackageName(packageName);
     	m.setJavabeanName(className);
     	m.setMethodName(methodName);
     	m.setParamType(params);

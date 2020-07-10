@@ -160,7 +160,7 @@
             </plugin>
            -->
 <!-- 字节码插桩 -->
-<plugin>
+<!--<plugin>
 	<groupId>com.jzcs</groupId>
 	<artifactId>chazhuang-maven-plugin</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -169,11 +169,10 @@
 		    <phase>compile</phase>
 		    <goals>
 		        <goal>chazhuang</goal>
-		        <goal>runtimeOutPutMethodLinkMojo</goal>
 		    </goals>
 		</execution>
 	</executions>
-</plugin>
+</plugin>-->
 		</plugins>
 	</build>
 

@@ -49,7 +49,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.boc.accuratetest.annotation.SecurityIgnoreHandler;
 import com.boc.accuratetest.biz.ChangeCodeBiz;
+import com.boc.accuratetest.biz.TestingExampleBiz;
 import com.boc.accuratetest.pojo.ChangeCode;
+import com.boc.accuratetest.pojo.TestingExample;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -59,6 +61,8 @@ import net.sf.json.JSONObject;
 public class ChangeCodeController {
 	@Autowired
 	private ChangeCodeBiz changeCodeBiz;
+	@Autowired
+	private TestingExampleBiz testingExampleBiz;
 	@Value("${release_diff_url}")
 	private String release_diff_url;
 	@Value("${release_branch_url}")
@@ -91,7 +95,7 @@ public class ChangeCodeController {
 		List<ChangeCode> page = changeCodeBiz.page(pageNumber, pageSize, search,dataOfPart);
 		Integer total = changeCodeBiz.findTotal(search,dataOfPart);
 		
-		// 查找关联的测试用例。变更表——方法链表——方法链ref用例表——用例表(package_name暂存测试用例名称)
+		// 查找关联的测试用例。变更表——方法链表——方法链ref用例表——用例表(package_name暂存测试用例id)
 		List<ChangeCode> links = changeCodeBiz.findChangeCodeLinkTestExample();
 		for (ChangeCode pg : page) {
 			StringBuilder sb = new StringBuilder();
@@ -410,35 +414,22 @@ public class ChangeCodeController {
 		json.put("data", statistics);
 		return json;
 	}
+	
+	@SecurityIgnoreHandler
+	@RequestMapping("getLinkTestExample")
+	@ResponseBody
+	public JSONObject getLinkTestExample(String testExampleIds) {
+		JSONObject json = new JSONObject();
+		String[] ids = testExampleIds.split(",");
+		List<Integer> teids = new ArrayList<>();
+		for (String id : ids) {
+			teids.add(Integer.valueOf(id));
+		}
+		List<TestingExample> tes = testingExampleBiz.findByIds(teids);
+		json.put("list", tes);
+		json.put("success", true);
+		return json;
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

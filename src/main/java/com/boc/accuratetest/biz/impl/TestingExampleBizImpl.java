@@ -32,4 +32,15 @@ public class TestingExampleBizImpl implements TestingExampleBiz{
 		return total;
 	}
 
+	@Override
+	public void batchSave(List<TestingExample> tes) {
+		testingExampleMapper.batchSave(tes);
+	}
+
+	@Override
+	public List<TestingExample> findByIds(List<Integer> teids) {
+		List<TestingExample> tes =testingExampleMapper.findByIds(teids);
+		return tes;
+	}
+
 }

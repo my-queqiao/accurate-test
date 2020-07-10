@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.boc.accuratetest.mappers.MethodChainOriginalMapper">
-  <resultMap id="BaseResultMap" type="com.boc.accuratetest.pojo.MethodChainOriginal">
+<mapper namespace="com.boc.accuratetest.mappers.TestedMethodsMapper">
+  <resultMap id="BaseResultMap" type="com.boc.accuratetest.pojo.TestedMethods">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="package_name" jdbcType="VARCHAR" property="packageName" />
     <result column="javabean_name" jdbcType="VARCHAR" property="javabeanName" />
@@ -16,23 +16,23 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from method_chain_original
+    from tested_methods
     where id = #{id,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from method_chain_original
+    delete from tested_methods
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.boc.accuratetest.pojo.MethodChainOriginal">
-    insert into method_chain_original (id, package_name, javabean_name, 
+  <insert id="insert" parameterType="com.boc.accuratetest.pojo.TestedMethods">
+    insert into tested_methods (id, package_name, javabean_name, 
       method_name, param_type, call_time, 
       call_time_long)
     values (#{id,jdbcType=INTEGER}, #{packageName,jdbcType=VARCHAR}, #{javabeanName,jdbcType=VARCHAR}, 
       #{methodName,jdbcType=VARCHAR}, #{paramType,jdbcType=VARCHAR}, #{callTime,jdbcType=VARCHAR}, 
       #{callTimeLong,jdbcType=BIGINT})
   </insert>
-  <insert id="insertSelective" parameterType="com.boc.accuratetest.pojo.MethodChainOriginal">
-    insert into method_chain_original
+  <insert id="insertSelective" parameterType="com.boc.accuratetest.pojo.TestedMethods">
+    insert into tested_methods
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
@@ -80,8 +80,8 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.boc.accuratetest.pojo.MethodChainOriginal">
-    update method_chain_original
+  <update id="updateByPrimaryKeySelective" parameterType="com.boc.accuratetest.pojo.TestedMethods">
+    update tested_methods
     <set>
       <if test="packageName != null">
         package_name = #{packageName,jdbcType=VARCHAR},
@@ -104,8 +104,8 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.boc.accuratetest.pojo.MethodChainOriginal">
-    update method_chain_original
+  <update id="updateByPrimaryKey" parameterType="com.boc.accuratetest.pojo.TestedMethods">
+    update tested_methods
     set package_name = #{packageName,jdbcType=VARCHAR},
       javabean_name = #{javabeanName,jdbcType=VARCHAR},
       method_name = #{methodName,jdbcType=VARCHAR},
@@ -114,17 +114,9 @@
       call_time_long = #{callTimeLong,jdbcType=BIGINT}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <select id="getAll" resultMap="BaseResultMap">
-    select *
-    from method_chain_original
-  </select>
-  <select id="findTotal" resultType="java.lang.Integer">
-    select count(*)
-    from method_chain_original order by call_time_long asc
-  </select>
-  <insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys = "true" keyProperty = "id">
-    insert into method_chain_original (package_name, javabean_name, 
-      method_name, param_type, call_time, call_time_long)
+  
+  <insert id="insertBatchForTestedMethods" parameterType="java.util.List">
+    insert into tested_methods (package_name, javabean_name, method_name, param_type,call_time, call_time_long)
     values 
     <foreach collection="list" index="index" item="item" separator=",">
 	    (#{item.packageName,jdbcType=VARCHAR}, #{item.javabeanName,jdbcType=VARCHAR}, 
@@ -133,4 +125,8 @@
     </foreach>
   </insert>
   
+  <select id="getAll" resultMap="BaseResultMap">
+    select DISTINCT package_name,javabean_name,method_name,param_type
+    from tested_methods 
+  </select>
 </mapper>
