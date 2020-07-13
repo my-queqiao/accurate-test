@@ -21,8 +21,8 @@ public class AllMethods {
     private Integer addFunNumber; // 每一个类中的新增方法数量
     private Integer addFunTestedNumber; // 每个类中的新增方法已测试数量
     
-    private Integer testedOrNot; // 0未测试，1已测试
-    private Integer addOrNot; // 是否为新增方法
+    private Integer changeType; // 是否为新增方法
+    private String testedOrNot; // 
 
     public Integer getMethodNumber() {
 		return methodNumber;
@@ -72,20 +72,20 @@ public class AllMethods {
 		this.addFunTestedNumber = addFunTestedNumber;
 	}
 
-	public Integer getTestedOrNot() {
+	public String getTestedOrNot() {
 		return testedOrNot;
 	}
 
-	public void setTestedOrNot(Integer testedOrNot) {
+	public void setTestedOrNot(String testedOrNot) {
 		this.testedOrNot = testedOrNot;
 	}
-
-	public Integer getAddOrNot() {
-		return addOrNot;
+	
+	public Integer getChangeType() {
+		return changeType;
 	}
 
-	public void setAddOrNot(Integer addOrNot) {
-		this.addOrNot = addOrNot;
+	public void setChangeType(Integer changeType) {
+		this.changeType = changeType;
 	}
 
 	public Integer getId() {

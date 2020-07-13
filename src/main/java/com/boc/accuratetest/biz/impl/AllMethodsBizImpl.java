@@ -40,5 +40,13 @@ public class AllMethodsBizImpl implements AllMethodsBiz{
 	public List<AllMethods> statisticClassNumber() {
 		return allMethodsMapper.statisticClassNumber();
 	}
+	@Override
+	public List<AllMethods> statisticMethodInfoInClass(String packageName) {
+		return allMethodsMapper.statisticMethodInfoInClass(packageName);
+	}
+	@Override
+	public List<AllMethods> methodInfoInClass(String packageName, String simpleClassName) {
+		return allMethodsMapper.methodInfoInClass(packageName,simpleClassName);
+	}
 	
 }

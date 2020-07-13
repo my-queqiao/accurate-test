@@ -59,6 +59,7 @@
     </div>
     <script>
     $(function () {
+    	//var packageName = "${packageName}";
 
         //1.初始化Table
         var oTable = new TableInit();
@@ -75,7 +76,7 @@
         //初始化Table
         oTableInit.Init = function () {
             $('#tb_departments').bootstrapTable({
-                url: '/coverageReport/getAll',         //请求后台的URL（*）
+                url: '/coverageReport/getClassInfo',         //请求后台的URL（*）
                 method: 'get',                      //请求方式（*）
                 dataType: 'json',  
                 toolbar: '#toolbar',                //工具按钮用哪个容器
@@ -119,31 +120,9 @@
                     title: '主键id'
                 }, */
                 {
-                    field: 'packageName',
-                    title: '包路径',
-                    formatter: packageNameFormatter
-                }, 
-                {
-                    field: 'classNumber',
-                    title: '类数量',
-                    footerFormatter:function(list){
-                    	var sum = 0;
-                    	$.each(list,function(i,element){
-                    		sum += element.classNumber;
-                    	});
-                    	return sum;
-                    }
-                }, 
-                {
-                    field: 'testedclassNumber',
-                    title: '已测试的类数量',
-                    footerFormatter:function(list){
-                    	var sum = 0;
-                    	$.each(list,function(i,element){
-                    		sum += element.testedclassNumber;
-                    	});
-                    	return sum;
-                    }
+                    field: 'javabeanName',
+                    title: '类',
+                    formatter: javabeanNameFormatter
                 }, 
                 {
                     field: 'methodNumber',
@@ -202,7 +181,7 @@
             var temp = {   
                 pageSize: params.pageSize,   //页面大小
                 pageNumber: params.pageNumber,  //页码
-                //dataOfPart: $("#dataOfPart").val(),
+                packageName: "${packageName}",
                 //statu: $("#txt_search_statu").val()
             };
             return temp;
@@ -335,14 +314,14 @@
 
         return oInit;
     };
-    function packageNameFormatter(value, row, index) {
+    function javabeanNameFormatter(value, row, index) {
     	return [
-    		"<a title='查看包详情' onclick='package_details(\""+value+"\")'"
+    		"<a title='查看类详情' onclick='package_details(\""+"${packageName}."+value+"\")'"
     		+"style='background-color: ;cursor: pointer;text-decoration:underline;'>"+value+"</a>",  
     		].join("");
     }
     function package_details(value){
-    	window.location.href="${request.contextPath}/coverageReport/toClassInfo?packageName="+value;
+    	window.location.href="${request.contextPath}/coverageReport/toMethodInfo?className="+value;
     }
     function coverageReport(){
         $("#myModalLabel2").text("请输入目标服务器ip地址");

@@ -59,7 +59,6 @@
     </div>
     <script>
     $(function () {
-
         //1.初始化Table
         var oTable = new TableInit();
         oTable.Init();
@@ -75,7 +74,7 @@
         //初始化Table
         oTableInit.Init = function () {
             $('#tb_departments').bootstrapTable({
-                url: '/coverageReport/getAll',         //请求后台的URL（*）
+                url: '/coverageReport/getMethodInfo',         //请求后台的URL（*）
                 method: 'get',                      //请求方式（*）
                 dataType: 'json',  
                 toolbar: '#toolbar',                //工具按钮用哪个容器
@@ -110,84 +109,24 @@
                 showFooter:true,
                 columns: [{
                     checkbox: true,
-                    footerFormatter:function(value){
-                    	return "合计";
-                    }
                 }, 
                 /* {
                     field: 'id',
                     title: '主键id'
                 }, */
                 {
-                    field: 'packageName',
-                    title: '包路径',
-                    formatter: packageNameFormatter
+                    field: 'methodName',
+                    title: '方法名',
                 }, 
                 {
-                    field: 'classNumber',
-                    title: '类数量',
-                    footerFormatter:function(list){
-                    	var sum = 0;
-                    	$.each(list,function(i,element){
-                    		sum += element.classNumber;
-                    	});
-                    	return sum;
-                    }
+                    field: 'changeType',
+                    title: '是否是新增方法',
+                    formatter: changeTypeFormatter
                 }, 
                 {
-                    field: 'testedclassNumber',
-                    title: '已测试的类数量',
-                    footerFormatter:function(list){
-                    	var sum = 0;
-                    	$.each(list,function(i,element){
-                    		sum += element.testedclassNumber;
-                    	});
-                    	return sum;
-                    }
-                }, 
-                {
-                    field: 'methodNumber',
-                    title: '方法数量',
-                    footerFormatter:function(list){
-                    	var sum = 0;
-                    	$.each(list,function(i,element){
-                    		sum += element.methodNumber;
-                    	});
-                    	return sum;
-                    }
-                }, 
-                {
-                    field: 'methodTestedNumber',
-                    title: '已测试的方法数量',
-                    footerFormatter:function(list){
-                    	var sum = 0;
-                    	$.each(list,function(i,element){
-                    		sum += element.methodTestedNumber;
-                    	});
-                    	return sum;
-                    }
-                }, 
-                {
-                    field: 'addFunNumber',
-                    title: '新增方法数量',
-                    footerFormatter:function(list){
-                    	var sum = 0;
-                    	$.each(list,function(i,element){
-                    		sum += element.addFunNumber;
-                    	});
-                    	return sum;
-                    }
-                }, 
-                {
-                    field: 'addFunTestedNumber',
-                    title: '已测试的新增方法数量',
-                    footerFormatter:function(list){
-                    	var sum = 0;
-                    	$.each(list,function(i,element){
-                    		sum += element.addFunTestedNumber;
-                    	});
-                    	return sum;
-                    }
+                    field: 'testedOrNot',
+                    title: '是否经过测试',
+                    formatter: testedOrNotFormatter
                 }, 
                 ]
             });
@@ -202,7 +141,7 @@
             var temp = {   
                 pageSize: params.pageSize,   //页面大小
                 pageNumber: params.pageNumber,  //页码
-                //dataOfPart: $("#dataOfPart").val(),
+                className: "${className}",
                 //statu: $("#txt_search_statu").val()
             };
             return temp;
@@ -244,137 +183,27 @@
                 $("#dataOfPart").val(1);
             });
 
-            $("#btn_edit").click(function () {
-               	 var opt = {
-               		        url: "/changeCode/getAll",
-               		        silent: true,
-               		        query:{
-               		            dataOfPart:3,
-               		        }
-               		    };
-                $("#tb_departments").bootstrapTable('refresh',opt);//带参数 刷新
-                $("#dataOfPart").val(3);
-            });
-
-            $("#btn_delete").click(function () {
-                  	 var opt = {
-                  		        url: "/changeCode/getAll",
-                  		        silent: true,
-                  		        query:{
-                  		            dataOfPart:2,
-                  		        }
-                  		    };
-                $("#tb_departments").bootstrapTable('refresh',opt);//带参数 刷新
-                $("#dataOfPart").val(2);
-            });
-           	$("#btn_all").click(function () {
-                     	 var opt = {
-                     		        url: "/changeCode/getAll",
-                     		        silent: true,
-                     		        query:{
-                     		            dataOfPart:0,
-                     		        }
-                     		    };
-                   $("#tb_departments").bootstrapTable('refresh',opt);//带参数 刷新
-                   $("#dataOfPart").val(0);
-               });
-
-            $("#btn_submit").click(function () {
-                //postdata.DEPARTMENT_NAME = $("#txt_departmentname").val();
-                //postdata.PARENT_ID = $("#txt_parentdepartment").val();
-                //postdata.DEPARTMENT_LEVEL = $("#txt_departmentlevel").val();
-                //postdata.STATUS = $("#txt_statu").val();
-                //$.ajax({
-                //    type: "post",
-                //    url: "/Home/GetEdit",
-                //    data: { "": JSON.stringify(postdata) },
-                //    success: function (data, status) {
-                //        if (status == "success") {
-                //            toastr.success('提交数据成功');
-                //            $("#tb_departments").bootstrapTable('refresh');
-                //        }
-                //    },
-                //    error: function () {
-                //        toastr.error('Error');
-                //    },
-                //    complete: function () {
-
-                //    }
-
-                //});
-            });
-
-            $("#btn_query").click(function () {
-            	var gitUrl = $("#git_url").val();
-            	var masterBranch = $("#master_branch").val();
-            	var testBranch = $("#test_branch").val();
-            	if(gitUrl == ""){
-            		alert("git仓库不能为空");
-            		return;
-            	}
-            	if(masterBranch == "" || masterBranch == "0"){
-            		alert("稳定分支不能为空");
-            		return;
-            	}
-            	if(testBranch == "" || testBranch == "0"){
-            		alert("测试分支不能为空");
-            		return;
-            	}
-            	getData_before();
-            	$.post('/changeCode/getChangeData?git_url='+gitUrl+'&master_branch='+masterBranch+'&test_branch='+testBranch,
-        				function(json){
-            		getData_after();
-            				alert(json.res);
-            				if(json.success == true){
-            					statistics();
-	                			$("#tb_departments").bootstrapTable('refresh');
-            				}
-        		});
-            });
         };
 
         return oInit;
     };
-    function packageNameFormatter(value, row, index) {
-    	return [
-    		"<a title='查看包详情' onclick='package_details(\""+value+"\")'"
-    		+"style='background-color: ;cursor: pointer;text-decoration:underline;'>"+value+"</a>",  
-    		].join("");
+    function changeTypeFormatter(value){
+    	if(value == "1"){
+    		return ["新增",].join("");
+    	}else if(value == "2"){
+    		return ["删除",].join("");
+	    }else if(value == "3"){
+    		return ["修改",].join("");
+	    }else{
+    		return ["未变更",].join("");
+	    }
     }
-    function package_details(value){
-    	window.location.href="${request.contextPath}/coverageReport/toClassInfo?packageName="+value;
-    }
-    function coverageReport(){
-        $("#myModalLabel2").text("请输入目标服务器ip地址");
-        $('#myModal2').modal();
-  }
-    function checkIp(ip) {
-        var strRegex = '[0-9]+\.{1}[0-9]+\.{1}[0-9]+\.{1}[0-9]+'; // 22.11.3.23.adf.df也可以匹配。
-        return new RegExp(strRegex).test(ip);
-    }
-    $("#btn_save").click(function(){
-    	var testExampleIp = $("#testExampleIp").val();
-    	if(null != testExampleIp  && "" != testExampleIp) {
-    		if(checkIp(testExampleIp)){
-    			getAllMethodInfo(testExampleIp);
-    		}else{
-    			alert("ip地址格式有误");
-    		}
+    function testedOrNotFormatter(value){
+    	if(value == ""){
+    		return ["否",].join("");
     	}else{
-    		alert("输入不能为空");
-    	}
-    });
-    function getAllMethodInfo(testExampleIp){
-    	$("#loading").show();
-    	$.post('/coverageReport/getAllMethodInfo?ipOnTestExample='+testExampleIp,
-				function(json){
-    		$("#loading").hide();
-    				if(json.success == false){
-    					alert(json.msg);
-    				}else{
-    					$("#tb_departments").bootstrapTable('refresh');
-    				}
-		});
+    		return ["已测试",].join("");
+	    }
     }
     </script>
     

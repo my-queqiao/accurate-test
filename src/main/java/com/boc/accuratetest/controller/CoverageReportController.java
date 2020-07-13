@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -71,6 +72,68 @@ public class CoverageReportController {
 		
 		json.put("rows", statisticClassNumber);
 		json.put("total", statisticClassNumber.size());
+		return json;
+	}
+	/**
+	 * 	跳转到类信息页面
+	 * @param packageName
+	 * @param model
+	 * @return
+	 */
+	@SecurityIgnoreHandler
+	@RequestMapping("toClassInfo")
+	public String toClassInfo(String packageName,Model model) {
+		model.addAttribute("packageName", packageName);
+		return "coverageClassInfo";
+	}
+	/**
+	 * 	获取指定包路径下的类信息
+	 * @param packageName
+	 * @return
+	 */
+	@SecurityIgnoreHandler
+	@RequestMapping("getClassInfo")
+	@ResponseBody
+	public JSONObject getClassInfo(String packageName) {
+		JSONObject json = new JSONObject();
+		
+		// 统计每个包的各自类数量、方法数量、增加方法数量，及其已测试数量
+		List<AllMethods> statisticClassNumber = allMethodsBiz.statisticMethodInfoInClass(packageName);
+		
+		json.put("rows", statisticClassNumber);
+		json.put("total", statisticClassNumber.size());
+		return json;
+	}
+	/**
+	 * 	跳转到方法信息页面
+	 * @param packageName
+	 * @param model
+	 * @return
+	 */
+	@SecurityIgnoreHandler
+	@RequestMapping("toMethodInfo")
+	public String toMethodInfo(String className,Model model) {
+		model.addAttribute("className", className);
+		return "coverageMethodInfo";
+	}
+	/**
+	 * 	获取指定类下面的方法名、并注明是否是新增方法、是否已测试
+	 * @param className
+	 * @return
+	 */
+	@SecurityIgnoreHandler
+	@RequestMapping("getMethodInfo")
+	@ResponseBody
+	public JSONObject getMethodInfo(String className) {
+		String packageName = className.substring(0, className.lastIndexOf("."));
+		String simpleClassName = className.substring(className.lastIndexOf(".")+1);
+		JSONObject json = new JSONObject();
+		
+		// 统计每个包的各自类数量、方法数量、增加方法数量，及其已测试数量
+		List<AllMethods> methodInfos = allMethodsBiz.methodInfoInClass(packageName,simpleClassName);
+		
+		json.put("rows", methodInfos);
+		json.put("total", methodInfos.size());
 		return json;
 	}
 	/**

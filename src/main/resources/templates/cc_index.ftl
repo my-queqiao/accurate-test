@@ -139,6 +139,10 @@
             <a id="btn_all" class="btn btn-info">
                 <span>总计：0个</span>
             </a>
+            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+            <a id="btn_recommend" class="btn btn-success">
+                <span>推荐测试用例</span>
+            </a>
         </div>
         <table id="tb_departments"></table>
     </div>
@@ -576,6 +580,9 @@
     		alert("输入不能为空");
     	}
     });
+    $("#btn_recommend").click(function () {
+    	alert("待开发");
+	});
     </script>
     
     

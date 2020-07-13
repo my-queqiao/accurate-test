@@ -26,4 +26,8 @@ public interface AllMethodsMapper {
 	List<AllMethods> getAll();
 
 	List<AllMethods> statisticClassNumber();
+
+	List<AllMethods> statisticMethodInfoInClass(String packageName);
+
+	List<AllMethods> methodInfoInClass(String packageName, String simpleClassName);
 }
