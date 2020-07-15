@@ -20,4 +20,6 @@ public interface TestedMethodsMapper {
 	void insertBatchForTestedMethods(List<TestedMethods> tms);
 
 	List<TestedMethods> getAll();
+
+	void updateChangeCodeTestingOrNot();
 }

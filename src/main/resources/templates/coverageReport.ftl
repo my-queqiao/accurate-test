@@ -136,7 +136,7 @@
                 }, 
                 {
                     field: 'testedclassNumber',
-                    title: '已测试的类数量',
+                    title: '已测试的<br>类数量',
                     footerFormatter:function(list){
                     	var sum = 0;
                     	$.each(list,function(i,element){
@@ -158,7 +158,7 @@
                 }, 
                 {
                     field: 'methodTestedNumber',
-                    title: '已测试的方法数量',
+                    title: '已测试的<br>方法数量',
                     footerFormatter:function(list){
                     	var sum = 0;
                     	$.each(list,function(i,element){
@@ -180,11 +180,33 @@
                 }, 
                 {
                     field: 'addFunTestedNumber',
-                    title: '已测试的新增方法数量',
+                    title: '已测试的<br>新增方法数量',
                     footerFormatter:function(list){
                     	var sum = 0;
                     	$.each(list,function(i,element){
                     		sum += element.addFunTestedNumber;
+                    	});
+                    	return sum;
+                    }
+                }, 
+                {
+                    field: 'modifyFunNumber',
+                    title: '修改方法数量',
+                    footerFormatter:function(list){
+                    	var sum = 0;
+                    	$.each(list,function(i,element){
+                    		sum += element.modifyFunNumber;
+                    	});
+                    	return sum;
+                    }
+                }, 
+                {
+                    field: 'modifyFunTestedNumber',
+                    title: '已测试的<br>修改方法数量',
+                    footerFormatter:function(list){
+                    	var sum = 0;
+                    	$.each(list,function(i,element){
+                    		sum += element.modifyFunTestedNumber;
                     	});
                     	return sum;
                     }

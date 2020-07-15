@@ -347,8 +347,8 @@
     				if(json.success == true){
     					var list = json.list; //遍历集合，model展示
     					var yonglis="";
-    					for(var j = 0; j < list.length; j++) {
-    						yonglis+=yonglis+list[j].testCaseNumber+"<br/>";
+    					for(var j = 1; j < list.length+1; j++) {
+    						yonglis += j+"."+list[j-1].testCaseNumber+"<br/>";
 				    	}
     					$('#myModal').on('show.bs.modal', function (event) {
 				           	 var modal = $(this);
@@ -569,6 +569,7 @@
     						$("#loading").hide();
     						if(json.success == true){
     							alert("获取成功，数据已存储到后台");
+    							$("#tb_departments").bootstrapTable('refresh');
     						}else{
     							alert("获取失败");
     						}
@@ -581,7 +582,31 @@
     	}
     });
     $("#btn_recommend").click(function () {
-    	alert("待开发");
+    	$.post('/changeCode/recommendTestExample',
+			function(json){
+	    		var list = json.list; //遍历集合，model展示
+				var yonglis="";
+				for(var j = 1; j < list.length+1; j++) {
+					
+					var n = list[j-1];
+					if(n.indexOf("@") >= 0){
+						var n5 = n.split("@");
+						var reg = new RegExp("@","g");//g,表示全部替换。
+		    			var n2 = n.replace(reg,"<br>");
+		    			yonglis += j+" . "+n2+"";
+		    			yonglis += "<span style='color:red;'>以上"+(n5.length-1)+"个测试用例，任选一个执行即可</span><br/>";
+					}else{
+						yonglis += j+" . "+list[j-1]+"<br/>";
+					}
+					
+		    	}
+				$('#myModal').on('show.bs.modal', function (event) {
+		           	 var modal = $(this);
+		           	 modal.find('#methodDetail').html(yonglis);
+	           	});
+	           $("#myModalLabel").text("推荐测试用例");
+	           $('#myModal').modal();
+			});
 	});
     </script>
     

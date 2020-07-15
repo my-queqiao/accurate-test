@@ -27,10 +27,10 @@
 	    	<span class="col-xs-12 " style="font-size: xx-large;">
 	    		<span style="margin-left: ;">覆盖率报告</span>
 	    	</span>
-	    	<span class="" style="font-size:large;bottom:-20px;position: absolute; left: 82%;top: 33px;">
+	    	<!-- <span class="" style="font-size:large;bottom:-20px;position: absolute; left: 82%;top: 33px;">
 	    		<a target="_blank" onclick="coverageReport();" style="margin-left: ;color: blue;
 	    			cursor: pointer;text-decoration:underline;float:left;">获取测试项目所有方法</a>
-	    	</span>
+	    	</span> -->
 	    </div>
         <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
 	        <div class="modal-dialog" role="document">
@@ -160,6 +160,28 @@
                 {
                     field: 'addFunTestedNumber',
                     title: '已测试的新增方法数量',
+                    footerFormatter:function(list){
+                    	var sum = 0;
+                    	$.each(list,function(i,element){
+                    		sum += element.addFunTestedNumber;
+                    	});
+                    	return sum;
+                    }
+                }, 
+                {
+                    field: 'modifyFunNumber',
+                    title: '修改方法数量',
+                    footerFormatter:function(list){
+                    	var sum = 0;
+                    	$.each(list,function(i,element){
+                    		sum += element.addFunNumber;
+                    	});
+                    	return sum;
+                    }
+                }, 
+                {
+                    field: 'modifyFunTestedNumber',
+                    title: '已测试的修改方法数量',
                     footerFormatter:function(list){
                     	var sum = 0;
                     	$.each(list,function(i,element){

@@ -15,16 +15,35 @@ public class AllMethods {
     private Integer classNumber; // 每个包的各自类数量
     private Integer testedclassNumber; // 每个包的各自已测试类数量
     
-    private Integer methodNumber; // 每个类中的方法数量
-    private Integer methodTestedNumber; // 每个类中的已测试方法数量
+    private Integer methodNumber; // 每个包、类中的方法数量
+    private Integer methodTestedNumber; // 每个包、类中的已测试方法数量
     
-    private Integer addFunNumber; // 每一个类中的新增方法数量
-    private Integer addFunTestedNumber; // 每个类中的新增方法已测试数量
+    private Integer addFunNumber; // 每一个包、类中的新增方法数量
+    private Integer addFunTestedNumber; // 每个包、类中的新增方法已测试数量
     
-    private Integer changeType; // 是否为新增方法
+    private Integer modifyFunNumber; // 每一个包、类中的新增方法数量
+    private Integer modifyFunTestedNumber; // 每个包、类中的新增方法已测试数量
+    
+    private Integer changeType; // 是否为新增方法，变更类型
     private String testedOrNot; // 
+    
+    public Integer getModifyFunNumber() {
+		return modifyFunNumber;
+	}
 
-    public Integer getMethodNumber() {
+	public void setModifyFunNumber(Integer modifyFunNumber) {
+		this.modifyFunNumber = modifyFunNumber;
+	}
+
+	public Integer getModifyFunTestedNumber() {
+		return modifyFunTestedNumber;
+	}
+
+	public void setModifyFunTestedNumber(Integer modifyFunTestedNumber) {
+		this.modifyFunTestedNumber = modifyFunTestedNumber;
+	}
+
+	public Integer getMethodNumber() {
 		return methodNumber;
 	}
 

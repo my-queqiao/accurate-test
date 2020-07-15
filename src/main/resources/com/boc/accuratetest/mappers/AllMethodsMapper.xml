@@ -119,7 +119,7 @@
   
   <select id="statisticClassNumber" resultMap="BaseResultMap">
     SELECT m.package_name,m.classNumber,n.testedClassNumber ,o.methodNumber,p.methodTestedNumber,
-    		q.addFunNumber,r.addFunTestedNumber
+    		q.addFunNumber,r.addFunTestedNumber,s.modifyFunNumber,u.modifyFunTestedNumber 
     from 
     	<!-- 从句1，每个包、及其各自类的数量 -->
 		(SELECT package_name, COUNT(DISTINCT package_name,javabean_name) as classNumber
@@ -161,12 +161,30 @@
       		and c.param_type=t.param_type
       		and c.change_type=1 
 			GROUP BY c.package_name) r
-	on m.package_name = r.package_name ORDER BY m.package_name
+	on m.package_name = r.package_name 
+	LEFT JOIN
+		<!-- 从句7，每个包、及其各自新增方法的数量 -->
+		(SELECT package_name, COUNT(DISTINCT package_name,javabean_name,method_name,param_type) as modifyFunNumber
+		from change_code
+		where change_type=3 GROUP BY package_name) s
+	on m.package_name = s.package_name
+	LEFT JOIN
+		<!-- 从句8，每个包、及其各自已测试新增方法的数量 -->
+		(SELECT c.package_name, COUNT(DISTINCT c.package_name,c.javabean_name,c.method_name,c.param_type) as modifyFunTestedNumber
+		from change_code c,tested_methods t 
+		where c.package_name=t.package_name
+			and c.javabean_name=t.javabean_name 
+      		and c.method_name=t.method_name
+      		and c.param_type=t.param_type
+      		and c.change_type=3 
+			GROUP BY c.package_name) u
+	on m.package_name = u.package_name ORDER BY m.package_name
 ;
   </select>
   <select id="statisticMethodInfoInClass" resultMap="BaseResultMap" parameterType="java.lang.String">
-SELECT a.javabean_name,a.methodNumber,b.methodTestedNumber,c.addFunNumber,d.addFunTestedNumber
-FROM (SELECT javabean_name, COUNT(DISTINCT javabean_name,method_name,param_type) as methodNumber
+SELECT a.javabean_name,a.methodNumber,b.methodTestedNumber,c.addFunNumber,d.addFunTestedNumber,
+		e.modifyFunNumber,f.modifyFunTestedNumber  
+	FROM (SELECT javabean_name, COUNT(DISTINCT javabean_name,method_name,param_type) as methodNumber
 			from all_methods
 			WHERE package_name = #{packageName}
 				GROUP BY javabean_name) a
@@ -193,7 +211,25 @@ LEFT JOIN
       and c.param_type=t.param_type
       and c.change_type=1 
 		GROUP BY c.javabean_name) d
-		on a.javabean_name = d.javabean_name ORDER BY a.javabean_name
+		on a.javabean_name = d.javabean_name 
+LEFT JOIN
+		<!-- 从句5，每个类、及其各自修改方法的数量 -->
+		(SELECT javabean_name, COUNT(DISTINCT javabean_name,method_name,param_type) as modifyFunNumber
+		from change_code
+		where package_name = #{packageName} and change_type=3 GROUP BY javabean_name) e
+on a.javabean_name = e.javabean_name
+
+LEFT JOIN
+		<!-- 从句6，每个类、及其各自已测试修改方法的数量 -->
+		(SELECT c.javabean_name, COUNT(DISTINCT c.javabean_name,c.method_name,c.param_type) as modifyFunTestedNumber
+		from change_code c,tested_methods t
+		where c.package_name = #{packageName}
+			and c.javabean_name=t.javabean_name 
+      and c.method_name=t.method_name
+      and c.param_type=t.param_type
+      and c.change_type=3 
+		GROUP BY c.javabean_name) f
+		on a.javabean_name = f.javabean_name ORDER BY a.javabean_name
 ;
   </select>
   <select id="methodInfoInClass" resultMap="BaseResultMap" parameterType="java.lang.String">

@@ -7,8 +7,14 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.text.ChangedCharSetException;
@@ -196,10 +202,6 @@ public class ChangeCodeController {
 //		// 解析差异文件，并和源码对比，找出新增、删除、和修改的方法
 //		return null;
 		
-	}
-	public static void main(String[] args) {
-		String diffMethod = diffMethod("C:\\Users\\tom\\Desktop\\springboot-saolei_test", "master", "origin/test");
-		System.out.println("diffMethod==="+diffMethod);
 	}
 	public static String diffMethod(String URL,String masterBranch, String testBranch){
 		StringBuilder sb = new StringBuilder();
@@ -429,6 +431,187 @@ public class ChangeCodeController {
 		json.put("list", tes);
 		json.put("success", true);
 		return json;
+	}
+	/**
+	 * 	推荐测试用例
+	 * @return
+	 */
+	@SecurityIgnoreHandler
+	@RequestMapping("recommendTestExample")
+	@ResponseBody
+	public JSONObject recommendTestExample() {
+		JSONObject json = new JSONObject();
+		List<ChangeCode> list = changeCodeBiz.findChangeCodeLinkTestExample();
+		// list.get(0).getId(); // 变更表主键id
+		// list.get(0).getPackageName(); // 测试用例表主键id
+		Map<Integer,Integer> ccidCount = new HashMap<>();
+		List<String> ss = new ArrayList<>();
+		for (ChangeCode c : list) {
+			Integer ccid = c.getId();
+			if(null != ccidCount.get(ccid) && ccidCount.get(ccid) >= 1) {
+				continue;
+			}
+			ccidCount.put(ccid, (ccidCount.get(ccid)==null?0:ccidCount.get(ccid)) +1);
+			StringBuilder sb = new StringBuilder();
+			sb.append(ccid+":");
+			for (ChangeCode c2 : list) {
+				if(ccid.intValue() == c2.getId().intValue()) {
+					sb.append(c2.getPackageName()+",");
+				}
+			}
+			String substring = sb.toString().substring(0, sb.toString().length()-1);
+			ss.add(substring);
+		}
+		// <"'用例1','用例2'"   ,   变更表主键id> // 用例组———》及其对应的某个变更方法
+		Map<String,Integer> teidRefCcid = new HashMap<>(); 
+		for (String s : ss) {
+			String[] split = s.split(":");
+			teidRefCcid.put(split[1], Integer.valueOf(split[0]));
+		}
+		// 测试用例去重，得到所有的测试用例
+		Set<String> keyQuchong = new HashSet<>();
+		for (String key : teidRefCcid.keySet()) {
+			String[] split = key.split(",");
+			for (String s : split) {
+				keyQuchong.add(s);
+			}
+		}
+		Set<String> recommend = new HashSet<>();
+		recommend(keyQuchong, teidRefCcid, recommend);
+		// 推荐的测试用例：[234@235@236,240,260]
+		System.out.println("推荐的测试用例："+recommend); // 推荐的测试用例
+		// 根据推荐的测试用例主键，获取其测试案例编号
+		List<Integer> testExampleIds = new ArrayList<>();
+		for (String r : recommend) {
+			String[] split = r.split("@");
+			for (String s : split) {
+				testExampleIds.add(Integer.valueOf(s));
+			}
+		}
+		List<TestingExample> tes = testingExampleBiz.findByIds(testExampleIds);
+		Set<String> recommend2 = new HashSet<>();
+		for (String r : recommend) {
+			if(r.contains("@")) {
+				String[] split = r.split("@");
+				StringBuilder sb = new StringBuilder();
+				for (String teid : split) {
+					
+					for(TestingExample te : tes) {
+						if(Integer.valueOf(teid).intValue() == te.getId().intValue()) {
+							sb.append(te.getTestCaseNumber()+"@");
+						}
+					}
+					
+				}
+				recommend2.add(sb.toString());
+			}else {
+				for(TestingExample te : tes) {
+					if(Integer.valueOf(r).intValue() == te.getId().intValue()) {
+						recommend2.add(te.getTestCaseNumber());
+						break;
+					}
+				}
+			}
+		}
+		System.out.println(recommend2);
+		json.put("list", recommend2);
+		return json;
+	}
+	public static void main(String[] args) {
+		// <"'用例1','用例2'"   ,   变更表主键id>
+		Map<String,Integer> teidRefCcid = new HashMap<>();
+		teidRefCcid.put("用例1,用例4", 234);
+		teidRefCcid.put("用例1", 235);
+		teidRefCcid.put("用例1,用例2", 235);
+		teidRefCcid.put("用例2,用例9", 236);
+		teidRefCcid.put("用例19,用例12", 236);
+		teidRefCcid.put("用例5", 236);
+		System.out.println(teidRefCcid.size());
+		// 得到所有测试用例，找出出现次数最高的用例
+		
+		// 测试用例去重，得到所有的测试用例
+		Set<String> keyQuchong = new HashSet<>();
+		for (String key : teidRefCcid.keySet()) {
+			String[] split = key.split(",");
+			for (String s : split) {
+				keyQuchong.add(s);
+			}
+		}
+		Set<String> recommend = new HashSet<>();
+		recommend(keyQuchong, teidRefCcid, recommend);
+		System.out.println("最终推荐："+recommend); // 最终推荐：[用例2@用例9, 用例5, 用例19@用例12, 用例1]
+		
+		
+	}
+	/**
+	 * 	当前逻辑：从用例组中查找出现次数最高的用例，并推荐。然后剔除包含该用例的用例组。再从头递归，直到teidRefCcid为空。
+	 * 	特殊情况：某个用例组含有多个（出现次数为1的）用例，都推荐了。这属于重复推荐，应该一起推荐，让用户自己选择执行哪个用例
+	 * @param keyQuchong  全部测试用例（去重后）
+	 * @param teidRefCcid 用例组———》及其对应的某个变更方法	
+	 * @param recommend   推荐的用例
+	 */
+	private static void recommend(Set<String> keyQuchong,Map<String,Integer> teidRefCcid,Set<String> recommend) {
+		// 剔除后查看是否还有未推荐的用例（对应的方法没有测试到）
+		if(teidRefCcid.size() <= 0) {
+			return; // 结束推荐
+		}
+		// 计算每一个测试用例出现的次数
+		Map<String,Integer> map = new HashMap<>();
+		for (String s : keyQuchong) {
+			for (String key : teidRefCcid.keySet()) {
+				if(key.contains(s)) {
+					map.put(s, (map.get(s)==null?0:map.get(s)) +1);
+				}
+			}
+		}
+		//System.out.println("每一个测试用例出现的次数："+map); // 每一个测试用例出现的次数：{用例5=1, 用例9=1, 用例2=1}	（比如：用例2、9应该二选一）
+		// 拿到出现次数最大的测试用例
+		int maxnum = Collections.max(map.values()); // 
+		StringBuilder sb = new StringBuilder();
+		for(Entry<String, Integer> entry1:map.entrySet()) {
+			if(entry1.getValue().intValue() == maxnum) {
+				// recommend.add(entry1.getKey());// 推荐该测试用例
+				if(maxnum == 1) { // 不能直接收集
+				
+					// 收集用例组中确实有多个用例(至此teidRefCcid中剩余的用例都只出现一次)的情况。
+					Set<Entry<String,Integer>> entrySet = teidRefCcid.entrySet();
+					for (Entry<String,Integer> entry2 : entrySet) {
+						String key = entry2.getKey();
+						if(key.contains(",") && key.contains(entry1.getKey())) {
+							recommend.add(key.replace(",", "@")); // 有重复数据，用set去重
+						}
+						if(!key.contains(",") && key.equals(entry1.getKey())) {
+							recommend.add(entry1.getKey());// 推荐该测试用例
+						}
+					}
+				}
+				if(maxnum > 1) {
+					recommend.add(entry1.getKey());// 推荐该测试用例
+				}
+			}
+		}
+		// 将含有推荐测试用例的用例组合剔除
+		Set<String> keySet = teidRefCcid.keySet();
+		List<String> keyLeft = new ArrayList<>(); // 收集现有key
+		for (String string : keySet) {
+			keyLeft.add(string);
+		}
+		List<String> recommend2 = new ArrayList<>(); // 目前推荐的测试用例
+		for(String r : recommend) {
+			String[] split = r.split("@");
+			for (String s : split) {
+				recommend2.add(s);
+			}
+		}
+		for (String key : keyLeft) {
+			String[] split = key.split(",");
+			for (String s : split) {
+				if(recommend2.contains(s)) {
+					teidRefCcid.remove(key); // 剔除
+				}
+			}
+		}
+		recommend(keyQuchong, teidRefCcid, recommend);// 递归推荐	
 	}
 }
 

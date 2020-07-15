@@ -8,4 +8,6 @@ public interface TestedMethodsBiz {
 
 	List<TestedMethods> getAll();
 
+	void updateChangeCodeTestingOrNot();
+
 }

@@ -282,6 +282,9 @@ public class CoverageReportController {
             	tms.add(tm);
             }
             methodChainOriginalBiz.insertBatchForTestedMethods(tms);
+            // 修改change_code代码表更表，标注已测试方法
+            testedMethodsBiz.updateChangeCodeTestingOrNot();
+            
         } catch (UnknownHostException e) {
         	e.printStackTrace();
         	return json;

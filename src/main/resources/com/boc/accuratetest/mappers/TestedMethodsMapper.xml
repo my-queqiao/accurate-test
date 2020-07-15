@@ -129,4 +129,12 @@
     select DISTINCT package_name,javabean_name,method_name,param_type
     from tested_methods 
   </select>
+  <update id="updateChangeCodeTestingOrNot">
+    UPDATE change_code c,tested_methods t  SET c.testing_or_not = 1
+		WHERE c.package_name = t.package_name
+			and c.javabean_name = t.javabean_name
+			and c.method_name = t.method_name
+			and c.param_type = t.param_type
+	;
+  </update>
 </mapper>

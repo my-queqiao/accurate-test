@@ -27,10 +27,10 @@
 	    	<span class="col-xs-12 " style="font-size: xx-large;">
 	    		<span style="margin-left: ;">覆盖率报告</span>
 	    	</span>
-	    	<span class="" style="font-size:large;bottom:-20px;position: absolute; left: 82%;top: 33px;">
+	    	<!-- <span class="" style="font-size:large;bottom:-20px;position: absolute; left: 82%;top: 33px;">
 	    		<a target="_blank" onclick="coverageReport();" style="margin-left: ;color: blue;
 	    			cursor: pointer;text-decoration:underline;float:left;">获取测试项目所有方法</a>
-	    	</span>
+	    	</span> -->
 	    </div>
         <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
 	        <div class="modal-dialog" role="document">
@@ -117,10 +117,11 @@
                 {
                     field: 'methodName',
                     title: '方法名',
+                    formatter: methodNameFormatter
                 }, 
                 {
                     field: 'changeType',
-                    title: '是否是新增方法',
+                    title: '方法变更类型',
                     formatter: changeTypeFormatter
                 }, 
                 {
@@ -204,6 +205,9 @@
     	}else{
     		return ["已测试",].join("");
 	    }
+    }
+    function methodNameFormatter(value,row){
+    	return [value+"("+row.paramType+")",].join("");
     }
     </script>
     

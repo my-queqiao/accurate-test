@@ -17,5 +17,9 @@ public class TestedMethodsBizImpl implements TestedMethodsBiz{
 	public List<TestedMethods> getAll() {
 		return testedMethodsMapper.getAll();
 	}
+	@Override
+	public void updateChangeCodeTestingOrNot() {
+		testedMethodsMapper.updateChangeCodeTestingOrNot();
+	}
 
 }
