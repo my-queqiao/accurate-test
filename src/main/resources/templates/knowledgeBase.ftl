@@ -213,7 +213,7 @@
         var strRegex = '[0-9]+\.{1}[0-9]+\.{1}[0-9]+\.{1}[0-9]+'; // 22.11.3.23.adf.df也可以匹配。
         return new RegExp(strRegex).test(ip);
     }
-    $("#btn_save").click(function(){ 
+    $("#btn_save").click(function(){
     	var testExampleIp = $("#testExampleIp").val();
     	if(null != testExampleIp  && null != currentTestExampleId) {
     		if(checkIp(testExampleIp)){
@@ -225,7 +225,7 @@
     });
 	function startTestExample(id){
 		currentTestExampleId = id;
-		$("#myModalLabel").text("请输入目标服务器ip地址：");
+		$("#myModalLabel").text("目标服务器ip地址");
         $('#myModal').modal();
 	}
 	function sendStart(testExampleIp){
@@ -237,7 +237,7 @@
             			//$("#tb_departments").bootstrapTable('refresh');
             			$("#"+currentTestExampleId+"start").html("执行中。。");
     				}else{
-    					alert("开始失败");
+    					alert("开始失败："+json.msg);
     				}
 		});
 	}

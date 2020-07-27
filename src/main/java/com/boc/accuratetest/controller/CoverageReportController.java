@@ -30,8 +30,6 @@ import com.boc.accuratetest.biz.AllMethodsBiz;
 import com.boc.accuratetest.biz.MethodChainOriginalBiz;
 import com.boc.accuratetest.biz.TestedMethodsBiz;
 import com.boc.accuratetest.pojo.AllMethods;
-import com.boc.accuratetest.pojo.AllMethodsRes;
-import com.boc.accuratetest.pojo.PackageInfoRes;
 import com.boc.accuratetest.pojo.TestedMethods;
 
 import net.sf.json.JSONObject;

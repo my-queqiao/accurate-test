@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.swing.text.ChangedCharSetException;
 
 import org.eclipse.jgit.api.CheckoutCommand;
@@ -53,9 +54,14 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.boc.accuratetest.acl.LiuyanRank;
+import com.boc.accuratetest.annotation.SecurityAclDesc;
 import com.boc.accuratetest.annotation.SecurityIgnoreHandler;
+import com.boc.accuratetest.annotation.SecurityManagement;
 import com.boc.accuratetest.biz.ChangeCodeBiz;
 import com.boc.accuratetest.biz.TestingExampleBiz;
+import com.boc.accuratetest.constant.NotLoginInException;
+import com.boc.accuratetest.constant.ProductionTaskSession;
 import com.boc.accuratetest.pojo.ChangeCode;
 import com.boc.accuratetest.pojo.TestingExample;
 
@@ -80,9 +86,11 @@ public class ChangeCodeController {
 	@SecurityIgnoreHandler
 	@RequestMapping("index")
 	public String index() {
-		HttpServletRequest request = ( (ServletRequestAttributes)RequestContextHolder.getRequestAttributes() ).getRequest();
-		String remoteAddr = request.getRemoteAddr();
-		System.out.println("remoteAddr:"+remoteAddr);
+		/*HttpServletRequest request = ( (ServletRequestAttributes)RequestContextHolder.getRequestAttributes() ).getRequest();
+		Object productionTaskNumber = request.getSession().getAttribute(ProductionTaskSession.number);
+		if(null == productionTaskNumber) {
+			throw new NotLoginInException("您尚未登陆");
+		}*/
 		return "cc_index";
 	}
 	/**
@@ -96,7 +104,7 @@ public class ChangeCodeController {
 	@SecurityIgnoreHandler
 	@RequestMapping("getAll")
 	@ResponseBody
-	public JSONObject getList(Integer pageNumber,Integer pageSize,Integer search,Byte dataOfPart) {
+	public JSONObject getList(Integer pageNumber,Integer pageSize,Integer search,Byte dataOfPart,HttpSession session) {
 		JSONObject json = new JSONObject();
 		List<ChangeCode> page = changeCodeBiz.page(pageNumber, pageSize, search,dataOfPart);
 		Integer total = changeCodeBiz.findTotal(search,dataOfPart);

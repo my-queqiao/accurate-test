@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boc.accuratetest.mappers.ProductionTaskMapper">
+  <resultMap id="BaseResultMap" type="com.boc.accuratetest.pojo.ProductionTask">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="production_task_number" jdbcType="VARCHAR" property="productionTaskNumber" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, production_task_number
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from production_task
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from production_task
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.boc.accuratetest.pojo.ProductionTask">
+    insert into production_task (id, production_task_number)
+    values (#{id,jdbcType=INTEGER}, #{productionTaskNumber,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.boc.accuratetest.pojo.ProductionTask">
+    insert into production_task
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="productionTaskNumber != null">
+        production_task_number,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="productionTaskNumber != null">
+        #{productionTaskNumber,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.boc.accuratetest.pojo.ProductionTask">
+    update production_task
+    <set>
+      <if test="productionTaskNumber != null">
+        production_task_number = #{productionTaskNumber,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.boc.accuratetest.pojo.ProductionTask">
+    update production_task
+    set production_task_number = #{productionTaskNumber,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="findBy" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select * from production_task
+    where production_task_number = #{productionTaskNumber,jdbcType=VARCHAR}
+  </select>
+</mapper>

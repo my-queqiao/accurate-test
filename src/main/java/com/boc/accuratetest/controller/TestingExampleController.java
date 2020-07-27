@@ -2,25 +2,20 @@ package com.boc.accuratetest.controller;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,7 +28,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.boc.accuratetest.acl.openKnowledgePageRank;
 import com.boc.accuratetest.annotation.SecurityIgnoreHandler;
+import com.boc.accuratetest.annotation.SecurityManagement;
 import com.boc.accuratetest.biz.MethodChainOriginalBiz;
 import com.boc.accuratetest.biz.TestingExampleBiz;
 import com.boc.accuratetest.pojo.ExampleRefMethodChain;
@@ -58,12 +55,12 @@ public class TestingExampleController {
 	@Autowired
 	private ExampleRefMethodChainBiz exampleRefMethodChainBiz;
 	// <测试用例主键,最后一行数据@测试用例所在的服务器ip>
-	Map<Integer,String> testExampleIdRef = new ConcurrentHashMap<Integer, String>();
+		Map<Integer,String> testExampleIdRef = new ConcurrentHashMap<Integer, String>();
 	/**
 	 * 	跳转到知识库页面
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(openKnowledgePageRank.class)
 	@RequestMapping("knowledgeBase")
 	public String knowledgeBase(@ModelAttribute("success") String success, Model model) {
 		System.out.println("拿到重定向得到的参数success:" + success);
@@ -150,7 +147,7 @@ public class TestingExampleController {
 		return json;
 	}
 	/**
-	 * 结束测试用例。建立知识库
+	 * 	结束测试用例。建立知识库
 	 * @param ipOnTestExample
 	 * @param testExampleId
 	 * @return
@@ -307,31 +304,24 @@ public class TestingExampleController {
         model.addFlashAttribute("success", "uploadSuccess");
         return "redirect:/testingExample/knowledgeBase";
     }
-	public static void main(String[] args) {
-		try{
-            InputStream is = new FileInputStream("C:\\Users\\tom\\Desktop\\P2003新银行卡交换系统功能测试案例T-P2003-CS1-0008_02评审.xls");
-            jxl.Workbook wb = Workbook.getWorkbook(is);
-            wb.getNumberOfSheets(); // sheet数量
-            Sheet sheet = wb.getSheet(0); // 读取第一个sheet
-            int row_total = sheet.getRows();
-            for (int j = 0; j < row_total; j++) {
-                if(j == 0)continue; // 不读标题行
-                    Cell[] cells = sheet.getRow(j);
-                    System.out.println(cells[1].getContents()); // 所属产品
-                    System.out.println(cells[3].getContents()); // 功能
-                    System.out.println(cells[4].getContents()); // 子功能
-                    System.out.println(cells[9].getContents()); // 测试项 
-                    System.out.println(cells[10].getContents()); // 测试点 
-                    System.out.println(cells[11].getContents()); // 测试案例编号 
-                    System.out.println(cells[13].getContents()); // 测试操作说明
-                    System.out.println(cells[14].getContents()); // 预期结果
-                    System.out.println(cells[15].getContents()); // 生产任务编号
-            }
-        }catch (IOException e) {
-            e.printStackTrace();
-        } catch (BiffException e){
-            e.printStackTrace();
+	public static boolean deleteFolder(String url) {
+        File file = new File(url);
+        if (!file.exists()) {
+            return false;
         }
-	}
+        if (file.isFile()) {
+            file.delete();
+            return true;
+        } else {
+            File[] files = file.listFiles();
+            for (int i = 0; i < files.length; i++) {
+                String root = files[i].getAbsolutePath();//得到子文件或文件夹的绝对路径
+                //System.out.println(root);
+                deleteFolder(root);
+            }
+            file.delete();
+            return true;
+        }
+    }
 }
 

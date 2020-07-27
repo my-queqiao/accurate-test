@@ -14,6 +14,11 @@ package com.boc.accuratetest.demo;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import org.jacoco.core.analysis.Analyzer;
 import org.jacoco.core.analysis.CoverageBuilder;
@@ -24,6 +29,14 @@ import org.jacoco.report.FileMultiReportOutput;
 import org.jacoco.report.IReportVisitor;
 import org.jacoco.report.html.HTMLFormatter;
 
+import org.jacoco.core.data.ExecutionData;
+import org.jacoco.core.data.ExecutionDataStore;
+import org.jacoco.core.data.SessionInfo;
+import org.jacoco.core.data.SessionInfoStore;
+import org.jacoco.core.instr.Instrumenter;
+import org.jacoco.core.runtime.IRuntime;
+import org.jacoco.core.runtime.LoggerRuntime;
+import org.jacoco.core.runtime.RuntimeData;
 /**
  * This example creates a HTML report for eclipse like projects based on a
  * single execution data store called jacoco.exec. The report contains no
@@ -92,9 +105,9 @@ public class ReportGenerator {
 		// Initialize the report with all of the execution and session
 		// information. At this point the report doesn't know about the
 		// structure of the report being created
-		visitor.visitInfo(execFileLoader.getSessionInfoStore().getInfos(),
-				execFileLoader.getExecutionDataStore().getContents());
-
+		Collection<ExecutionData> contents = execFileLoader.getExecutionDataStore().getContents();
+		List<SessionInfo> infos = execFileLoader.getSessionInfoStore().getInfos();
+		visitor.visitInfo(infos,contents);
 		// Populate the report structure with the bundle coverage information.
 		// Call visitGroup if you need groups in your report.
 		visitor.visitBundle(bundleCoverage,
@@ -103,7 +116,7 @@ public class ReportGenerator {
 		// Signal end of structure information to allow report to write all
 		// information out
 		visitor.visitEnd();
-
+		System.out.println("创建报告完成");
 	}
 
 	private void loadExecutionData() throws IOException {
@@ -120,7 +133,7 @@ public class ReportGenerator {
 
 		return coverageBuilder.getBundle(title);
 	}
-
+	
 	/**
 	 * Starts the report generation process
 	 *
@@ -134,5 +147,4 @@ public class ReportGenerator {
 					new File(projectLujing));
 			generator.create();
 	}
-
 }

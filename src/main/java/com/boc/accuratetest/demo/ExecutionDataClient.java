@@ -12,6 +12,7 @@
  *******************************************************************************/
 package com.boc.accuratetest.demo;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -20,6 +21,8 @@ import java.net.Socket;
 import org.jacoco.core.data.ExecutionDataWriter;
 import org.jacoco.core.runtime.RemoteControlReader;
 import org.jacoco.core.runtime.RemoteControlWriter;
+import org.jacoco.core.tools.ExecDumpClient;
+import org.jacoco.core.tools.ExecFileLoader;
 
 /**
  * This example connects to a coverage agent that run in output mode
@@ -32,7 +35,7 @@ public final class ExecutionDataClient {
 
 	private static final String ADDRESS = "127.0.0.1";
 
-	private static final int PORT = 12345;
+	private static final int PORT = 8766;
 
 	/**
 	 * Starts the execution data request.
@@ -41,6 +44,7 @@ public final class ExecutionDataClient {
 	 * @throws IOException
 	 */
 	public static void main(final String[] args) throws IOException {
+		
 		final FileOutputStream localFile = new FileOutputStream(DESTFILE);
 		final ExecutionDataWriter localWriter = new ExecutionDataWriter(
 				localFile);
