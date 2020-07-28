@@ -35,14 +35,14 @@ public class IntercptSessionCheck extends HandlerInterceptorAdapter{
 				Object object = request.getSession().getAttribute(ProductionTaskSession.loginUser);
 				if(null == object) {
 					//request.getRequestDispatcher("/").forward(request, response); // 登陆页面
-					throw new NotLoginInException("您尚未登陆");
+					throw new NotLoginInException("您尚未登陆");	
 				}else {
 					SecurityManagement securityManagement = handlerMethod.getMethodAnnotation(SecurityManagement.class);
 					if(null == securityManagement) {
-						throw new PermissionUndifinedException("该路径没有设置权限，请联系管理员");
+						return true; // 应该设为false。一段代码出错，spring通过自身一个controller（它没有这个注解）报出错误原因。
 					}
 					Class<?> value = securityManagement.value();
-					String rankName = value.getName(); // com.boc.accuratetest.acl.LiuyanRank  查看这个用户是否拥有这个rank就可以了。
+					String rankName = value.getName(); // com.boc.accuratetest.acl.LiuyanRank  查看这个用户是否拥有这个rank。
 					Object object2 = request.getSession().getAttribute(ProductionTaskSession.permissionsOfLoginUser);
 					@SuppressWarnings("unchecked")
 					List<Permission> ps = (List<Permission>)object2;

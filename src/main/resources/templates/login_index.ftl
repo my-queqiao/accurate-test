@@ -42,11 +42,6 @@
 	             <label for="password" style="display:inline;">&nbsp&nbsp&nbsp&nbsp密码：</label>
 	             <input type="password" class="form-control" id="password" style="display:inline;width:200px;"autocomplete="off" />
 	         </div>
-	         <div class="form-group">
-	             <label for="user" stype="display:inline;">生产任务编号：</label>
-	             <input type="text" class="form-control" id="user" 
-	             		style="display:inline;width:200px;"autocomplete="on" />
-	         </div>
 	         <button type="button" id="login" class="btn btn-primary">登录</button>
 	         <button type="button" id="register" class="btn btn-primary">注册</button>
          </form>

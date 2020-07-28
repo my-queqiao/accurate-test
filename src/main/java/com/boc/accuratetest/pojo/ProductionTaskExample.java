@@ -3,14 +3,14 @@ package com.boc.accuratetest.pojo;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RoleExample {
+public class ProductionTaskExample {
     protected String orderByClause;
 
     protected boolean distinct;
 
     protected List<Criteria> oredCriteria;
 
-    public RoleExample() {
+    public ProductionTaskExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
 
@@ -164,273 +164,283 @@ public class RoleExample {
             return (Criteria) this;
         }
 
-        public Criteria andRoleNameIsNull() {
-            addCriterion("role_name is null");
+        public Criteria andProductionTaskNumberIsNull() {
+            addCriterion("production_task_number is null");
             return (Criteria) this;
         }
 
-        public Criteria andRoleNameIsNotNull() {
-            addCriterion("role_name is not null");
+        public Criteria andProductionTaskNumberIsNotNull() {
+            addCriterion("production_task_number is not null");
             return (Criteria) this;
         }
 
-        public Criteria andRoleNameEqualTo(String value) {
-            addCriterion("role_name =", value, "roleName");
+        public Criteria andProductionTaskNumberEqualTo(String value) {
+            addCriterion("production_task_number =", value, "productionTaskNumber");
             return (Criteria) this;
         }
 
-        public Criteria andRoleNameNotEqualTo(String value) {
-            addCriterion("role_name <>", value, "roleName");
+        public Criteria andProductionTaskNumberNotEqualTo(String value) {
+            addCriterion("production_task_number <>", value, "productionTaskNumber");
             return (Criteria) this;
         }
 
-        public Criteria andRoleNameGreaterThan(String value) {
-            addCriterion("role_name >", value, "roleName");
+        public Criteria andProductionTaskNumberGreaterThan(String value) {
+            addCriterion("production_task_number >", value, "productionTaskNumber");
             return (Criteria) this;
         }
 
-        public Criteria andRoleNameGreaterThanOrEqualTo(String value) {
-            addCriterion("role_name >=", value, "roleName");
+        public Criteria andProductionTaskNumberGreaterThanOrEqualTo(String value) {
+            addCriterion("production_task_number >=", value, "productionTaskNumber");
             return (Criteria) this;
         }
 
-        public Criteria andRoleNameLessThan(String value) {
-            addCriterion("role_name <", value, "roleName");
+        public Criteria andProductionTaskNumberLessThan(String value) {
+            addCriterion("production_task_number <", value, "productionTaskNumber");
             return (Criteria) this;
         }
 
-        public Criteria andRoleNameLessThanOrEqualTo(String value) {
-            addCriterion("role_name <=", value, "roleName");
+        public Criteria andProductionTaskNumberLessThanOrEqualTo(String value) {
+            addCriterion("production_task_number <=", value, "productionTaskNumber");
             return (Criteria) this;
         }
 
-        public Criteria andRoleNameLike(String value) {
-            addCriterion("role_name like", value, "roleName");
+        public Criteria andProductionTaskNumberLike(String value) {
+            addCriterion("production_task_number like", value, "productionTaskNumber");
             return (Criteria) this;
         }
 
-        public Criteria andRoleNameNotLike(String value) {
-            addCriterion("role_name not like", value, "roleName");
+        public Criteria andProductionTaskNumberNotLike(String value) {
+            addCriterion("production_task_number not like", value, "productionTaskNumber");
             return (Criteria) this;
         }
 
-        public Criteria andRoleNameIn(List<String> values) {
-            addCriterion("role_name in", values, "roleName");
+        public Criteria andProductionTaskNumberIn(List<String> values) {
+            addCriterion("production_task_number in", values, "productionTaskNumber");
             return (Criteria) this;
         }
 
-        public Criteria andRoleNameNotIn(List<String> values) {
-            addCriterion("role_name not in", values, "roleName");
+        public Criteria andProductionTaskNumberNotIn(List<String> values) {
+            addCriterion("production_task_number not in", values, "productionTaskNumber");
             return (Criteria) this;
         }
 
-        public Criteria andRoleNameBetween(String value1, String value2) {
-            addCriterion("role_name between", value1, value2, "roleName");
+        public Criteria andProductionTaskNumberBetween(String value1, String value2) {
+            addCriterion("production_task_number between", value1, value2, "productionTaskNumber");
             return (Criteria) this;
         }
 
-        public Criteria andRoleNameNotBetween(String value1, String value2) {
-            addCriterion("role_name not between", value1, value2, "roleName");
+        public Criteria andProductionTaskNumberNotBetween(String value1, String value2) {
+            addCriterion("production_task_number not between", value1, value2, "productionTaskNumber");
             return (Criteria) this;
         }
 
-        public Criteria andCreateUserIdIsNull() {
-            addCriterion("create_user_id is null");
+        public Criteria andGitUrlIsNull() {
+            addCriterion("git_url is null");
             return (Criteria) this;
         }
 
-        public Criteria andCreateUserIdIsNotNull() {
-            addCriterion("create_user_id is not null");
+        public Criteria andGitUrlIsNotNull() {
+            addCriterion("git_url is not null");
             return (Criteria) this;
         }
 
-        public Criteria andCreateUserIdEqualTo(Integer value) {
-            addCriterion("create_user_id =", value, "createUserId");
+        public Criteria andGitUrlEqualTo(String value) {
+            addCriterion("git_url =", value, "gitUrl");
             return (Criteria) this;
         }
 
-        public Criteria andCreateUserIdNotEqualTo(Integer value) {
-            addCriterion("create_user_id <>", value, "createUserId");
+        public Criteria andGitUrlNotEqualTo(String value) {
+            addCriterion("git_url <>", value, "gitUrl");
             return (Criteria) this;
         }
 
-        public Criteria andCreateUserIdGreaterThan(Integer value) {
-            addCriterion("create_user_id >", value, "createUserId");
+        public Criteria andGitUrlGreaterThan(String value) {
+            addCriterion("git_url >", value, "gitUrl");
             return (Criteria) this;
         }
 
-        public Criteria andCreateUserIdGreaterThanOrEqualTo(Integer value) {
-            addCriterion("create_user_id >=", value, "createUserId");
+        public Criteria andGitUrlGreaterThanOrEqualTo(String value) {
+            addCriterion("git_url >=", value, "gitUrl");
             return (Criteria) this;
         }
 
-        public Criteria andCreateUserIdLessThan(Integer value) {
-            addCriterion("create_user_id <", value, "createUserId");
+        public Criteria andGitUrlLessThan(String value) {
+            addCriterion("git_url <", value, "gitUrl");
             return (Criteria) this;
         }
 
-        public Criteria andCreateUserIdLessThanOrEqualTo(Integer value) {
-            addCriterion("create_user_id <=", value, "createUserId");
+        public Criteria andGitUrlLessThanOrEqualTo(String value) {
+            addCriterion("git_url <=", value, "gitUrl");
             return (Criteria) this;
         }
 
-        public Criteria andCreateUserIdIn(List<Integer> values) {
-            addCriterion("create_user_id in", values, "createUserId");
+        public Criteria andGitUrlLike(String value) {
+            addCriterion("git_url like", value, "gitUrl");
             return (Criteria) this;
         }
 
-        public Criteria andCreateUserIdNotIn(List<Integer> values) {
-            addCriterion("create_user_id not in", values, "createUserId");
+        public Criteria andGitUrlNotLike(String value) {
+            addCriterion("git_url not like", value, "gitUrl");
             return (Criteria) this;
         }
 
-        public Criteria andCreateUserIdBetween(Integer value1, Integer value2) {
-            addCriterion("create_user_id between", value1, value2, "createUserId");
+        public Criteria andGitUrlIn(List<String> values) {
+            addCriterion("git_url in", values, "gitUrl");
             return (Criteria) this;
         }
 
-        public Criteria andCreateUserIdNotBetween(Integer value1, Integer value2) {
-            addCriterion("create_user_id not between", value1, value2, "createUserId");
+        public Criteria andGitUrlNotIn(List<String> values) {
+            addCriterion("git_url not in", values, "gitUrl");
             return (Criteria) this;
         }
 
-        public Criteria andCreateTimeIsNull() {
-            addCriterion("create_time is null");
+        public Criteria andGitUrlBetween(String value1, String value2) {
+            addCriterion("git_url between", value1, value2, "gitUrl");
             return (Criteria) this;
         }
 
-        public Criteria andCreateTimeIsNotNull() {
-            addCriterion("create_time is not null");
+        public Criteria andGitUrlNotBetween(String value1, String value2) {
+            addCriterion("git_url not between", value1, value2, "gitUrl");
             return (Criteria) this;
         }
 
-        public Criteria andCreateTimeEqualTo(String value) {
-            addCriterion("create_time =", value, "createTime");
+        public Criteria andMasterBranchIsNull() {
+            addCriterion("master_branch is null");
             return (Criteria) this;
         }
 
-        public Criteria andCreateTimeNotEqualTo(String value) {
-            addCriterion("create_time <>", value, "createTime");
+        public Criteria andMasterBranchIsNotNull() {
+            addCriterion("master_branch is not null");
             return (Criteria) this;
         }
 
-        public Criteria andCreateTimeGreaterThan(String value) {
-            addCriterion("create_time >", value, "createTime");
+        public Criteria andMasterBranchEqualTo(String value) {
+            addCriterion("master_branch =", value, "masterBranch");
             return (Criteria) this;
         }
 
-        public Criteria andCreateTimeGreaterThanOrEqualTo(String value) {
-            addCriterion("create_time >=", value, "createTime");
+        public Criteria andMasterBranchNotEqualTo(String value) {
+            addCriterion("master_branch <>", value, "masterBranch");
             return (Criteria) this;
         }
 
-        public Criteria andCreateTimeLessThan(String value) {
-            addCriterion("create_time <", value, "createTime");
+        public Criteria andMasterBranchGreaterThan(String value) {
+            addCriterion("master_branch >", value, "masterBranch");
             return (Criteria) this;
         }
 
-        public Criteria andCreateTimeLessThanOrEqualTo(String value) {
-            addCriterion("create_time <=", value, "createTime");
+        public Criteria andMasterBranchGreaterThanOrEqualTo(String value) {
+            addCriterion("master_branch >=", value, "masterBranch");
             return (Criteria) this;
         }
 
-        public Criteria andCreateTimeLike(String value) {
-            addCriterion("create_time like", value, "createTime");
+        public Criteria andMasterBranchLessThan(String value) {
+            addCriterion("master_branch <", value, "masterBranch");
             return (Criteria) this;
         }
 
-        public Criteria andCreateTimeNotLike(String value) {
-            addCriterion("create_time not like", value, "createTime");
+        public Criteria andMasterBranchLessThanOrEqualTo(String value) {
+            addCriterion("master_branch <=", value, "masterBranch");
             return (Criteria) this;
         }
 
-        public Criteria andCreateTimeIn(List<String> values) {
-            addCriterion("create_time in", values, "createTime");
+        public Criteria andMasterBranchLike(String value) {
+            addCriterion("master_branch like", value, "masterBranch");
             return (Criteria) this;
         }
 
-        public Criteria andCreateTimeNotIn(List<String> values) {
-            addCriterion("create_time not in", values, "createTime");
+        public Criteria andMasterBranchNotLike(String value) {
+            addCriterion("master_branch not like", value, "masterBranch");
             return (Criteria) this;
         }
 
-        public Criteria andCreateTimeBetween(String value1, String value2) {
-            addCriterion("create_time between", value1, value2, "createTime");
+        public Criteria andMasterBranchIn(List<String> values) {
+            addCriterion("master_branch in", values, "masterBranch");
             return (Criteria) this;
         }
 
-        public Criteria andCreateTimeNotBetween(String value1, String value2) {
-            addCriterion("create_time not between", value1, value2, "createTime");
+        public Criteria andMasterBranchNotIn(List<String> values) {
+            addCriterion("master_branch not in", values, "masterBranch");
             return (Criteria) this;
         }
 
-        public Criteria andDescriptionIsNull() {
-            addCriterion("description is null");
+        public Criteria andMasterBranchBetween(String value1, String value2) {
+            addCriterion("master_branch between", value1, value2, "masterBranch");
             return (Criteria) this;
         }
 
-        public Criteria andDescriptionIsNotNull() {
-            addCriterion("description is not null");
+        public Criteria andMasterBranchNotBetween(String value1, String value2) {
+            addCriterion("master_branch not between", value1, value2, "masterBranch");
             return (Criteria) this;
         }
 
-        public Criteria andDescriptionEqualTo(String value) {
-            addCriterion("description =", value, "description");
+        public Criteria andTestBranchIsNull() {
+            addCriterion("test_branch is null");
             return (Criteria) this;
         }
 
-        public Criteria andDescriptionNotEqualTo(String value) {
-            addCriterion("description <>", value, "description");
+        public Criteria andTestBranchIsNotNull() {
+            addCriterion("test_branch is not null");
             return (Criteria) this;
         }
 
-        public Criteria andDescriptionGreaterThan(String value) {
-            addCriterion("description >", value, "description");
+        public Criteria andTestBranchEqualTo(String value) {
+            addCriterion("test_branch =", value, "testBranch");
             return (Criteria) this;
         }
 
-        public Criteria andDescriptionGreaterThanOrEqualTo(String value) {
-            addCriterion("description >=", value, "description");
+        public Criteria andTestBranchNotEqualTo(String value) {
+            addCriterion("test_branch <>", value, "testBranch");
             return (Criteria) this;
         }
 
-        public Criteria andDescriptionLessThan(String value) {
-            addCriterion("description <", value, "description");
+        public Criteria andTestBranchGreaterThan(String value) {
+            addCriterion("test_branch >", value, "testBranch");
             return (Criteria) this;
         }
 
-        public Criteria andDescriptionLessThanOrEqualTo(String value) {
-            addCriterion("description <=", value, "description");
+        public Criteria andTestBranchGreaterThanOrEqualTo(String value) {
+            addCriterion("test_branch >=", value, "testBranch");
             return (Criteria) this;
         }
 
-        public Criteria andDescriptionLike(String value) {
-            addCriterion("description like", value, "description");
+        public Criteria andTestBranchLessThan(String value) {
+            addCriterion("test_branch <", value, "testBranch");
             return (Criteria) this;
         }
 
-        public Criteria andDescriptionNotLike(String value) {
-            addCriterion("description not like", value, "description");
+        public Criteria andTestBranchLessThanOrEqualTo(String value) {
+            addCriterion("test_branch <=", value, "testBranch");
             return (Criteria) this;
         }
 
-        public Criteria andDescriptionIn(List<String> values) {
-            addCriterion("description in", values, "description");
+        public Criteria andTestBranchLike(String value) {
+            addCriterion("test_branch like", value, "testBranch");
             return (Criteria) this;
         }
 
-        public Criteria andDescriptionNotIn(List<String> values) {
-            addCriterion("description not in", values, "description");
+        public Criteria andTestBranchNotLike(String value) {
+            addCriterion("test_branch not like", value, "testBranch");
             return (Criteria) this;
         }
 
-        public Criteria andDescriptionBetween(String value1, String value2) {
-            addCriterion("description between", value1, value2, "description");
+        public Criteria andTestBranchIn(List<String> values) {
+            addCriterion("test_branch in", values, "testBranch");
             return (Criteria) this;
         }
 
-        public Criteria andDescriptionNotBetween(String value1, String value2) {
-            addCriterion("description not between", value1, value2, "description");
+        public Criteria andTestBranchNotIn(List<String> values) {
+            addCriterion("test_branch not in", values, "testBranch");
+            return (Criteria) this;
+        }
+
+        public Criteria andTestBranchBetween(String value1, String value2) {
+            addCriterion("test_branch between", value1, value2, "testBranch");
+            return (Criteria) this;
+        }
+
+        public Criteria andTestBranchNotBetween(String value1, String value2) {
+            addCriterion("test_branch not between", value1, value2, "testBranch");
             return (Criteria) this;
         }
     }

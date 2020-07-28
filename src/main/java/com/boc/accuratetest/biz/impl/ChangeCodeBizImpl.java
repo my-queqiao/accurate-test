@@ -12,13 +12,14 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.boc.accuratetest.biz.ChangeCodeBiz;
 import com.boc.accuratetest.mappers.ChangeCodeMapper;
 import com.boc.accuratetest.pojo.ChangeCode;
+import com.boc.accuratetest.pojo.ChangeCodeExample;
 
 @Service
 public class ChangeCodeBizImpl implements ChangeCodeBiz{
 	@Autowired
 	private ChangeCodeMapper changeCodeMapper;
 	@Override
-	public List<ChangeCode> page(Integer pageNumber, Integer pageSize, Integer search,Byte dataOfPart) {
+	public List<ChangeCode> page(Integer pageNumber, Integer pageSize, Integer search,Byte dataOfPart,String productionTaskNumber) {
 		// SELECT * FROM table LIMIT 5,10;  // 检索记录行 6-15
 		int limit = 0;
 		if(pageNumber.intValue() == 1) {
@@ -26,13 +27,13 @@ public class ChangeCodeBizImpl implements ChangeCodeBiz{
 		}else {
 			limit = (pageNumber-1)*pageSize;
 		}
-		List<ChangeCode> list = changeCodeMapper.page(search,limit,pageSize, dataOfPart);
+		List<ChangeCode> list = changeCodeMapper.page(search,limit,pageSize, dataOfPart,productionTaskNumber);
 		return list;
 	}
 
 	@Override
-	public Integer findTotal(Integer search,Byte dataOfPart) {
-		int total = changeCodeMapper.findTotal(search, dataOfPart);
+	public Integer findTotal(Integer search,Byte dataOfPart,String productionTaskNumber) {
+		int total = changeCodeMapper.findTotal(search, dataOfPart,productionTaskNumber);
 		return total;
 	}
 
@@ -42,18 +43,20 @@ public class ChangeCodeBizImpl implements ChangeCodeBiz{
 	}
 
 	@Override
-	public void deleteByGitUrlAndBranchs(String gitUrlAndBranchs) {
-		changeCodeMapper.deleteByGitUrlAndBranchs(gitUrlAndBranchs);
+	public List<ChangeCode> countByChangeType(String productionTaskNumber) {
+		return changeCodeMapper.countByChangeType(productionTaskNumber);
 	}
 
 	@Override
-	public List<ChangeCode> countByChangeType() {
-		return changeCodeMapper.countByChangeType();
+	public List<ChangeCode> findChangeCodeLinkTestExample(String productionTaskNumber) {
+		return changeCodeMapper.findChangeCodeLinkTestExample(productionTaskNumber);
 	}
 
 	@Override
-	public List<ChangeCode> findChangeCodeLinkTestExample() {
-		return changeCodeMapper.findChangeCodeLinkTestExample();
+	public void deleteByProductionTaskNumber(String productionTaskNumber) {
+		ChangeCodeExample e = new ChangeCodeExample();
+		e.createCriteria().andProductionTaskNumberEqualTo(productionTaskNumber);
+		changeCodeMapper.deleteByExample(e);
 	}
 
 }

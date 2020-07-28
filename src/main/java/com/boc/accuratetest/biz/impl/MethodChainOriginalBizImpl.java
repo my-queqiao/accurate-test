@@ -16,15 +16,6 @@ public class MethodChainOriginalBizImpl implements MethodChainOriginalBiz{
 	private MethodChainOriginalMapper methodChainOriginalMapper;
 	@Autowired
 	private TestedMethodsMapper testedMethodsMapper;
-	@Override
-	public List<MethodChainOriginal> getAll() {
-		return methodChainOriginalMapper.getAll();
-	}
-
-	@Override
-	public int findTotal() {
-		return methodChainOriginalMapper.findTotal();
-	}
 
 	@Override
 	public void insertBatch(List<MethodChainOriginal> ms) {

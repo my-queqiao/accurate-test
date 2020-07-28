@@ -6,6 +6,7 @@
     <result column="role_name" jdbcType="VARCHAR" property="roleName" />
     <result column="create_user_id" jdbcType="INTEGER" property="createUserId" />
     <result column="create_time" jdbcType="VARCHAR" property="createTime" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -66,7 +67,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, role_name, create_user_id, create_time
+    id, role_name, create_user_id, create_time, description
   </sql>
   <select id="selectByExample" parameterType="com.boc.accuratetest.pojo.RoleExample" resultMap="BaseResultMap">
     select
@@ -100,9 +101,9 @@
   </delete>
   <insert id="insert" parameterType="com.boc.accuratetest.pojo.Role">
     insert into role (id, role_name, create_user_id, 
-      create_time)
+      create_time, description)
     values (#{id,jdbcType=INTEGER}, #{roleName,jdbcType=VARCHAR}, #{createUserId,jdbcType=INTEGER}, 
-      #{createTime,jdbcType=VARCHAR})
+      #{createTime,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.boc.accuratetest.pojo.Role">
     insert into role
@@ -119,6 +120,9 @@
       <if test="createTime != null">
         create_time,
       </if>
+      <if test="description != null">
+        description,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -132,6 +136,9 @@
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -156,6 +163,9 @@
       <if test="record.createTime != null">
         create_time = #{record.createTime,jdbcType=VARCHAR},
       </if>
+      <if test="record.description != null">
+        description = #{record.description,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -166,7 +176,8 @@
     set id = #{record.id,jdbcType=INTEGER},
       role_name = #{record.roleName,jdbcType=VARCHAR},
       create_user_id = #{record.createUserId,jdbcType=INTEGER},
-      create_time = #{record.createTime,jdbcType=VARCHAR}
+      create_time = #{record.createTime,jdbcType=VARCHAR},
+      description = #{record.description,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -183,6 +194,9 @@
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=VARCHAR},
       </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -190,7 +204,17 @@
     update role
     set role_name = #{roleName,jdbcType=VARCHAR},
       create_user_id = #{createUserId,jdbcType=INTEGER},
-      create_time = #{createTime,jdbcType=VARCHAR}
+      create_time = #{createTime,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  
+  <select id="page" resultMap="BaseResultMap">
+    select * from role 
+    where 1 = 1
+    <if test="search != null">
+       and role_name = #{search,jdbcType=VARCHAR}
+    </if>
+    limit #{limit} , #{pageSize}
+  </select>
 </mapper>

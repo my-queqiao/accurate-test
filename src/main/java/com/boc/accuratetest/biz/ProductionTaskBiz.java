@@ -10,4 +10,9 @@ public interface ProductionTaskBiz {
 
 	void insert(ProductionTask pt);
 
+	List<ProductionTask> getAll();
+
+	void updateByProductionTaskNumber(String productionTaskNumber, String git_url, String master_branch,
+			String test_branch);
+
 }

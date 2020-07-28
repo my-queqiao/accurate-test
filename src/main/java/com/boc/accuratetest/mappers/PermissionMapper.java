@@ -29,4 +29,6 @@ public interface PermissionMapper {
     int updateByPrimaryKey(Permission record);
 
 	void insertBatch(List<Permission> ps);
+
+	List<Permission> page(String search, int limit, Integer pageSize);
 }

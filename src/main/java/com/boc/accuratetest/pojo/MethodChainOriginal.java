@@ -15,6 +15,8 @@ public class MethodChainOriginal {
 
     private Long callTimeLong;
 
+    private String productionTaskNumber;
+
     public Integer getId() {
         return id;
     }
@@ -69,5 +71,13 @@ public class MethodChainOriginal {
 
     public void setCallTimeLong(Long callTimeLong) {
         this.callTimeLong = callTimeLong;
+    }
+
+    public String getProductionTaskNumber() {
+        return productionTaskNumber;
+    }
+
+    public void setProductionTaskNumber(String productionTaskNumber) {
+        this.productionTaskNumber = productionTaskNumber == null ? null : productionTaskNumber.trim();
     }
 }

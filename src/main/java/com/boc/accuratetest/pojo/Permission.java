@@ -6,8 +6,17 @@ public class Permission {
     private String rankName;
 
     private String rankDesc;
+    private Integer checked = 0; // 页面显示被选中
+    
+    public Integer getChecked() {
+		return checked;
+	}
 
-    public Integer getId() {
+	public void setChecked(Integer checked) {
+		this.checked = checked;
+	}
+
+	public Integer getId() {
         return id;
     }
 

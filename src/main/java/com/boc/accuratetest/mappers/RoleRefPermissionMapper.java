@@ -19,4 +19,6 @@ public interface RoleRefPermissionMapper {
     int updateByExampleSelective(@Param("record") RoleRefPermission record, @Param("example") RoleRefPermissionExample example);
 
     int updateByExample(@Param("record") RoleRefPermission record, @Param("example") RoleRefPermissionExample example);
+
+	void insertBatch(List<RoleRefPermission> rrps);
 }

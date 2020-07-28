@@ -13,11 +13,21 @@ public class User {
 
     private String createTime;
     
-    private Role role; // 一个用户只有一个角色
+    private Role role; // 一个用户只有一个角色(应该可以有多个角色)
     
     private List<Permission> ps; // 这个字段冗余了，应该只放到role下
     
-    public List<Permission> getPs() {
+    private String productionTaskNumber; // 
+    
+    public String getProductionTaskNumber() {
+		return productionTaskNumber;
+	}
+
+	public void setProductionTaskNumber(String productionTaskNumber) {
+		this.productionTaskNumber = productionTaskNumber;
+	}
+
+	public List<Permission> getPs() {
 		return ps;
 	}
 

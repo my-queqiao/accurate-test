@@ -3,7 +3,6 @@
 <mapper namespace="com.boc.accuratetest.mappers.ChangeCodeMapper">
   <resultMap id="BaseResultMap" type="com.boc.accuratetest.pojo.ChangeCode">
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="git_url" jdbcType="VARCHAR" property="gitUrl" />
     <result column="package_name" jdbcType="VARCHAR" property="packageName" />
     <result column="javabean_name" jdbcType="VARCHAR" property="javabeanName" />
     <result column="method_name" jdbcType="VARCHAR" property="methodName" />
@@ -11,11 +10,84 @@
     <result column="change_type" jdbcType="TINYINT" property="changeType" />
     <result column="method_body" jdbcType="VARCHAR" property="methodBody" />
     <result column="testing_or_not" jdbcType="TINYINT" property="testingOrNot" />
+    <result column="production_task_number" jdbcType="VARCHAR" property="productionTaskNumber" />
   </resultMap>
-  <sql id="Base_Column_List">
-    id, git_url, package_name, javabean_name, method_name, param_type, change_type, method_body, 
-    testing_or_not
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
   </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, package_name, javabean_name, method_name, param_type, change_type, method_body, 
+    testing_or_not, production_task_number
+  </sql>
+  <select id="selectByExample" parameterType="com.boc.accuratetest.pojo.ChangeCodeExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from change_code
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
@@ -26,14 +98,20 @@
     delete from change_code
     where id = #{id,jdbcType=INTEGER}
   </delete>
+  <delete id="deleteByExample" parameterType="com.boc.accuratetest.pojo.ChangeCodeExample">
+    delete from change_code
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
   <insert id="insert" parameterType="com.boc.accuratetest.pojo.ChangeCode">
-    insert into change_code (id, git_url, package_name, 
-      javabean_name, method_name, param_type, 
-      change_type, method_body, testing_or_not
+    insert into change_code (id, package_name, javabean_name, 
+      method_name, param_type, change_type, 
+      method_body, testing_or_not, production_task_number
       )
-    values (#{id,jdbcType=INTEGER}, #{gitUrl,jdbcType=VARCHAR}, #{packageName,jdbcType=VARCHAR}, 
-      #{javabeanName,jdbcType=VARCHAR}, #{methodName,jdbcType=VARCHAR}, #{paramType,jdbcType=VARCHAR}, 
-      #{changeType,jdbcType=TINYINT}, #{methodBody,jdbcType=VARCHAR}, #{testingOrNot,jdbcType=TINYINT}
+    values (#{id,jdbcType=INTEGER}, #{packageName,jdbcType=VARCHAR}, #{javabeanName,jdbcType=VARCHAR}, 
+      #{methodName,jdbcType=VARCHAR}, #{paramType,jdbcType=VARCHAR}, #{changeType,jdbcType=TINYINT}, 
+      #{methodBody,jdbcType=VARCHAR}, #{testingOrNot,jdbcType=TINYINT}, #{productionTaskNumber,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.boc.accuratetest.pojo.ChangeCode">
@@ -41,9 +119,6 @@
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
-      </if>
-      <if test="gitUrl != null">
-        git_url,
       </if>
       <if test="packageName != null">
         package_name,
@@ -66,13 +141,13 @@
       <if test="testingOrNot != null">
         testing_or_not,
       </if>
+      <if test="productionTaskNumber != null">
+        production_task_number,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
         #{id,jdbcType=INTEGER},
-      </if>
-      <if test="gitUrl != null">
-        #{gitUrl,jdbcType=VARCHAR},
       </if>
       <if test="packageName != null">
         #{packageName,jdbcType=VARCHAR},
@@ -95,14 +170,70 @@
       <if test="testingOrNot != null">
         #{testingOrNot,jdbcType=TINYINT},
       </if>
+      <if test="productionTaskNumber != null">
+        #{productionTaskNumber,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
+  <select id="countByExample" parameterType="com.boc.accuratetest.pojo.ChangeCodeExample" resultType="java.lang.Long">
+    select count(*) from change_code
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update change_code
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.packageName != null">
+        package_name = #{record.packageName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.javabeanName != null">
+        javabean_name = #{record.javabeanName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.methodName != null">
+        method_name = #{record.methodName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.paramType != null">
+        param_type = #{record.paramType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.changeType != null">
+        change_type = #{record.changeType,jdbcType=TINYINT},
+      </if>
+      <if test="record.methodBody != null">
+        method_body = #{record.methodBody,jdbcType=VARCHAR},
+      </if>
+      <if test="record.testingOrNot != null">
+        testing_or_not = #{record.testingOrNot,jdbcType=TINYINT},
+      </if>
+      <if test="record.productionTaskNumber != null">
+        production_task_number = #{record.productionTaskNumber,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update change_code
+    set id = #{record.id,jdbcType=INTEGER},
+      package_name = #{record.packageName,jdbcType=VARCHAR},
+      javabean_name = #{record.javabeanName,jdbcType=VARCHAR},
+      method_name = #{record.methodName,jdbcType=VARCHAR},
+      param_type = #{record.paramType,jdbcType=VARCHAR},
+      change_type = #{record.changeType,jdbcType=TINYINT},
+      method_body = #{record.methodBody,jdbcType=VARCHAR},
+      testing_or_not = #{record.testingOrNot,jdbcType=TINYINT},
+      production_task_number = #{record.productionTaskNumber,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.boc.accuratetest.pojo.ChangeCode">
     update change_code
     <set>
-      <if test="gitUrl != null">
-        git_url = #{gitUrl,jdbcType=VARCHAR},
-      </if>
       <if test="packageName != null">
         package_name = #{packageName,jdbcType=VARCHAR},
       </if>
@@ -124,62 +255,67 @@
       <if test="testingOrNot != null">
         testing_or_not = #{testingOrNot,jdbcType=TINYINT},
       </if>
+      <if test="productionTaskNumber != null">
+        production_task_number = #{productionTaskNumber,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.boc.accuratetest.pojo.ChangeCode">
     update change_code
-    set git_url = #{gitUrl,jdbcType=VARCHAR},
-      package_name = #{packageName,jdbcType=VARCHAR},
+    set package_name = #{packageName,jdbcType=VARCHAR},
       javabean_name = #{javabeanName,jdbcType=VARCHAR},
       method_name = #{methodName,jdbcType=VARCHAR},
       param_type = #{paramType,jdbcType=VARCHAR},
       change_type = #{changeType,jdbcType=TINYINT},
       method_body = #{methodBody,jdbcType=VARCHAR},
-      testing_or_not = #{testingOrNot,jdbcType=TINYINT}
+      testing_or_not = #{testingOrNot,jdbcType=TINYINT},
+      production_task_number = #{productionTaskNumber,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  
   <select id="page" resultMap="BaseResultMap">
-    select * from change_code
+    select * from change_code 
+    where production_task_number = #{productionTaskNumber}
     <if test="search != null">
         method_name = #{search,jdbcType=VARCHAR}
     </if>
     <if test="dataOfPart == 0">
     </if>
     <if test="dataOfPart != 0">
-       where change_type = #{dataOfPart,jdbcType=TINYINT}
+       and change_type = #{dataOfPart,jdbcType=TINYINT}
     </if>
     limit #{limit} , #{pageSize}
   </select>
   
   <select id="findTotal" resultType="java.lang.Integer">
-    select count(*) from change_code
+    select count(*) from change_code 
+    where production_task_number = #{productionTaskNumber}
     <if test="search != null">
         where method_name = #{search,jdbcType=VARCHAR}
     </if>
     <if test="dataOfPart == 0">
     </if>
     <if test="dataOfPart != 0">
-       where change_type = #{dataOfPart,jdbcType=TINYINT}
+       and change_type = #{dataOfPart,jdbcType=TINYINT}
     </if>
   </select>
   <insert id="insertBatch" parameterType="java.util.List">
-    insert into change_code (git_url,package_name, javabean_name, 
+    insert into change_code (production_task_number,package_name, javabean_name, 
       method_name, param_type, change_type, method_body, testing_or_not)
     values 
     <foreach collection="list" index="index" item="item" separator=",">
-	    (#{item.gitUrl,jdbcType=VARCHAR},#{item.packageName,jdbcType=VARCHAR}, #{item.javabeanName,jdbcType=VARCHAR}, 
+	    (#{item.productionTaskNumber,jdbcType=VARCHAR},
+	    	#{item.packageName,jdbcType=VARCHAR}, #{item.javabeanName,jdbcType=VARCHAR}, 
 	      #{item.methodName,jdbcType=VARCHAR}, #{item.paramType,jdbcType=VARCHAR}, #{item.changeType,jdbcType=TINYINT}, 
 	      #{item.methodBody,jdbcType=VARCHAR}, #{item.testingOrNot,jdbcType=TINYINT})
     </foreach>
   </insert>
-  <delete id="deleteByGitUrlAndBranchs" parameterType="java.lang.String">
-    delete from change_code
-    where git_url = #{gitUrlAndBranchs,jdbcType=VARCHAR}
-  </delete>
   
   <select id="countByChangeType" resultMap="BaseResultMap">
-    select change_type,COUNT(*) AS id from change_code GROUP BY change_type
+    select change_type,COUNT(*) AS id 
+     from change_code where production_task_number = #{productionTaskNumber}
+     GROUP BY change_type
   </select>
   
   <select id="findChangeCodeLinkTestExample" resultMap="BaseResultMap">
@@ -188,7 +324,8 @@
 							method_chain_original mco,
 							example_ref_method_chain ermc,
 							testing_example te
-		where cc.package_name=mco.package_name and cc.javabean_name=mco.javabean_name and cc.method_name=mco.method_name
+		where cc.production_task_number = #{productionTaskNumber,jdbcType=VARCHAR}
+			and cc.package_name=mco.package_name and cc.javabean_name=mco.javabean_name and cc.method_name=mco.method_name
 			and cc.param_type=mco.param_type
 			and mco.id=ermc.method_chain_original_id and ermc.testing_example_id=te.id
 		GROUP BY cc.id,te.id

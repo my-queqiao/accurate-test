@@ -1,31 +1,40 @@
 package com.boc.accuratetest.mappers;
 
-import java.util.List;
-
 import com.boc.accuratetest.pojo.ChangeCode;
+import com.boc.accuratetest.pojo.ChangeCodeExample;
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
 
 public interface ChangeCodeMapper {
+    long countByExample(ChangeCodeExample example);
+
+    int deleteByExample(ChangeCodeExample example);
+
     int deleteByPrimaryKey(Integer id);
 
     int insert(ChangeCode record);
 
     int insertSelective(ChangeCode record);
 
+    List<ChangeCode> selectByExample(ChangeCodeExample example);
+
     ChangeCode selectByPrimaryKey(Integer id);
+
+    int updateByExampleSelective(@Param("record") ChangeCode record, @Param("example") ChangeCodeExample example);
+
+    int updateByExample(@Param("record") ChangeCode record, @Param("example") ChangeCodeExample example);
 
     int updateByPrimaryKeySelective(ChangeCode record);
 
     int updateByPrimaryKey(ChangeCode record);
 
-	int findTotal(Integer search,Byte dataOfPart);
+	List<ChangeCode> page(Integer search, int limit, Integer pageSize, Byte dataOfPart,String productionTaskNumber);
+
+	int findTotal(Integer search, Byte dataOfPart,String productionTaskNumber);
 
 	void insertBatch(List<ChangeCode> ccs);
 
-	List<ChangeCode> page(Integer search, int limit, Integer pageSize,Byte dataOfPart);
+	List<ChangeCode> countByChangeType(String productionTaskNumber);
 
-	void deleteByGitUrlAndBranchs(String gitUrlAndBranchs);
-
-	List<ChangeCode> countByChangeType();
-
-	List<ChangeCode> findChangeCodeLinkTestExample();
+	List<ChangeCode> findChangeCodeLinkTestExample(String productionTaskNumber);
 }

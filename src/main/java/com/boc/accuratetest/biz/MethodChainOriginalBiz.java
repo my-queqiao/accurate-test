@@ -7,10 +7,6 @@ import com.boc.accuratetest.pojo.TestedMethods;
 
 public interface MethodChainOriginalBiz {
 
-	List<MethodChainOriginal> getAll();
-
-	int findTotal();
-
 	void insertBatch(List<MethodChainOriginal> ms);
 
 	void insertBatchForTestedMethods(List<TestedMethods> tms);

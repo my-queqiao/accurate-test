@@ -9,10 +9,84 @@
     <result column="param_type" jdbcType="VARCHAR" property="paramType" />
     <result column="call_time" jdbcType="VARCHAR" property="callTime" />
     <result column="call_time_long" jdbcType="BIGINT" property="callTimeLong" />
+    <result column="production_task_number" jdbcType="VARCHAR" property="productionTaskNumber" />
   </resultMap>
-  <sql id="Base_Column_List">
-    id, package_name, javabean_name, method_name, param_type, call_time, call_time_long
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
   </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, package_name, javabean_name, method_name, param_type, call_time, call_time_long, 
+    production_task_number
+  </sql>
+  <select id="selectByExample" parameterType="com.boc.accuratetest.pojo.MethodChainOriginalExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from method_chain_original
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
@@ -23,13 +97,19 @@
     delete from method_chain_original
     where id = #{id,jdbcType=INTEGER}
   </delete>
+  <delete id="deleteByExample" parameterType="com.boc.accuratetest.pojo.MethodChainOriginalExample">
+    delete from method_chain_original
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
   <insert id="insert" parameterType="com.boc.accuratetest.pojo.MethodChainOriginal">
     insert into method_chain_original (id, package_name, javabean_name, 
       method_name, param_type, call_time, 
-      call_time_long)
+      call_time_long, production_task_number)
     values (#{id,jdbcType=INTEGER}, #{packageName,jdbcType=VARCHAR}, #{javabeanName,jdbcType=VARCHAR}, 
       #{methodName,jdbcType=VARCHAR}, #{paramType,jdbcType=VARCHAR}, #{callTime,jdbcType=VARCHAR}, 
-      #{callTimeLong,jdbcType=BIGINT})
+      #{callTimeLong,jdbcType=BIGINT}, #{productionTaskNumber,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.boc.accuratetest.pojo.MethodChainOriginal">
     insert into method_chain_original
@@ -55,6 +135,9 @@
       <if test="callTimeLong != null">
         call_time_long,
       </if>
+      <if test="productionTaskNumber != null">
+        production_task_number,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -78,8 +161,63 @@
       <if test="callTimeLong != null">
         #{callTimeLong,jdbcType=BIGINT},
       </if>
+      <if test="productionTaskNumber != null">
+        #{productionTaskNumber,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
+  <select id="countByExample" parameterType="com.boc.accuratetest.pojo.MethodChainOriginalExample" resultType="java.lang.Long">
+    select count(*) from method_chain_original
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update method_chain_original
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.packageName != null">
+        package_name = #{record.packageName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.javabeanName != null">
+        javabean_name = #{record.javabeanName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.methodName != null">
+        method_name = #{record.methodName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.paramType != null">
+        param_type = #{record.paramType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.callTime != null">
+        call_time = #{record.callTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.callTimeLong != null">
+        call_time_long = #{record.callTimeLong,jdbcType=BIGINT},
+      </if>
+      <if test="record.productionTaskNumber != null">
+        production_task_number = #{record.productionTaskNumber,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update method_chain_original
+    set id = #{record.id,jdbcType=INTEGER},
+      package_name = #{record.packageName,jdbcType=VARCHAR},
+      javabean_name = #{record.javabeanName,jdbcType=VARCHAR},
+      method_name = #{record.methodName,jdbcType=VARCHAR},
+      param_type = #{record.paramType,jdbcType=VARCHAR},
+      call_time = #{record.callTime,jdbcType=VARCHAR},
+      call_time_long = #{record.callTimeLong,jdbcType=BIGINT},
+      production_task_number = #{record.productionTaskNumber,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.boc.accuratetest.pojo.MethodChainOriginal">
     update method_chain_original
     <set>
@@ -101,6 +239,9 @@
       <if test="callTimeLong != null">
         call_time_long = #{callTimeLong,jdbcType=BIGINT},
       </if>
+      <if test="productionTaskNumber != null">
+        production_task_number = #{productionTaskNumber,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -111,25 +252,18 @@
       method_name = #{methodName,jdbcType=VARCHAR},
       param_type = #{paramType,jdbcType=VARCHAR},
       call_time = #{callTime,jdbcType=VARCHAR},
-      call_time_long = #{callTimeLong,jdbcType=BIGINT}
+      call_time_long = #{callTimeLong,jdbcType=BIGINT},
+      production_task_number = #{productionTaskNumber,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <select id="getAll" resultMap="BaseResultMap">
-    select *
-    from method_chain_original
-  </select>
-  <select id="findTotal" resultType="java.lang.Integer">
-    select count(*)
-    from method_chain_original order by call_time_long asc
-  </select>
-  <insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys = "true" keyProperty = "id">
+  <insert id="insertBatch" keyProperty="id" parameterType="java.util.List" useGeneratedKeys="true">
     insert into method_chain_original (package_name, javabean_name, 
-      method_name, param_type, call_time, call_time_long)
+      method_name, param_type, call_time, call_time_long,production_task_number)
     values 
     <foreach collection="list" index="index" item="item" separator=",">
 	    (#{item.packageName,jdbcType=VARCHAR}, #{item.javabeanName,jdbcType=VARCHAR}, 
       #{item.methodName,jdbcType=VARCHAR}, #{item.paramType,jdbcType=VARCHAR}, #{item.callTime,jdbcType=VARCHAR}, 
-      #{item.callTimeLong,jdbcType=BIGINT})
+      #{item.callTimeLong,jdbcType=BIGINT},#{item.productionTaskNumber,jdbcType=VARCHAR})
     </foreach>
   </insert>
   

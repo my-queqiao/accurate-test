@@ -231,4 +231,12 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
   
+  <select id="page" resultMap="BaseResultMap">
+    select * from user 
+    where 1 = 1
+    <if test="search != null">
+       and user_name = #{search,jdbcType=VARCHAR}
+    </if>
+    limit #{limit} , #{pageSize}
+  </select>
 </mapper>

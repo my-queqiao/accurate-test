@@ -19,4 +19,6 @@ public interface UserRefRoleMapper {
     int updateByExampleSelective(@Param("record") UserRefRole record, @Param("example") UserRefRoleExample example);
 
     int updateByExample(@Param("record") UserRefRole record, @Param("example") UserRefRoleExample example);
+
+	void insertBatch(List<UserRefRole> urrs);
 }

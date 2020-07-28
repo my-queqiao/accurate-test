@@ -1,7 +1,5 @@
 package com.boc.accuratetest.pojo;
 
-import java.util.List;
-
 public class Role {
     private Integer id;
 
@@ -11,14 +9,15 @@ public class Role {
 
     private String createTime;
 
-    private List<Permission> ps; // 一个角色拥有多个许可证（每一个controller有一个访问许可）
+    private String description;
+    private Integer checked = 0; // 非数据库字段，1：页面显示被选中
     
-    public List<Permission> getPs() {
-		return ps;
+    public Integer getChecked() {
+		return checked;
 	}
 
-	public void setPs(List<Permission> ps) {
-		this.ps = ps;
+	public void setChecked(Integer checked) {
+		this.checked = checked;
 	}
 
 	public Integer getId() {
@@ -51,5 +50,13 @@ public class Role {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime == null ? null : createTime.trim();
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description == null ? null : description.trim();
     }
 }

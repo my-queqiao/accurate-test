@@ -3,8 +3,6 @@ package com.boc.accuratetest.controller;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,24 +14,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.swing.text.ChangedCharSetException;
-
-import org.eclipse.jgit.api.CheckoutCommand;
-import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.ListBranchCommand;
-import org.eclipse.jgit.api.ListBranchCommand.ListMode;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRemoteException;
-import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
-import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,20 +38,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import com.boc.accuratetest.acl.LiuyanRank;
-import com.boc.accuratetest.annotation.SecurityAclDesc;
 import com.boc.accuratetest.annotation.SecurityIgnoreHandler;
-import com.boc.accuratetest.annotation.SecurityManagement;
 import com.boc.accuratetest.biz.ChangeCodeBiz;
+import com.boc.accuratetest.biz.ProductionTaskBiz;
 import com.boc.accuratetest.biz.TestingExampleBiz;
-import com.boc.accuratetest.constant.NotLoginInException;
+import com.boc.accuratetest.constant.NotSelectProductionTaskException;
 import com.boc.accuratetest.constant.ProductionTaskSession;
 import com.boc.accuratetest.pojo.ChangeCode;
+import com.boc.accuratetest.pojo.ProductionTask;
 import com.boc.accuratetest.pojo.TestingExample;
+import com.boc.accuratetest.pojo.User;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -71,14 +55,16 @@ import net.sf.json.JSONObject;
 @Controller
 @RequestMapping("changeCode")
 public class ChangeCodeController {
-	@Autowired
-	private ChangeCodeBiz changeCodeBiz;
-	@Autowired
-	private TestingExampleBiz testingExampleBiz;
 	@Value("${release_diff_url}")
 	private String release_diff_url;
 	@Value("${release_branch_url}")
 	private String release_branch_url;
+	@Autowired
+	private ChangeCodeBiz changeCodeBiz;
+	@Autowired
+	private TestingExampleBiz testingExampleBiz;
+	@Autowired
+	private ProductionTaskBiz productionTaskBiz;
 	/**
 	 * 精准测试项目首页
 	 * @return
@@ -106,11 +92,16 @@ public class ChangeCodeController {
 	@ResponseBody
 	public JSONObject getList(Integer pageNumber,Integer pageSize,Integer search,Byte dataOfPart,HttpSession session) {
 		JSONObject json = new JSONObject();
-		List<ChangeCode> page = changeCodeBiz.page(pageNumber, pageSize, search,dataOfPart);
-		Integer total = changeCodeBiz.findTotal(search,dataOfPart);
+		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		String productionTaskNumber = user.getProductionTaskNumber();
+		if(StringUtils.isEmpty(productionTaskNumber)) {
+			throw new NotSelectProductionTaskException("请选择一个生产任务编号");
+		}
+		List<ChangeCode> page = changeCodeBiz.page(pageNumber, pageSize, search,dataOfPart,productionTaskNumber);
+		Integer total = changeCodeBiz.findTotal(search,dataOfPart,productionTaskNumber);
 		
 		// 查找关联的测试用例。变更表——方法链表——方法链ref用例表——用例表(package_name暂存测试用例id)
-		List<ChangeCode> links = changeCodeBiz.findChangeCodeLinkTestExample();
+		List<ChangeCode> links = changeCodeBiz.findChangeCodeLinkTestExample(productionTaskNumber);
 		for (ChangeCode pg : page) {
 			StringBuilder sb = new StringBuilder();
 			for (ChangeCode link : links) {
@@ -139,12 +130,30 @@ public class ChangeCodeController {
 	@SecurityIgnoreHandler
 	@RequestMapping("getChangeData")
 	@ResponseBody
-	public JSONObject getChangeData(String git_url,String master_branch,String test_branch) {
+	public JSONObject getChangeData(String git_url,String master_branch,String test_branch,HttpSession session) {
 		git_url = git_url.trim();
-		// 如果数据库中已有该git仓库、版本号下的差异代码，先全部删除
-		changeCodeBiz.deleteByGitUrlAndBranchs(git_url+","+master_branch+","+test_branch);
 		JSONObject jsonRes = new JSONObject();
 		jsonRes.put("success", false);
+		
+		// 每一个生产任务编号，只能关联一次、一个，git地址、稳定分支、测试分支
+		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		String productionTaskNumber = user.getProductionTaskNumber();
+		if(StringUtils.isEmpty(productionTaskNumber)) {
+			throw new NotSelectProductionTaskException("您未选择生产任务编号");
+		}
+		List<ProductionTask> pts = productionTaskBiz.findBy(productionTaskNumber);
+		if(pts.size() > 0) {
+			ProductionTask pt = pts.get(0);
+			if(pt.getGitUrl().equals(git_url) && pt.getMasterBranch().equals(master_branch) && pt.getTestBranch().equals(test_branch)) {
+				// 重新获取数据
+			}else {
+				jsonRes.put("res", "当前生产任务编号已经有数据了");
+				return jsonRes;
+			}
+		}
+		
+		// 如果数据库中已有该生产任务编号下的差异代码，先全部删除
+		changeCodeBiz.deleteByProductionTaskNumber(productionTaskNumber);
 		ResponseEntity<String> response = null;
 		try {
 			response = conn(git_url, master_branch, test_branch);
@@ -165,12 +174,15 @@ public class ChangeCodeController {
 		Collection<JSONObject> values = json.values();
 		// 存储数据
 		try {
-			String gitUrl= git_url+","+master_branch+","+test_branch;
-			insertBatch(gitUrl,values);
+			insertBatch(productionTaskNumber,values);
 		} catch (Exception e) {
 			jsonRes.put("res", "解析、存储数据时出现异常："+e.getMessage());
 			return jsonRes;
 		}
+		
+		// 每一个生产任务编号，对应唯一的git地址、稳定分支、测试分支
+		productionTaskBiz.updateByProductionTaskNumber(productionTaskNumber,git_url,master_branch,test_branch);
+		
 		jsonRes.put("success", true);
 		jsonRes.put("res", "获取数据成功！");
 		return jsonRes;
@@ -259,6 +271,7 @@ public class ChangeCodeController {
 	 * @param git_url
 	 * @return
 	 */
+	@SuppressWarnings("rawtypes")
 	@SecurityIgnoreHandler
 	@RequestMapping("getBranchList")
 	@ResponseBody
@@ -381,11 +394,11 @@ public class ChangeCodeController {
 		}
 		return response;
 	}
-	private void insertBatch(String gitUrl,Collection<JSONObject> values) {
+	private void insertBatch(String productionTaskNumber,Collection<JSONObject> values) {
 		List<ChangeCode> ccs = new ArrayList<>();
 		for (JSONObject js : values) {
 			ChangeCode cc = new ChangeCode();
-			cc.setGitUrl(gitUrl);
+			cc.setProductionTaskNumber(productionTaskNumber);
 			cc.setPackageName(js.getString("package_name").replace("\\", "."));
 			cc.setJavabeanName(js.getString("class_name"));
 			cc.setMethodName(js.getString("func_name"));
@@ -418,9 +431,14 @@ public class ChangeCodeController {
 	@SecurityIgnoreHandler
 	@RequestMapping("statistics")
 	@ResponseBody
-	public JSONObject statistics() {
+	public JSONObject statistics(HttpSession session) {
 		JSONObject json = new JSONObject();
-		List<ChangeCode> statistics = changeCodeBiz.countByChangeType();
+		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		String productionTaskNumber = user.getProductionTaskNumber();
+		if(StringUtils.isEmpty(productionTaskNumber)) {
+			throw new NotSelectProductionTaskException("您未选择生产任务编号");
+		}
+		List<ChangeCode> statistics = changeCodeBiz.countByChangeType(productionTaskNumber);
 		json.put("data", statistics);
 		return json;
 	}
@@ -447,9 +465,14 @@ public class ChangeCodeController {
 	@SecurityIgnoreHandler
 	@RequestMapping("recommendTestExample")
 	@ResponseBody
-	public JSONObject recommendTestExample() {
+	public JSONObject recommendTestExample(HttpSession session) {
 		JSONObject json = new JSONObject();
-		List<ChangeCode> list = changeCodeBiz.findChangeCodeLinkTestExample();
+		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		String productionTaskNumber = user.getProductionTaskNumber();
+		if(StringUtils.isEmpty(productionTaskNumber)) {
+			throw new NotSelectProductionTaskException("请选择一个生产任务编号");
+		}
+		List<ChangeCode> list = changeCodeBiz.findChangeCodeLinkTestExample(productionTaskNumber);
 		// list.get(0).getId(); // 变更表主键id
 		// list.get(0).getPackageName(); // 测试用例表主键id
 		Map<Integer,Integer> ccidCount = new HashMap<>();
@@ -495,6 +518,10 @@ public class ChangeCodeController {
 			for (String s : split) {
 				testExampleIds.add(Integer.valueOf(s));
 			}
+		}
+		if(testExampleIds.isEmpty()) {
+			json.put("list", new ArrayList<>());
+			return json;
 		}
 		List<TestingExample> tes = testingExampleBiz.findByIds(testExampleIds);
 		Set<String> recommend2 = new HashSet<>();

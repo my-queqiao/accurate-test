@@ -14,7 +14,7 @@ public class TestingExampleBizImpl implements TestingExampleBiz{
 	@Autowired
 	private TestingExampleMapper testingExampleMapper;
 	@Override
-	public List<TestingExample> page(Integer pageNumber, Integer pageSize, String search) {
+	public List<TestingExample> page(Integer pageNumber, Integer pageSize, String search,String productionTaskNumber) {
 		// SELECT * FROM table LIMIT 5,10;  // 检索记录行 6-15
 		int limit = 0;
 		if(pageNumber.intValue() == 1) {
@@ -22,13 +22,13 @@ public class TestingExampleBizImpl implements TestingExampleBiz{
 		}else {
 			limit = (pageNumber-1)*pageSize;
 		}
-		List<TestingExample> list = testingExampleMapper.page(search,limit,pageSize);
+		List<TestingExample> list = testingExampleMapper.page(search,limit,pageSize,productionTaskNumber);
 		return list;
 	}
 
 	@Override
-	public Integer findTotal(String search) {
-		int total = testingExampleMapper.findTotal(search);
+	public Integer findTotal(String search,String productionTaskNumber) {
+		int total = testingExampleMapper.findTotal(search,productionTaskNumber);
 		return total;
 	}
 

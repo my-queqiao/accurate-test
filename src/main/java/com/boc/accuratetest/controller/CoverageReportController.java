@@ -12,11 +12,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,8 +27,11 @@ import com.boc.accuratetest.annotation.SecurityIgnoreHandler;
 import com.boc.accuratetest.biz.AllMethodsBiz;
 import com.boc.accuratetest.biz.MethodChainOriginalBiz;
 import com.boc.accuratetest.biz.TestedMethodsBiz;
+import com.boc.accuratetest.constant.NotSelectProductionTaskException;
+import com.boc.accuratetest.constant.ProductionTaskSession;
 import com.boc.accuratetest.pojo.AllMethods;
 import com.boc.accuratetest.pojo.TestedMethods;
+import com.boc.accuratetest.pojo.User;
 
 import net.sf.json.JSONObject;
 
@@ -44,7 +45,7 @@ public class CoverageReportController {
 	@Autowired
 	private TestedMethodsBiz testedMethodsBiz;
 	/**
-	 * 	跳转到知识库页面
+	 * 	跳转到覆盖率报告页面
 	 * @return
 	 */
 	@SecurityIgnoreHandler
@@ -252,10 +253,17 @@ public class CoverageReportController {
 	@SecurityIgnoreHandler
 	@RequestMapping("getTestedMethods")
 	@ResponseBody
-	public JSONObject getTestedMethods(String testServerIp) {
+	public JSONObject getTestedMethods(String testServerIp,HttpSession session) {
 		JSONObject json = new JSONObject();
 		json.put("success", false);
 		testServerIp = testServerIp.trim();
+		
+		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		String productionTaskNumber = user.getProductionTaskNumber();
+		if(StringUtils.isEmpty(productionTaskNumber)) {
+			throw new NotSelectProductionTaskException("您未选择生产任务编号");
+		}
+		
 		Socket client = null;
     	OutputStream os = null;        
     	PrintWriter pw = null;
@@ -277,6 +285,7 @@ public class CoverageReportController {
             while ((info = br.readLine()) != null) {
             	System.out.println("info:"+info);
             	TestedMethods tm = insertPrepareForTestedMethods(info);
+            	tm.setProductionTaskNumber(productionTaskNumber);
             	tms.add(tm);
             }
             methodChainOriginalBiz.insertBatchForTestedMethods(tms);

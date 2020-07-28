@@ -6,9 +6,9 @@ import com.boc.accuratetest.pojo.TestingExample;
 
 public interface TestingExampleBiz {
 
-	List<TestingExample> page(Integer pageNumber, Integer pageSize, String search);
+	List<TestingExample> page(Integer pageNumber, Integer pageSize, String search,String productionTaskNumber);
 
-	Integer findTotal(String search);
+	Integer findTotal(String search,String productionTaskNumber);
 
 	void batchSave(List<TestingExample> tes);
 

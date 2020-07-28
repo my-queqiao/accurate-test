@@ -16,6 +16,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,14 +31,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.boc.accuratetest.acl.openKnowledgePageRank;
+import com.boc.accuratetest.acl.KnowledgeRank;
 import com.boc.accuratetest.annotation.SecurityIgnoreHandler;
 import com.boc.accuratetest.annotation.SecurityManagement;
 import com.boc.accuratetest.biz.MethodChainOriginalBiz;
 import com.boc.accuratetest.biz.TestingExampleBiz;
+import com.boc.accuratetest.constant.NotSelectProductionTaskException;
+import com.boc.accuratetest.constant.ProductionTaskSession;
 import com.boc.accuratetest.pojo.ExampleRefMethodChain;
 import com.boc.accuratetest.pojo.MethodChainOriginal;
 import com.boc.accuratetest.pojo.TestingExample;
+import com.boc.accuratetest.pojo.User;
 
 import jxl.Cell;
 import jxl.Sheet;
@@ -60,7 +66,7 @@ public class TestingExampleController {
 	 * 	跳转到知识库页面
 	 * @return
 	 */
-	@SecurityManagement(openKnowledgePageRank.class)
+	@SecurityManagement(KnowledgeRank.class)
 	@RequestMapping("knowledgeBase")
 	public String knowledgeBase(@ModelAttribute("success") String success, Model model) {
 		System.out.println("拿到重定向得到的参数success:" + success);
@@ -75,13 +81,18 @@ public class TestingExampleController {
 	 * @param search
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(KnowledgeRank.class)
 	@RequestMapping("getAll")
 	@ResponseBody
-	public JSONObject getAll(Integer pageNumber,Integer pageSize,String search) {
+	public JSONObject getAll(Integer pageNumber,Integer pageSize,String search,HttpSession session) {
 		JSONObject json = new JSONObject();
-		List<TestingExample> page = testingExampleBiz.page(pageNumber, pageSize, search);
-		Integer total = testingExampleBiz.findTotal(search);
+		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		String productionTaskNumber = user.getProductionTaskNumber();
+		if(StringUtils.isEmpty(productionTaskNumber)) {
+			throw new NotSelectProductionTaskException("请选择一个生产任务编号");
+		}
+		List<TestingExample> page = testingExampleBiz.page(pageNumber, pageSize, search,productionTaskNumber);
+		Integer total = testingExampleBiz.findTotal(search,productionTaskNumber);
 		json.put("rows", page);
 		json.put("total", total);
 		return json;
@@ -91,7 +102,7 @@ public class TestingExampleController {
 	 * @param testExampleId
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(KnowledgeRank.class)
 	@RequestMapping("testExampleStart")
 	@ResponseBody
 	public JSONObject testExampleStart(String ipOnTestExample, Integer testExampleId) {
@@ -152,12 +163,17 @@ public class TestingExampleController {
 	 * @param testExampleId
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(KnowledgeRank.class)
 	@RequestMapping("testExampleEnd")
 	@ResponseBody
-	public JSONObject testExampleEnd(String ipOnTestExample, Integer testExampleId) {
+	public JSONObject testExampleEnd(String ipOnTestExample, Integer testExampleId,HttpSession session) {
 		JSONObject json = new JSONObject();
 		json.put("success", false);
+		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		String productionTaskNumber = user.getProductionTaskNumber();
+		if(StringUtils.isEmpty(productionTaskNumber)) {
+			throw new NotSelectProductionTaskException("请选择一个生产任务编号");
+		}
 		if(StringUtils.isEmpty(testExampleId) ) {
 			return json;
 		}
@@ -184,6 +200,7 @@ public class TestingExampleController {
             	while ((info = br.readLine()) != null) {
             		// 全部读取，保存到数据库
             		MethodChainOriginal chainOriginal = insertPrepare(info);
+            		chainOriginal.setProductionTaskNumber(productionTaskNumber);
             		ms.add(chainOriginal);
             	}
             }else {
@@ -192,6 +209,7 @@ public class TestingExampleController {
             	while ((info = br.readLine()) != null) {
             		if(start == 1) { // 读取，保存到数据库
             			MethodChainOriginal chainOriginal = insertPrepare(info);
+            			chainOriginal.setProductionTaskNumber(productionTaskNumber);
                 		ms.add(chainOriginal);
             		}
             		if(info.equals(split[0])) { // 从下一行开始读取
@@ -263,7 +281,7 @@ public class TestingExampleController {
 	 * @param model
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(KnowledgeRank.class)
 	@PostMapping("/upload")
     public String upload(@RequestParam("file") MultipartFile file,RedirectAttributes model) {
 		model.addFlashAttribute("success", "uploadFail");
@@ -289,7 +307,7 @@ public class TestingExampleController {
                     te.setTestCaseNumber(cells[11].getContents());// 测试案例编号
                     te.setTestOperationExplain(cells[13].getContents());// 测试操作说明
                     te.setExpectedResults(cells[14].getContents());// 预期结果
-                    te.setProductionTaskNumber(cells[15].getContents());// 生产任务编号
+                    te.setProductionTaskNumber(cells[15].getContents().trim());// 生产任务编号
                     tes.add(te);
             }
             testingExampleBiz.batchSave(tes);

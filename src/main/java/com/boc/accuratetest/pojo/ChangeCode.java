@@ -1,11 +1,7 @@
 package com.boc.accuratetest.pojo;
 
-import org.springframework.util.StringUtils;
-
 public class ChangeCode {
     private Integer id;
-
-    private String gitUrl;
 
     private String packageName;
 
@@ -20,9 +16,11 @@ public class ChangeCode {
     private String methodBody;
 
     private Byte testingOrNot;
+
+    private String productionTaskNumber;
     
-    private String linkTestExample; // 非数据库字段，关联多个测试用例时，用英文逗号分割
-    
+    private String linkTestExample; // 关联的测试用例
+
     public String getLinkTestExample() {
 		return linkTestExample;
 	}
@@ -37,14 +35,6 @@ public class ChangeCode {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getGitUrl() {
-        return gitUrl;
-    }
-
-    public void setGitUrl(String gitUrl) {
-        this.gitUrl = gitUrl == null ? null : gitUrl.trim();
     }
 
     public String getPackageName() {
@@ -101,5 +91,13 @@ public class ChangeCode {
 
     public void setTestingOrNot(Byte testingOrNot) {
         this.testingOrNot = testingOrNot;
+    }
+
+    public String getProductionTaskNumber() {
+        return productionTaskNumber;
+    }
+
+    public void setProductionTaskNumber(String productionTaskNumber) {
+        this.productionTaskNumber = productionTaskNumber == null ? null : productionTaskNumber.trim();
     }
 }

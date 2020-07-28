@@ -31,4 +31,12 @@ public class GlobalException {
 		mv.setViewName("error");//页面
 		return mv;
 	}
+	// 用户未选择生产任务编号
+	@ExceptionHandler(value= {NotSelectProductionTaskException.class})
+	public ModelAndView notSelectProductionTaskException(Exception e) {
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("error", e.toString());
+		mv.setViewName("error");//页面
+		return mv;
+	}
 }

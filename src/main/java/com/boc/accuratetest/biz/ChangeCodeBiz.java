@@ -7,15 +7,15 @@ import com.boc.accuratetest.pojo.ChangeCode;
 
 public interface ChangeCodeBiz {
 
-	List<ChangeCode> page(Integer pageNumber, Integer pageSize, Integer search,Byte dataOfPart);
+	List<ChangeCode> page(Integer pageNumber, Integer pageSize, Integer search,Byte dataOfPart,String productionTaskNumber);
 
-	Integer findTotal(Integer search,Byte dataOfPart);
+	Integer findTotal(Integer search,Byte dataOfPart,String productionTaskNumber);
 
 	void insertBatch(List<ChangeCode> ccs);
 
-	void deleteByGitUrlAndBranchs(String gitUrlAndBranchs);
+	List<ChangeCode> countByChangeType(String productionTaskNumber);
 
-	List<ChangeCode> countByChangeType();
+	List<ChangeCode> findChangeCodeLinkTestExample(String productionTaskNumber);
 
-	List<ChangeCode> findChangeCodeLinkTestExample();
+	void deleteByProductionTaskNumber(String productionTaskNumber);
 }

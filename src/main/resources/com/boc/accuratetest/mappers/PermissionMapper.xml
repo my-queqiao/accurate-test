@@ -186,4 +186,13 @@
 	    (#{item.rankName,jdbcType=VARCHAR},#{item.rankDesc,jdbcType=VARCHAR})
     </foreach>
   </insert>
+  
+  <select id="page" resultMap="BaseResultMap">
+    select * from permission 
+    where 1 = 1
+    <if test="search != null">
+       and rank_desc = #{search,jdbcType=VARCHAR}
+    </if>
+    limit #{limit} , #{pageSize}
+  </select>
 </mapper>

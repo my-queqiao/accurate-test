@@ -151,17 +151,19 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
   <select id="page" resultMap="BaseResultMap">
-    select * from testing_example
+    select * from testing_example 
+    where production_task_number = #{productionTaskNumber,jdbcType=VARCHAR}
     <if test="search != null">
-        belong_product = #{search,jdbcType=VARCHAR}
+        and belong_product = #{search,jdbcType=VARCHAR}
     </if>
     limit #{limit} , #{pageSize}
   </select>
   
   <select id="findTotal" resultType="java.lang.Integer">
-    select count(*) from testing_example
+    select count(*) from testing_example 
+    where production_task_number = #{productionTaskNumber,jdbcType=VARCHAR}
     <if test="search != null">
-        where belong_product = #{search,jdbcType=VARCHAR}
+        and belong_product = #{search,jdbcType=VARCHAR}
     </if>
   </select>
   <insert id="batchSave" parameterType="java.util.List">

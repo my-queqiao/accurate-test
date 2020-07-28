@@ -27,17 +27,9 @@
 	    	<span class="col-xs-12 " style="font-size: xx-large;">
 	    		<span style="margin-left: ;">精准测试项目</span>
 	    	</span>
-	    	<span class="" style="font-size:large;bottom:-20px;position: absolute;left: 68%;top: 33px;">
-	    		<a href="${request.contextPath}/testingExample/knowledgeBase" target="_blank" style="margin-left: ;color: blue;
-	    			cursor: pointer;text-decoration:underline;float:left;">知识库</a>
-	    	</span>
-	    	<span class="" style="font-size:large;bottom:-20px;position: absolute; left: 78%;top: 33px;">
+	    	<span class="" style="font-size:large;bottom:-20px;position: absolute; left: 88%;top: 33px;">
 	    		<a target="_blank" onclick="getTestedMethods();" style="margin-left: ;color: blue;
 	    			cursor: pointer;text-decoration:underline;float:left;">获取已测试方法</a>
-	    	</span>
-	    	<span class="" style="font-size:large;bottom:-20px;position: absolute;left: 92%;top: 33px;">
-	    		<a href="${request.contextPath}/coverageReport/index" target="_blank" style="margin-left: ;color: blue;
-	    			cursor: pointer;text-decoration:underline;float:left;">覆盖率报告</a>
 	    	</span>
 	    	
 	    </div>
@@ -602,7 +594,11 @@
 		    	}
 				$('#myModal').on('show.bs.modal', function (event) {
 		           	 var modal = $(this);
-		           	 modal.find('#methodDetail').html(yonglis);
+		           	 if(yonglis == ""){
+			           	 modal.find('#methodDetail').html("无");
+		           	 }else{
+			           	 modal.find('#methodDetail').html(yonglis);
+		           	 }
 	           	});
 	           $("#myModalLabel").text("推荐测试用例");
 	           $('#myModal').modal();

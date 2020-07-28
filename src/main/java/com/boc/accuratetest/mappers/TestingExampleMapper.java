@@ -17,9 +17,9 @@ public interface TestingExampleMapper {
 
     int updateByPrimaryKey(TestingExample record);
 
-	List<TestingExample> page(String search, int limit, Integer pageSize);
+	List<TestingExample> page(String search, int limit, Integer pageSize,String productionTaskNumber);
 
-	int findTotal(String search);
+	int findTotal(String search,String productionTaskNumber);
 
 	void batchSave(List<TestingExample> tes);
 

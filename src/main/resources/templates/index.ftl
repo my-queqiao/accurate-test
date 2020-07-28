@@ -29,11 +29,17 @@
 	    		<span style="margin-left: ;">精准测试首页</span>
 	    	</span>
 	    </div>
-	    <div id="loading" style="color:black; position:absolute;
-	    		    right: 200px;top: 10px;z-index:9999;font-size: 20px;font-family: 宋体;" >权限配置</div>
+	    <a id="loading" href="${request.contextPath}/permission/index" 
+	    style="color:black; position:absolute;cursor: pointer;text-decoration:underline;
+	    		    right: 420px;top: 10px;z-index:9999;font-size: 20px;font-family: 宋体;" >权限配置</a>
 	    
-	    <select id="loginUser" onchange="gradeChange()"
-	    style="color:black; position:absolute;right: 10px;top: 10px;z-index:9999;font-size: 20px;font-family: 宋体;">
+	    <select id="productionTaskNumber" onchange="gradeChangeForTask()"
+	    style="color:black; position:absolute;right: 150px;top: 10px;z-index:9999;font-size: 20px;font-family: 宋体;">
+	    	<option value="0">请选择生产任务编号</option>
+	    	<option value="addProductionTaskNumber">新增生产任务编号</option>
+	    </select>
+	    <select id="loginUser" onchange="gradeChange()" style="color:black; position:absolute;width: 100px;
+	    right: 10px;top: 10px;z-index:9999;font-size: 20px;font-family: 宋体;">
 	    	<option><#if Session["loginUser"]?exists>${Session["loginUser"].userName}<#else>未登录</#if></option>
 	    	<option value="loginOut">退出</option>
 	    </select>
@@ -54,6 +60,57 @@
 	    </div>
     </div>
 <script>
+var currentProductionTaskNumber;
+getPuductionTaskNumber(); // 获取已有的生产任务编号
+function getPuductionTaskNumber() {
+	var loginUser=$("#loginUser option:selected").text();
+	if(loginUser == "未登录"){
+		alert("请先登陆");
+		return;
+	}	
+	$.post('/getPuductionTaskNumber',
+			function(json){
+				if(json.success == false){
+					alert(json.msg);
+				}else{
+					var cptn = json.currentProductionTaskNumber;
+					currentProductionTaskNumber = cptn;
+				    //$("#productionTaskNumber").append(opt);
+					$.each(json.list,function(index,item){
+						var ptn = item.productionTaskNumber;
+						if(null != cptn){
+							if(cptn == ptn){
+						        var opt=$("<option selected value="+ptn+">"+ptn+"</option>");
+						        $("#productionTaskNumber").append(opt);
+							}else{
+						        var opt=$("<option value="+ptn+">"+ptn+"</option>");
+						        $("#productionTaskNumber").append(opt);
+							}
+						}
+					});
+				}
+	});
+}
+
+// 新增生产任务编号
+function gradeChangeForTask() {
+    var objS = document.getElementById("productionTaskNumber");
+    var grade = objS.options[objS.selectedIndex].value;
+    if(grade == "addProductionTaskNumber"){
+    	window.location.href="${request.contextPath}/loginOut";
+    }else{
+    	// 指定生产任务编号，区分后台数据
+    	$.post('/selectProductionTaskNumber?productionTaskNumber='+grade,
+    			function(json){
+    				if(json.success == false){
+    					alert(json.msg);
+    				}else{
+    					currentProductionTaskNumber = grade;
+    				}
+    	});
+    }
+}
+// 退出登陆
 function gradeChange() {
     var objS = document.getElementById("loginUser");
     var grade = objS.options[objS.selectedIndex].value;
@@ -61,14 +118,25 @@ function gradeChange() {
     	window.location.href="${request.contextPath}/loginOut";
     }
 }
-
-$("#changeCode").click(function () {
+$("#changeCode").click(function () { // 刚登陆进入首页时为空，请选择的值为0
+	if(null == currentProductionTaskNumber || "" == currentProductionTaskNumber || "0" == currentProductionTaskNumber){
+		alert("请先选择生产任务编号");
+		return;
+	}
 	window.location.href="${request.contextPath}/changeCode/index";
 });
 $("#knowleage").click(function () {
+	if(null == currentProductionTaskNumber || "" == currentProductionTaskNumber || "0" == currentProductionTaskNumber){
+		alert("请先选择生产任务编号");
+		return;
+	}
 	window.location.href="${request.contextPath}/testingExample/knowledgeBase";
 });
 $("#coverageReport").click(function () {
+	if(null == currentProductionTaskNumber || "" == currentProductionTaskNumber || "0" == currentProductionTaskNumber){
+		alert("请先选择生产任务编号");
+		return;
+	}
 	window.location.href="${request.contextPath}/coverageReport/index";
 });
 </script>

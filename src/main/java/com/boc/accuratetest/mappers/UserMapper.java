@@ -30,4 +30,6 @@ public interface UserMapper {
     int updateByPrimaryKey(User record);
 
 	List<Permission> getPermissionsBy(User user);
+
+	List<User> page(String search, int limit, Integer pageSize);
 }

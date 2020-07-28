@@ -11,4 +11,10 @@ public interface UserBiz {
 
 	List<Permission> getPermissionsBy(User user);
 
+	List<User> getAll();
+
+	List<User> page(Integer pageNumber, Integer pageSize, String search);
+
+	Integer findTotal(String search);
+
 }
