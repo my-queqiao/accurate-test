@@ -21,7 +21,7 @@
     <script src="~/Scripts/table/Home/Index.js"></script>
     -->
 </head>
-<body class="container-fiuled" style="background-color: aliceblue;background-repeat:repeat-x;background-size:cover;" 
+<body class="container-fiuled" style="background-color: aliceblue;background-repeat:repeat-x;" 
 	background="../img/haibin.jpg">
     <div class="panel-body" style="padding-bottom:0px;">
 	    <div class="row text-center">
@@ -44,19 +44,47 @@
 	    	<option value="loginOut">退出</option>
 	    </select>
 	    
-	    <div class="row text-center">
-	    	<span class="col-xs-4 " style="font-size: xx-large;top: 240px;">
+	    <div class="row text-center" style="font-size: xx-large; margin-top: 15%;">
+	    	<span class="col-xs-4 " >
 	    		<span style="margin-left: ;font-size: xx-large;font-family: 仿宋;" 
 	    			class="btn btn-success" id="changeCode">变更代码</span>
 	    	</span>
-	    	<span class="col-xs-4 " style="font-size: xx-large;top: 240px;">
+	    	<span class="col-xs-4 " >
 	    		<span style="margin-left: ;font-size: xx-large;font-family: 仿宋;" 
-	    			class="btn btn-success" id="knowleage">知识库</span>
+	    			class="btn btn-success" id="buildKnowleage">创建知识库</span>
 	    	</span>
-	    	<span class="col-xs-4 " style="font-size: xx-large;top: 240px;">
+	    	<span class="col-xs-4 " >
+	    		<span style="margin-left: ;font-size: xx-large;font-family: 仿宋;" 
+	    			class="btn btn-success" id="knowleageDetail">查看知识库</span>
+	    	</span>
+	    </div>
+	    <div class="row text-center" style="font-size: xx-large;margin-top: 11%;">
+	    	<span class="col-xs-4 " >
 	    		<span style="margin-left: ;font-size: xx-large;font-family: 仿宋;" 
 	    			class="btn btn-success" id="coverageReport">覆盖率报告</span>
 	    	</span>
+	    </div>
+	    <div class="modal fade" id="myModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3">
+	        <div class="modal-dialog" role="document">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+	                    <h4 class="modal-title" id="myModalLabel3">注册</h4>
+	                </div>
+	                <div class="modal-body text-center">
+	                    <div class="form-group">
+	                    	<label for="productionTaskNumber2" stype="display:inline;">编号：</label>
+	                        <input id="productionTaskNumber2" placeholder="" />
+	                    </div>
+	                </div>
+	                <div class="modal-footer">
+	                	<button type="button" id="btn_save_productionTaskNumber" class="btn btn-primary" data-dismiss="modal">
+	                		<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>确认</button>
+	                    <button type="button" class="btn btn-default" data-dismiss="modal">
+	                    	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
+	                </div>
+	            </div>
+	        </div>
 	    </div>
     </div>
 <script>
@@ -92,12 +120,13 @@ function getPuductionTaskNumber() {
 	});
 }
 
-// 新增生产任务编号
+// 指定生产任务编号
 function gradeChangeForTask() {
     var objS = document.getElementById("productionTaskNumber");
     var grade = objS.options[objS.selectedIndex].value;
     if(grade == "addProductionTaskNumber"){
-    	window.location.href="${request.contextPath}/loginOut";
+    	$("#myModalLabel3").text("新增生产任务编号");
+        $('#myModal3').modal();
     }else{
     	// 指定生产任务编号，区分后台数据
     	$.post('/selectProductionTaskNumber?productionTaskNumber='+grade,
@@ -105,11 +134,28 @@ function gradeChangeForTask() {
     				if(json.success == false){
     					alert(json.msg);
     				}else{
+    					alert(json.msg);
     					currentProductionTaskNumber = grade;
     				}
     	});
     }
 }
+
+$("#btn_save_productionTaskNumber").click(function(){
+	var productionTaskNumber = $("#productionTaskNumber2").val();
+	if(null == productionTaskNumber  || "" == productionTaskNumber) {
+		alert("不能为空");
+		return;
+	}
+	$.post('/addProductionTaskNumber?productionTaskNumber='+productionTaskNumber,
+			function(json){
+				//$("#loading").hide();
+				alert(json.msg);
+				if(json.success == true){
+				}else{
+				}
+		});
+});
 // 退出登陆
 function gradeChange() {
     var objS = document.getElementById("loginUser");
@@ -125,12 +171,11 @@ $("#changeCode").click(function () { // 刚登陆进入首页时为空，请选�
 	}
 	window.location.href="${request.contextPath}/changeCode/index";
 });
-$("#knowleage").click(function () {
-	if(null == currentProductionTaskNumber || "" == currentProductionTaskNumber || "0" == currentProductionTaskNumber){
-		alert("请先选择生产任务编号");
-		return;
-	}
-	window.location.href="${request.contextPath}/testingExample/knowledgeBase";
+$("#buildKnowleage").click(function () {
+	window.location.href="${request.contextPath}/testingExample/buildKnowleage";
+});
+$("#knowleageDetail").click(function () {
+	window.location.href="${request.contextPath}/testingExample/knowleageDetail";
 });
 $("#coverageReport").click(function () {
 	if(null == currentProductionTaskNumber || "" == currentProductionTaskNumber || "0" == currentProductionTaskNumber){

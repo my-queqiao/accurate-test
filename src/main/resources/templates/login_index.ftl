@@ -21,7 +21,7 @@
     <script src="~/Scripts/table/Home/Index.js"></script>
     -->
 </head>
-<body class="container-fiuled" style="background-color: aliceblue;background-repeat:repeat-x;background-size:cover;" 
+<body class="container-fiuled" style="background-color: aliceblue;background-repeat:repeat-x;" 
 	background="../img/haibin.jpg">
     <div class="panel-body" style="padding-bottom:0px;">
 	    <div class="row text-center">
@@ -45,6 +45,33 @@
 	         <button type="button" id="login" class="btn btn-primary">登录</button>
 	         <button type="button" id="register" class="btn btn-primary">注册</button>
          </form>
+         
+         <div class="modal fade" id="myModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3">
+	        <div class="modal-dialog" role="document">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+	                    <h4 class="modal-title" id="myModalLabel3">注册</h4>
+	                </div>
+	                <div class="modal-body text-center">
+	                    <div class="form-group">
+	                    	<label for="user2" stype="display:inline;">用户名：</label>
+	                        <input id="user2" placeholder="" />
+	                    </div>
+	                    <div class="form-group">
+	                    	<label for="password2" stype="display:inline;">&nbsp&nbsp&nbsp&nbsp密码：</label>
+	                        <input id="password2" type="password" placeholder="" />
+	                    </div>
+	                </div>
+	                <div class="modal-footer">
+	                	<button type="button" id="btn_save_register" class="btn btn-primary" data-dismiss="modal">
+	                		<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>确认</button>
+	                    <button type="button" class="btn btn-default" data-dismiss="modal">
+	                    	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
     </div>
 <script>
     $("#login").click(function () {
@@ -60,7 +87,7 @@
 		});
     });
     $("#register").click(function () {
-    	var production_task_number = $("#production_task_number").val();
+    	/* var production_task_number = $("#production_task_number").val();
     	if($.isEmptyObject(production_task_number) == true || $.trim(production_task_number) == ""){
     		alert("编号不能为空");
     		return;
@@ -68,7 +95,29 @@
     	$.post('/register?productionTaskNumber='+production_task_number,
 				function(json){
     		alert(json.msg);
-		});
+		}); */
+    	$("#myModalLabel3").text("注册");
+        $('#myModal3').modal();
+    });
+    $("#btn_save_register").click(function(){
+    	var user = $("#user2").val();
+    	var password = $("#password2").val();
+    	if(null == user  || "" == user) {
+    		alert("用户名不能为空");
+    		return;
+    	}
+    	if(null == password  || "" == password) {
+    		alert("密码不能为空");
+    		return;
+    	}
+		$.post('/register?user='+user+'&password='+password,
+				function(json){
+					//$("#loading").hide();
+					alert(json.msg);
+					if(json.success == true){
+					}else{
+					}
+			});
     });
 </script>
     

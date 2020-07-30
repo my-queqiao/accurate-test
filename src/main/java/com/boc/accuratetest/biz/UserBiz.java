@@ -17,4 +17,8 @@ public interface UserBiz {
 
 	Integer findTotal(String search);
 
+	List<User> findByName(String user);
+
+	void insert(String user, String password);
+
 }

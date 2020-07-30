@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width" />
-    <title>精准测试-知识库创建、查看</title>
+    <title>精准测试-用户授权</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css"/>
     <link rel="stylesheet" href="../css/bootstrap-table/bootstrap-table.css"/>
     <link rel="stylesheet" href="../css/font-awesome.min.css"/>

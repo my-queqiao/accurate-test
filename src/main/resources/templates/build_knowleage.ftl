@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width" />
-    <title>精准测试-知识库创建、查看</title>
+    <title>精准测试-知识库创建</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css"/>
     <link rel="stylesheet" href="../css/bootstrap-table/bootstrap-table.css"/>
     <link rel="stylesheet" href="../css/font-awesome.min.css"/>
@@ -58,6 +58,24 @@
 	                		<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>保存</button>
 	                    <button type="button" class="btn btn-default" data-dismiss="modal">
 	                    	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+	        <div class="modal-dialog" role="document" style="width:1000px; height:100px;">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+	                    <h4 class="modal-title" id="myModalLabel2">关联方法链</h4>
+	                </div>
+	                <div class="modal-body">
+	                    <div class="form-group">
+	                        <div id="methodDetail"></div>
+	                    </div>
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
 	                </div>
 	            </div>
 	        </div>
@@ -269,12 +287,26 @@
     		].join("");
     }
     function method_body_details(id){
-    	for(j = 0; j < list.length; j++) {
-    		if(list[j].id == id){
-	    		alert(list[j].methodBody);
-	    		break;
-    		}
-    	}
+    	$.ajaxSettings.async = false; //同步,默认就是异步
+		$.post('/testingExample/getMethodLinkByTestExampleId?testExampleId='+id,
+				function(json){
+				var list = json.list;
+				var yonglis="";
+				for(var j = 1; j < list.length+1; j++) {
+					var n = list[j-1];
+					yonglis += j+" . "+n.packageName+"."+n.javabeanName+"."+n.methodName+"("+n.paramType+")<br/>";
+		    	}
+				$('#myModal2').on('show.bs.modal', function (event) {
+		           	 var modal = $(this);
+		           	 if(yonglis == ""){
+			           	 modal.find('#methodDetail').html("无");
+		           	 }else{
+			           	 modal.find('#methodDetail').html(yonglis);
+		           	 }
+	           	});
+		});
+		$("#myModalLabel2").text("关联方法链详情");
+        $('#myModal2').modal();
     }
     // 方法传参为英文字母字符串
     function paramTypeFormatter(value, row, index) {

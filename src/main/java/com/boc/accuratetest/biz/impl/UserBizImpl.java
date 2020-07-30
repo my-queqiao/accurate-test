@@ -1,10 +1,13 @@
 package com.boc.accuratetest.biz.impl;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
 import com.boc.accuratetest.biz.UserBiz;
@@ -59,5 +62,23 @@ public class UserBizImpl implements UserBiz{
 		}
 		int i = (int)(userMapper.countByExample(e));
 		return i;
+	}
+
+	@Override
+	public List<User> findByName(String user) {
+		UserExample e = new UserExample();
+		e.createCriteria().andUserNameEqualTo(user);
+		return userMapper.selectByExample(e);
+	}
+
+	@Override
+	public void insert(String user, String password) {
+		password = DigestUtils.md5DigestAsHex(password.getBytes());
+		User record = new User();
+		record.setUserName(user);
+		record.setPassWord(password);
+		String createTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		record.setCreateTime(createTime);
+		userMapper.insert(record);
 	}
 }

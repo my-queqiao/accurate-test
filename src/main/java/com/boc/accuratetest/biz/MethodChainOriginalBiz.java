@@ -11,4 +11,6 @@ public interface MethodChainOriginalBiz {
 
 	void insertBatchForTestedMethods(List<TestedMethods> tms);
 
+	List<MethodChainOriginal> getMethodLinkByTestExampleId(Integer testExampleId);
+
 }

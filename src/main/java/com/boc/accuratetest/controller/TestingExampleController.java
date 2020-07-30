@@ -63,16 +63,16 @@ public class TestingExampleController {
 	// <测试用例主键,最后一行数据@测试用例所在的服务器ip>
 		Map<Integer,String> testExampleIdRef = new ConcurrentHashMap<Integer, String>();
 	/**
-	 * 	跳转到知识库页面
+	 * 	跳转到知识库创建页面
 	 * @return
 	 */
 	@SecurityManagement(KnowledgeRank.class)
-	@RequestMapping("knowledgeBase")
-	public String knowledgeBase(@ModelAttribute("success") String success, Model model) {
+	@RequestMapping("buildKnowleage")
+	public String buildKnowleage(@ModelAttribute("success") String success, Model model) {
 		System.out.println("拿到重定向得到的参数success:" + success);
 		if(success == null || success.equals("")) success = "-1";
 		model.addAttribute("success", success);
-		return "knowledgeBase";
+		return "build_knowleage";
 	}
 	/**
 	 * 	获取测试用例列表
@@ -86,13 +86,8 @@ public class TestingExampleController {
 	@ResponseBody
 	public JSONObject getAll(Integer pageNumber,Integer pageSize,String search,HttpSession session) {
 		JSONObject json = new JSONObject();
-		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
-		String productionTaskNumber = user.getProductionTaskNumber();
-		if(StringUtils.isEmpty(productionTaskNumber)) {
-			throw new NotSelectProductionTaskException("请选择一个生产任务编号");
-		}
-		List<TestingExample> page = testingExampleBiz.page(pageNumber, pageSize, search,productionTaskNumber);
-		Integer total = testingExampleBiz.findTotal(search,productionTaskNumber);
+		List<TestingExample> page = testingExampleBiz.page(pageNumber, pageSize, search,null);
+		Integer total = testingExampleBiz.findTotal(search,null);
 		json.put("rows", page);
 		json.put("total", total);
 		return json;
@@ -105,9 +100,14 @@ public class TestingExampleController {
 	@SecurityManagement(KnowledgeRank.class)
 	@RequestMapping("testExampleStart")
 	@ResponseBody
-	public JSONObject testExampleStart(String ipOnTestExample, Integer testExampleId) {
+	public JSONObject testExampleStart(String ipOnTestExample, Integer testExampleId,HttpSession session) {
 		JSONObject json = new JSONObject();
 		json.put("success", false);
+		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		String productionTaskNumber = user.getProductionTaskNumber();
+		if(StringUtils.isEmpty(productionTaskNumber)) {
+			throw new NotSelectProductionTaskException("请选择一个生产任务编号");
+		}
 		if(StringUtils.isEmpty(ipOnTestExample) || StringUtils.isEmpty(testExampleId) ) {
 			return json;
 		}
@@ -341,5 +341,23 @@ public class TestingExampleController {
             return true;
         }
     }
+	/**
+	 * 	跳转到知识库详情页面
+	 * @return
+	 */
+	@SecurityManagement(KnowledgeRank.class)
+	@RequestMapping("knowleageDetail")
+	public String knowleageDetail() {
+		return "knowleage_detail";
+	}
+	@SecurityManagement(KnowledgeRank.class)
+	@RequestMapping("getMethodLinkByTestExampleId")
+	@ResponseBody
+	public JSONObject getMethodLinkByTestExampleId(Integer testExampleId) {
+		JSONObject json = new JSONObject();
+		List<MethodChainOriginal> mcos = methodChainOriginalBiz.getMethodLinkByTestExampleId(testExampleId);
+		json.put("list", mcos);
+		return json;
+	}
 }
 

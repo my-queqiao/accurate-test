@@ -159,20 +159,6 @@
                 </configuration>
             </plugin>
            -->
-<!-- 字节码插桩 -->
-<!--<plugin>
-	<groupId>com.jzcs</groupId>
-	<artifactId>chazhuang-maven-plugin</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<executions>
-		<execution>
-		    <phase>compile</phase>
-		    <goals>
-		        <goal>chazhuang</goal>
-		    </goals>
-		</execution>
-	</executions>
-</plugin>-->
 		</plugins>
 	</build>
 

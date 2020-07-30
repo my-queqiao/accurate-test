@@ -38,20 +38,18 @@ public class IndexController {
 	@SecurityIgnoreHandler
 	@RequestMapping("/register")
 	@ResponseBody
-	public JSONObject register(String productionTaskNumber) {
-		productionTaskNumber = productionTaskNumber.trim();
+	public JSONObject register(String user,String password) {
+		user = user.trim();
+		password = password.trim();
 		JSONObject json = new JSONObject();
 		json.put("success", false);
-		List<ProductionTask> pts = productionTaskBiz.findBy(productionTaskNumber);
-		if(pts.isEmpty()) {
-			// 存储
-			ProductionTask pt = new ProductionTask();
-			pt.setProductionTaskNumber(productionTaskNumber);
-			productionTaskBiz.insert(pt);
-		}else {
-			json.put("msg", "已存在该编号，请直接登陆");
+		
+		List<User> users = userBiz.findByName(user);
+		if(!users.isEmpty()) {
+			json.put("msg", "该用户已存在");
 			return json;
 		}
+		userBiz.insert(user,password);
 		json.put("msg", "注册成功");
 		json.put("success", true);
 		return json;
@@ -135,10 +133,6 @@ public class IndexController {
 	public JSONObject selectProductionTaskNumber(HttpSession session,String productionTaskNumber) {
 		JSONObject json = new JSONObject();
 		json.put("success", false);
-		if("0".equals(productionTaskNumber)) {
-			json.put("msg", "请指定生产任务编号");
-			return json;
-		}
 		Object u = session.getAttribute(ProductionTaskSession.loginUser);
 		if(null == u) {
 			throw new NotLoginInException("您尚未登陆");
@@ -146,13 +140,42 @@ public class IndexController {
 		User user = null;
 		try {
 			user = (User)(u);
-			user.setProductionTaskNumber(productionTaskNumber);
+			user.setProductionTaskNumber(productionTaskNumber.equals("0")?null:productionTaskNumber);
 			session.setAttribute(ProductionTaskSession.loginUser, user);
 			session.setMaxInactiveInterval(0);
 		} catch (Exception e) {
 			json.put("msg", "指定生产任务编号出错");
 			return json;
 		}
+		json.put("msg", "操作成功");
+		json.put("success", true);
+		return json;
+	}
+	/**
+	 * 	新增生产任务编号
+	 * @param session
+	 * @return
+	 */
+	@SecurityIgnoreHandler
+	@RequestMapping("/addProductionTaskNumber")
+	@ResponseBody
+	public JSONObject addProductionTaskNumber(HttpSession session,String productionTaskNumber) {
+		productionTaskNumber = productionTaskNumber.trim();
+		JSONObject json = new JSONObject();
+		json.put("success", false);
+		Object u = session.getAttribute(ProductionTaskSession.loginUser);
+		if(null == u) {
+			throw new NotLoginInException("您尚未登陆");
+		}
+		List<ProductionTask> findBy = productionTaskBiz.findBy(productionTaskNumber);
+		if(!findBy.isEmpty()) {
+			json.put("msg", "该生产任务编号已存在");
+			return json;
+		}
+		ProductionTask pt = new ProductionTask();
+		pt.setProductionTaskNumber(productionTaskNumber);
+		productionTaskBiz.insert(pt);
+		json.put("msg", "添加成功");
 		json.put("success", true);
 		return json;
 	}

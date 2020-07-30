@@ -267,4 +267,10 @@
     </foreach>
   </insert>
   
+  <select id="getMethodLinkByTestExampleId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    SELECT m.*
+	from example_ref_method_chain r,method_chain_original m
+	where r.testing_example_id = #{testExampleId}
+	and r.method_chain_original_id = m.id;
+  </select>
 </mapper>

@@ -4,8 +4,10 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.boc.accuratetest.biz.MethodChainOriginalBiz;
+import com.boc.accuratetest.mappers.ExampleRefMethodChainMapper;
 import com.boc.accuratetest.mappers.MethodChainOriginalMapper;
 import com.boc.accuratetest.mappers.TestedMethodsMapper;
 import com.boc.accuratetest.pojo.MethodChainOriginal;
@@ -21,10 +23,16 @@ public class MethodChainOriginalBizImpl implements MethodChainOriginalBiz{
 	public void insertBatch(List<MethodChainOriginal> ms) {
 		methodChainOriginalMapper.insertBatch(ms);
 	}
-
+	
 	@Override
+	@Transactional
 	public void insertBatchForTestedMethods(List<TestedMethods> tms) {
 		testedMethodsMapper.insertBatchForTestedMethods(tms);
+	}
+
+	@Override
+	public List<MethodChainOriginal> getMethodLinkByTestExampleId(Integer testExampleId) {
+		return methodChainOriginalMapper.getMethodLinkByTestExampleId(testExampleId);
 	}
 	
 }

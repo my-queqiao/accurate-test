@@ -144,7 +144,8 @@ public class ChangeCodeController {
 		List<ProductionTask> pts = productionTaskBiz.findBy(productionTaskNumber);
 		if(pts.size() > 0) {
 			ProductionTask pt = pts.get(0);
-			if(pt.getGitUrl().equals(git_url) && pt.getMasterBranch().equals(master_branch) && pt.getTestBranch().equals(test_branch)) {
+			if(pt.getGitUrl().equals(git_url) && pt.getMasterBranch().equals(master_branch) 
+					&& pt.getTestBranch().equals(test_branch)) {
 				// 重新获取数据
 			}else {
 				jsonRes.put("res", "当前生产任务编号已经有数据了");
@@ -474,31 +475,9 @@ public class ChangeCodeController {
 		}
 		List<ChangeCode> list = changeCodeBiz.findChangeCodeLinkTestExample(productionTaskNumber);
 		// list.get(0).getId(); // 变更表主键id
-		// list.get(0).getPackageName(); // 测试用例表主键id
-		Map<Integer,Integer> ccidCount = new HashMap<>();
-		List<String> ss = new ArrayList<>();
-		for (ChangeCode c : list) {
-			Integer ccid = c.getId();
-			if(null != ccidCount.get(ccid) && ccidCount.get(ccid) >= 1) {
-				continue;
-			}
-			ccidCount.put(ccid, (ccidCount.get(ccid)==null?0:ccidCount.get(ccid)) +1);
-			StringBuilder sb = new StringBuilder();
-			sb.append(ccid+":");
-			for (ChangeCode c2 : list) {
-				if(ccid.intValue() == c2.getId().intValue()) {
-					sb.append(c2.getPackageName()+",");
-				}
-			}
-			String substring = sb.toString().substring(0, sb.toString().length()-1);
-			ss.add(substring);
-		}
+		// list.get(0).getPackageName(); // 测试用例表主键id（借用字段暂存）
 		// <"'用例1','用例2'"   ,   变更表主键id> // 用例组———》及其对应的某个变更方法
-		Map<String,Integer> teidRefCcid = new HashMap<>(); 
-		for (String s : ss) {
-			String[] split = s.split(":");
-			teidRefCcid.put(split[1], Integer.valueOf(split[0]));
-		}
+		Map<String, Integer> teidRefCcid = teidRefCcid(list);
 		// 测试用例去重，得到所有的测试用例
 		Set<String> keyQuchong = new HashSet<>();
 		for (String key : teidRefCcid.keySet()) {
@@ -509,7 +488,7 @@ public class ChangeCodeController {
 		}
 		Set<String> recommend = new HashSet<>();
 		recommend(keyQuchong, teidRefCcid, recommend);
-		// 推荐的测试用例：[234@235@236,240,260]
+		// 推荐的测试用例(数字是用例表主键id)：[234@235@236,240,260]
 		System.out.println("推荐的测试用例："+recommend); // 推荐的测试用例
 		// 根据推荐的测试用例主键，获取其测试案例编号
 		List<Integer> testExampleIds = new ArrayList<>();
@@ -530,13 +509,11 @@ public class ChangeCodeController {
 				String[] split = r.split("@");
 				StringBuilder sb = new StringBuilder();
 				for (String teid : split) {
-					
 					for(TestingExample te : tes) {
 						if(Integer.valueOf(teid).intValue() == te.getId().intValue()) {
 							sb.append(te.getTestCaseNumber()+"@");
 						}
 					}
-					
 				}
 				recommend2.add(sb.toString());
 			}else {
@@ -551,6 +528,38 @@ public class ChangeCodeController {
 		System.out.println(recommend2);
 		json.put("list", recommend2);
 		return json;
+	}
+	/**
+	 * 整理数据，得到：用例组——》变更方法 : <"'用例1主键','用例2主键'"   ,   变更表主键>
+	 * @param list
+	 * @return
+	 */
+	private Map<String, Integer> teidRefCcid(List<ChangeCode> list) {
+		Map<Integer,Integer> ccidCount = new HashMap<>();
+		List<String> ss = new ArrayList<>();
+		for (ChangeCode c : list) {
+			Integer ccid = c.getId();
+			if(null != ccidCount.get(ccid) && ccidCount.get(ccid) >= 1) {
+				continue;
+			}
+			ccidCount.put(ccid, (ccidCount.get(ccid)==null?0:ccidCount.get(ccid)) +1);
+			StringBuilder sb = new StringBuilder();
+			sb.append(ccid+":");
+			for (ChangeCode c2 : list) {
+				if(ccid.intValue() == c2.getId().intValue()) {
+					sb.append(c2.getPackageName()+",");
+				}
+			}
+			String substring = sb.toString().substring(0, sb.toString().length()-1);
+			ss.add(substring);
+		}
+		// <"'用例1id','用例2'"   ,   变更表主键id> // 用例组———》及其对应的某个变更方法
+		Map<String,Integer> teidRefCcid = new HashMap<>(); 
+		for (String s : ss) {
+			String[] split = s.split(":");
+			teidRefCcid.put(split[1], Integer.valueOf(split[0]));
+		}
+		return teidRefCcid;
 	}
 	public static void main(String[] args) {
 		// <"'用例1','用例2'"   ,   变更表主键id>

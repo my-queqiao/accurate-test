@@ -29,4 +29,6 @@ public interface MethodChainOriginalMapper {
     int updateByPrimaryKey(MethodChainOriginal record);
 
 	void insertBatch(List<MethodChainOriginal> ms);
+
+	List<MethodChainOriginal> getMethodLinkByTestExampleId(Integer testExampleId);
 }
