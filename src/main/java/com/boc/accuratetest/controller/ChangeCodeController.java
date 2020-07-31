@@ -42,6 +42,7 @@ import com.boc.accuratetest.annotation.SecurityIgnoreHandler;
 import com.boc.accuratetest.biz.ChangeCodeBiz;
 import com.boc.accuratetest.biz.ProductionTaskBiz;
 import com.boc.accuratetest.biz.TestingExampleBiz;
+import com.boc.accuratetest.constant.NotLoginInException;
 import com.boc.accuratetest.constant.NotSelectProductionTaskException;
 import com.boc.accuratetest.constant.ProductionTaskSession;
 import com.boc.accuratetest.pojo.ChangeCode;
@@ -66,18 +67,18 @@ public class ChangeCodeController {
 	@Autowired
 	private ProductionTaskBiz productionTaskBiz;
 	/**
-	 * 精准测试项目首页
+	 * 变更代码首页
 	 * @return
 	 */
 	@SecurityIgnoreHandler
 	@RequestMapping("index")
-	public String index() {
-		/*HttpServletRequest request = ( (ServletRequestAttributes)RequestContextHolder.getRequestAttributes() ).getRequest();
-		Object productionTaskNumber = request.getSession().getAttribute(ProductionTaskSession.number);
-		if(null == productionTaskNumber) {
+	public String index(HttpSession session) {
+		//HttpServletRequest request = ( (ServletRequestAttributes)RequestContextHolder.getRequestAttributes() ).getRequest();
+		Object u = session.getAttribute(ProductionTaskSession.loginUser);
+		if(null == u) {
 			throw new NotLoginInException("您尚未登陆");
-		}*/
-		return "cc_index";
+		}
+		return "changeCode_index";
 	}
 	/**
 	 * 展示差异代码
@@ -144,9 +145,11 @@ public class ChangeCodeController {
 		List<ProductionTask> pts = productionTaskBiz.findBy(productionTaskNumber);
 		if(pts.size() > 0) {
 			ProductionTask pt = pts.get(0);
-			if(pt.getGitUrl().equals(git_url) && pt.getMasterBranch().equals(master_branch) 
-					&& pt.getTestBranch().equals(test_branch)) {
-				// 重新获取数据
+			if(StringUtils.isEmpty(pt.getGitUrl())) {
+				// 可以获取数据
+			}else if(git_url.equals(pt.getGitUrl()) && master_branch.equals(pt.getMasterBranch()) 
+					&& test_branch.equals(pt.getTestBranch())) {
+				// 可以重新获取数据
 			}else {
 				jsonRes.put("res", "当前生产任务编号已经有数据了");
 				return jsonRes;
@@ -420,7 +423,11 @@ public class ChangeCodeController {
 			if(changeType.equals("add"))cc.setChangeType((byte)1);
 			if(changeType.equals("delete"))cc.setChangeType((byte)2);
 			if(changeType.equals("change"))cc.setChangeType((byte)3);
-			cc.setMethodBody(js.getString("content"));
+			String body = js.getString("content");
+			if(body.length() >= 4000) {
+				body = body.substring(0, 3999);
+			}
+			cc.setMethodBody(body);
 			ccs.add(cc);
 		}
 		changeCodeBiz.insertBatch(ccs);

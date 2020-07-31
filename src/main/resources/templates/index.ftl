@@ -93,7 +93,8 @@ getPuductionTaskNumber(); // 获取已有的生产任务编号
 function getPuductionTaskNumber() {
 	var loginUser=$("#loginUser option:selected").text();
 	if(loginUser == "未登录"){
-		alert("请先登陆");
+		//alert("请先登陆");
+		window.location.href="${request.contextPath}/";
 		return;
 	}	
 	$.post('/getPuductionTaskNumber',

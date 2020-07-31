@@ -36,6 +36,7 @@ import com.boc.accuratetest.annotation.SecurityIgnoreHandler;
 import com.boc.accuratetest.annotation.SecurityManagement;
 import com.boc.accuratetest.biz.MethodChainOriginalBiz;
 import com.boc.accuratetest.biz.TestingExampleBiz;
+import com.boc.accuratetest.constant.NotLoginInException;
 import com.boc.accuratetest.constant.NotSelectProductionTaskException;
 import com.boc.accuratetest.constant.ProductionTaskSession;
 import com.boc.accuratetest.pojo.ExampleRefMethodChain;
@@ -60,7 +61,7 @@ public class TestingExampleController {
 	private MethodChainOriginalBiz methodChainOriginalBiz;
 	@Autowired
 	private ExampleRefMethodChainBiz exampleRefMethodChainBiz;
-	// <测试用例主键,最后一行数据@测试用例所在的服务器ip>
+	// < 测试用例主键  ,  最后一行数据@测试用例所在的服务器ip >
 		Map<Integer,String> testExampleIdRef = new ConcurrentHashMap<Integer, String>();
 	/**
 	 * 	跳转到知识库创建页面
@@ -68,7 +69,11 @@ public class TestingExampleController {
 	 */
 	@SecurityManagement(KnowledgeRank.class)
 	@RequestMapping("buildKnowleage")
-	public String buildKnowleage(@ModelAttribute("success") String success, Model model) {
+	public String buildKnowleage(@ModelAttribute("success") String success, Model model,HttpSession session) {
+		Object u = session.getAttribute(ProductionTaskSession.loginUser);
+		if(null == u) {
+			throw new NotLoginInException("您尚未登陆");
+		}
 		System.out.println("拿到重定向得到的参数success:" + success);
 		if(success == null || success.equals("")) success = "-1";
 		model.addAttribute("success", success);
@@ -103,11 +108,11 @@ public class TestingExampleController {
 	public JSONObject testExampleStart(String ipOnTestExample, Integer testExampleId,HttpSession session) {
 		JSONObject json = new JSONObject();
 		json.put("success", false);
-		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		/*User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
 		String productionTaskNumber = user.getProductionTaskNumber();
 		if(StringUtils.isEmpty(productionTaskNumber)) {
 			throw new NotSelectProductionTaskException("请选择一个生产任务编号");
-		}
+		}*/
 		if(StringUtils.isEmpty(ipOnTestExample) || StringUtils.isEmpty(testExampleId) ) {
 			return json;
 		}
@@ -169,11 +174,11 @@ public class TestingExampleController {
 	public JSONObject testExampleEnd(String ipOnTestExample, Integer testExampleId,HttpSession session) {
 		JSONObject json = new JSONObject();
 		json.put("success", false);
-		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		/*User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
 		String productionTaskNumber = user.getProductionTaskNumber();
 		if(StringUtils.isEmpty(productionTaskNumber)) {
 			throw new NotSelectProductionTaskException("请选择一个生产任务编号");
-		}
+		}*/
 		if(StringUtils.isEmpty(testExampleId) ) {
 			return json;
 		}
@@ -200,7 +205,7 @@ public class TestingExampleController {
             	while ((info = br.readLine()) != null) {
             		// 全部读取，保存到数据库
             		MethodChainOriginal chainOriginal = insertPrepare(info);
-            		chainOriginal.setProductionTaskNumber(productionTaskNumber);
+            		chainOriginal.setProductionTaskNumber("");
             		ms.add(chainOriginal);
             	}
             }else {
@@ -209,7 +214,7 @@ public class TestingExampleController {
             	while ((info = br.readLine()) != null) {
             		if(start == 1) { // 读取，保存到数据库
             			MethodChainOriginal chainOriginal = insertPrepare(info);
-            			chainOriginal.setProductionTaskNumber(productionTaskNumber);
+            			chainOriginal.setProductionTaskNumber("");
                 		ms.add(chainOriginal);
             		}
             		if(info.equals(split[0])) { // 从下一行开始读取
@@ -286,7 +291,7 @@ public class TestingExampleController {
     public String upload(@RequestParam("file") MultipartFile file,RedirectAttributes model) {
 		model.addFlashAttribute("success", "uploadFail");
         if (file.isEmpty() || !file.getOriginalFilename().endsWith(".xls")) {
-        	return "redirect:/testingExample/knowledgeBase";
+        	return "redirect:/testingExample/buildKnowleage";
         }
         
         try{
@@ -313,14 +318,14 @@ public class TestingExampleController {
             testingExampleBiz.batchSave(tes);
         }catch (IOException e) {
             e.printStackTrace();
-            return "redirect:/testingExample/knowledgeBase";
+            return "redirect:/testingExample/buildKnowleage";
         } catch (BiffException e){
             e.printStackTrace();
-            return "redirect:/testingExample/knowledgeBase";
+            return "redirect:/testingExample/buildKnowleage";
         }
         
         model.addFlashAttribute("success", "uploadSuccess");
-        return "redirect:/testingExample/knowledgeBase";
+        return "redirect:/testingExample/buildKnowleage";
     }
 	public static boolean deleteFolder(String url) {
         File file = new File(url);
@@ -347,7 +352,11 @@ public class TestingExampleController {
 	 */
 	@SecurityManagement(KnowledgeRank.class)
 	@RequestMapping("knowleageDetail")
-	public String knowleageDetail() {
+	public String knowleageDetail(HttpSession session) {
+		Object u = session.getAttribute(ProductionTaskSession.loginUser);
+		if(null == u) {
+			throw new NotLoginInException("您尚未登陆");
+		}
 		return "knowleage_detail";
 	}
 	@SecurityManagement(KnowledgeRank.class)
