@@ -15,6 +15,7 @@ import com.boc.accuratetest.biz.ProductionTaskBiz;
 import com.boc.accuratetest.biz.UserBiz;
 import com.boc.accuratetest.constant.NotLoginInException;
 import com.boc.accuratetest.constant.ProductionTaskSession;
+import com.boc.accuratetest.demo.StackTraceInfo;
 import com.boc.accuratetest.pojo.Permission;
 import com.boc.accuratetest.pojo.ProductionTask;
 import com.boc.accuratetest.pojo.User;
@@ -117,7 +118,8 @@ public class IndexController {
 			json.put("msg", "获取生产任务编号列表出错");
 			return json;
 		}
-		json.put("list", pts);
+		json.put("rows", pts);
+		json.put("total", pts.size());
 		json.put("currentProductionTaskNumber", user.getProductionTaskNumber()==null?"":user.getProductionTaskNumber());
 		json.put("success", true);
 		return json;
@@ -178,5 +180,14 @@ public class IndexController {
 		json.put("msg", "添加成功");
 		json.put("success", true);
 		return json;
+	}
+	@SecurityIgnoreHandler
+	@RequestMapping("/proTaskNumberIndex")
+	public String proTaskNumberIndex(HttpSession session) {
+		Object u = session.getAttribute(ProductionTaskSession.loginUser);
+		if(null == u) {
+			return "redirect:/";
+		}
+		return "proTaskNumber_index";
 	}
 }

@@ -3,7 +3,7 @@ package com.boc.accuratetest.pojo;
 public class ExampleRefMethodChain {
     private Integer testingExampleId;
 
-    private Integer methodChainOriginalId;
+    private String methodChainOriginalId;
 
     public Integer getTestingExampleId() {
         return testingExampleId;
@@ -13,11 +13,11 @@ public class ExampleRefMethodChain {
         this.testingExampleId = testingExampleId;
     }
 
-    public Integer getMethodChainOriginalId() {
+    public String getMethodChainOriginalId() {
         return methodChainOriginalId;
     }
 
-    public void setMethodChainOriginalId(Integer methodChainOriginalId) {
-        this.methodChainOriginalId = methodChainOriginalId;
+    public void setMethodChainOriginalId(String methodChainOriginalId) {
+        this.methodChainOriginalId = methodChainOriginalId == null ? null : methodChainOriginalId.trim();
     }
 }

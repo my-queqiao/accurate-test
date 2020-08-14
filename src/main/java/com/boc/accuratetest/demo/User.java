@@ -1,22 +1,56 @@
 package com.boc.accuratetest.demo;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+/**
+java.lang.Thread
+getStackTrace
+1559
+com.boc.accuratetest.demo.User
+t
+20
+com.boc.accuratetest.demo.User
+b
+32
+com.boc.accuratetest.demo.User
+a
+29
+com.boc.accuratetest.demo.User
+main
+13
 
+ */
 public class User {
 	public static void main(String[] args) throws IOException {
-		InputStream is = new FileInputStream(
-				new File("C:\\Users\\tom\\Desktop\\jacoco-client.exec"));
-        InputStreamReader isr = new InputStreamReader(is);
-        BufferedReader br = new BufferedReader(isr);
-        String info = null;
-        while ((info = br.readLine()) != null) { // 
-            System.out.println("服务器发来消息说：" + info);
-        }
+		//a();
+		
+	}
+	public static void e() {
+		System.out.println("e方法开始");
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        // 0是线程信息，1是当前方法自身信息，2是直接上级信息，3是上级的上级            以此类推
+        for (int i=0;i<stackTrace.length;i++) {
+			System.out.println("堆栈信息，类："+stackTrace[i].getClassName());
+			System.out.println("方法名："+stackTrace[i].getMethodName());
+			System.out.println("代码行："+stackTrace[i].getLineNumber());
+			System.out.println("文件名："+stackTrace[i].getFileName());
+		}
+        System.out.println("e方法结束");
+	}
+	public static void a() {
+		System.out.println("a方法开始");
+		b();
+		System.out.println("a方法结束");
+	}
+	public static void b() {
+		System.out.println("b方法开始");
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				//Thread.sleep(1000);
+				Thread.currentThread();
+				e();
+			}
+		}).start();
+		
+		System.out.println("b方法结束");
 	}
 }

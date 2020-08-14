@@ -10,7 +10,7 @@ public interface MethodChainOriginalMapper {
 
     int deleteByExample(MethodChainOriginalExample example);
 
-    int deleteByPrimaryKey(Integer id);
+    int deleteByPrimaryKey(String id);
 
     int insert(MethodChainOriginal record);
 
@@ -18,7 +18,7 @@ public interface MethodChainOriginalMapper {
 
     List<MethodChainOriginal> selectByExample(MethodChainOriginalExample example);
 
-    MethodChainOriginal selectByPrimaryKey(Integer id);
+    MethodChainOriginal selectByPrimaryKey(String id);
 
     int updateByExampleSelective(@Param("record") MethodChainOriginal record, @Param("example") MethodChainOriginalExample example);
 

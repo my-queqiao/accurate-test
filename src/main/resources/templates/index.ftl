@@ -33,11 +33,9 @@
 	    style="color:black; position:absolute;cursor: pointer;text-decoration:underline;
 	    		    right: 420px;top: 10px;z-index:9999;font-size: 20px;font-family: 宋体;" >权限配置</a>
 	    
-	    <select id="productionTaskNumber" onchange="gradeChangeForTask()"
-	    style="color:black; position:absolute;right: 150px;top: 10px;z-index:9999;font-size: 20px;font-family: 宋体;">
-	    	<option value="0">请选择生产任务编号</option>
-	    	<option value="addProductionTaskNumber">新增生产任务编号</option>
-	    </select>
+	    <div id="productionTaskNumber" style="color:black; width: 200px;
+	    position:absolute;right: 150px;top: 10px;z-index:9999;font-size: 20px;font-family: 宋体;">
+	    	未选择生产任务</div>
 	    <select id="loginUser" onchange="gradeChange()" style="color:black; position:absolute;width: 100px;
 	    right: 10px;top: 10px;z-index:9999;font-size: 20px;font-family: 宋体;">
 	    	<option><#if Session["loginUser"]?exists>${Session["loginUser"].userName}<#else>未登录</#if></option>
@@ -45,6 +43,10 @@
 	    </select>
 	    
 	    <div class="row text-center" style="font-size: xx-large; margin-top: 15%;">
+	    	<div class="col-xs-4 " >
+	    		<span style="margin-left: ;font-size: xx-large;font-family: 仿宋;" 
+	    			class="btn btn-success" id="productionTask">生产任务</span>
+	    	</div>
 	    	<span class="col-xs-4 " >
 	    		<span style="margin-left: ;font-size: xx-large;font-family: 仿宋;" 
 	    			class="btn btn-success" id="changeCode">变更代码</span>
@@ -53,12 +55,12 @@
 	    		<span style="margin-left: ;font-size: xx-large;font-family: 仿宋;" 
 	    			class="btn btn-success" id="buildKnowleage">创建知识库</span>
 	    	</span>
+	    </div>
+	    <div class="row text-center" style="font-size: xx-large;margin-top: 11%;">
 	    	<span class="col-xs-4 " >
 	    		<span style="margin-left: ;font-size: xx-large;font-family: 仿宋;" 
 	    			class="btn btn-success" id="knowleageDetail">查看知识库</span>
 	    	</span>
-	    </div>
-	    <div class="row text-center" style="font-size: xx-large;margin-top: 11%;">
 	    	<span class="col-xs-4 " >
 	    		<span style="margin-left: ;font-size: xx-large;font-family: 仿宋;" 
 	    			class="btn btn-success" id="coverageReport">覆盖率报告</span>
@@ -86,10 +88,33 @@
 	            </div>
 	        </div>
 	    </div>
+	    
+	    <div class="modal fade" id="myModal4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel4">
+	        <div class="modal-dialog" role="document">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+	                    <h4 class="modal-title" id="myModalLabel4">选择生产任务编号：</h4>
+	                </div>
+	                <div class="modal-body">
+	                    <div class="form-group">
+	                        <div id="ptnumber"></div>
+	                    </div>
+	                </div>
+	                <div class="modal-footer">
+	                	<button type="button" id="btn_save_testserverip" class="btn btn-primary" data-dismiss="modal">
+	                		<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>确认</button>
+	                    <button type="button" class="btn btn-default" data-dismiss="modal">
+	                    	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    
     </div>
 <script>
 var currentProductionTaskNumber;
-getPuductionTaskNumber(); // 获取已有的生产任务编号
+getPuductionTaskNumber(); // 获取、展示已有的生产任务编号
 function getPuductionTaskNumber() {
 	var loginUser=$("#loginUser option:selected").text();
 	if(loginUser == "未登录"){
@@ -99,64 +124,20 @@ function getPuductionTaskNumber() {
 	}	
 	$.post('/getPuductionTaskNumber',
 			function(json){
-				if(json.success == false){
-					alert(json.msg);
+				var cptn = json.currentProductionTaskNumber;
+				if(cptn == ""){
+					$("#productionTaskNumber").text("未选择生产任务");
 				}else{
-					var cptn = json.currentProductionTaskNumber;
 					currentProductionTaskNumber = cptn;
-				    //$("#productionTaskNumber").append(opt);
-					$.each(json.list,function(index,item){
-						var ptn = item.productionTaskNumber;
-						if(null != cptn){
-							if(cptn == ptn){
-						        var opt=$("<option selected value="+ptn+">"+ptn+"</option>");
-						        $("#productionTaskNumber").append(opt);
-							}else{
-						        var opt=$("<option value="+ptn+">"+ptn+"</option>");
-						        $("#productionTaskNumber").append(opt);
-							}
-						}
-					});
-				}
-	});
-}
-
-// 指定生产任务编号
-function gradeChangeForTask() {
-    var objS = document.getElementById("productionTaskNumber");
-    var grade = objS.options[objS.selectedIndex].value;
-    if(grade == "addProductionTaskNumber"){
-    	$("#myModalLabel3").text("新增生产任务编号");
-        $('#myModal3').modal();
-    }else{
-    	// 指定生产任务编号，区分后台数据
-    	$.post('/selectProductionTaskNumber?productionTaskNumber='+grade,
-    			function(json){
-    				if(json.success == false){
-    					alert(json.msg);
-    				}else{
-    					alert(json.msg);
-    					currentProductionTaskNumber = grade;
-    				}
-    	});
-    }
-}
-
-$("#btn_save_productionTaskNumber").click(function(){
-	var productionTaskNumber = $("#productionTaskNumber2").val();
-	if(null == productionTaskNumber  || "" == productionTaskNumber) {
-		alert("不能为空");
-		return;
-	}
-	$.post('/addProductionTaskNumber?productionTaskNumber='+productionTaskNumber,
-			function(json){
-				//$("#loading").hide();
-				alert(json.msg);
-				if(json.success == true){
-				}else{
+					$("#productionTaskNumber").text(cptn);
 				}
 		});
+}
+
+$("#productionTask").click(function(){
+    window.location.href="${request.contextPath}/proTaskNumberIndex";
 });
+
 // 退出登陆
 function gradeChange() {
     var objS = document.getElementById("loginUser");

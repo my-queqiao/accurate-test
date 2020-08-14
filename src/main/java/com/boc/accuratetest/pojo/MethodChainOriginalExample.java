@@ -114,52 +114,62 @@ public class MethodChainOriginalExample {
             return (Criteria) this;
         }
 
-        public Criteria andIdEqualTo(Integer value) {
+        public Criteria andIdEqualTo(String value) {
             addCriterion("id =", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdNotEqualTo(Integer value) {
+        public Criteria andIdNotEqualTo(String value) {
             addCriterion("id <>", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdGreaterThan(Integer value) {
+        public Criteria andIdGreaterThan(String value) {
             addCriterion("id >", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdGreaterThanOrEqualTo(Integer value) {
+        public Criteria andIdGreaterThanOrEqualTo(String value) {
             addCriterion("id >=", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdLessThan(Integer value) {
+        public Criteria andIdLessThan(String value) {
             addCriterion("id <", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdLessThanOrEqualTo(Integer value) {
+        public Criteria andIdLessThanOrEqualTo(String value) {
             addCriterion("id <=", value, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdIn(List<Integer> values) {
+        public Criteria andIdLike(String value) {
+            addCriterion("id like", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdNotLike(String value) {
+            addCriterion("id not like", value, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andIdIn(List<String> values) {
             addCriterion("id in", values, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdNotIn(List<Integer> values) {
+        public Criteria andIdNotIn(List<String> values) {
             addCriterion("id not in", values, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdBetween(Integer value1, Integer value2) {
+        public Criteria andIdBetween(String value1, String value2) {
             addCriterion("id between", value1, value2, "id");
             return (Criteria) this;
         }
 
-        public Criteria andIdNotBetween(Integer value1, Integer value2) {
+        public Criteria andIdNotBetween(String value1, String value2) {
             addCriterion("id not between", value1, value2, "id");
             return (Criteria) this;
         }
@@ -641,6 +651,76 @@ public class MethodChainOriginalExample {
 
         public Criteria andProductionTaskNumberNotBetween(String value1, String value2) {
             addCriterion("production_task_number not between", value1, value2, "productionTaskNumber");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastMethodIdIsNull() {
+            addCriterion("last_method_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastMethodIdIsNotNull() {
+            addCriterion("last_method_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastMethodIdEqualTo(String value) {
+            addCriterion("last_method_id =", value, "lastMethodId");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastMethodIdNotEqualTo(String value) {
+            addCriterion("last_method_id <>", value, "lastMethodId");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastMethodIdGreaterThan(String value) {
+            addCriterion("last_method_id >", value, "lastMethodId");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastMethodIdGreaterThanOrEqualTo(String value) {
+            addCriterion("last_method_id >=", value, "lastMethodId");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastMethodIdLessThan(String value) {
+            addCriterion("last_method_id <", value, "lastMethodId");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastMethodIdLessThanOrEqualTo(String value) {
+            addCriterion("last_method_id <=", value, "lastMethodId");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastMethodIdLike(String value) {
+            addCriterion("last_method_id like", value, "lastMethodId");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastMethodIdNotLike(String value) {
+            addCriterion("last_method_id not like", value, "lastMethodId");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastMethodIdIn(List<String> values) {
+            addCriterion("last_method_id in", values, "lastMethodId");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastMethodIdNotIn(List<String> values) {
+            addCriterion("last_method_id not in", values, "lastMethodId");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastMethodIdBetween(String value1, String value2) {
+            addCriterion("last_method_id between", value1, value2, "lastMethodId");
+            return (Criteria) this;
+        }
+
+        public Criteria andLastMethodIdNotBetween(String value1, String value2) {
+            addCriterion("last_method_id not between", value1, value2, "lastMethodId");
             return (Criteria) this;
         }
     }

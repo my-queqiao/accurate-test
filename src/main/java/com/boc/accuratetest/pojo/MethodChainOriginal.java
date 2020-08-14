@@ -1,7 +1,7 @@
 package com.boc.accuratetest.pojo;
 
 public class MethodChainOriginal {
-    private Integer id;
+    private String id;
 
     private String packageName;
 
@@ -17,12 +17,14 @@ public class MethodChainOriginal {
 
     private String productionTaskNumber;
 
-    public Integer getId() {
+    private String lastMethodId;
+
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setId(String id) {
+        this.id = id == null ? null : id.trim();
     }
 
     public String getPackageName() {
@@ -79,5 +81,13 @@ public class MethodChainOriginal {
 
     public void setProductionTaskNumber(String productionTaskNumber) {
         this.productionTaskNumber = productionTaskNumber == null ? null : productionTaskNumber.trim();
+    }
+
+    public String getLastMethodId() {
+        return lastMethodId;
+    }
+
+    public void setLastMethodId(String lastMethodId) {
+        this.lastMethodId = lastMethodId == null ? null : lastMethodId.trim();
     }
 }

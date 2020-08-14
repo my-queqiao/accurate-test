@@ -11,6 +11,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
 import com.boc.accuratetest.biz.UserBiz;
+import com.boc.accuratetest.demo.StackTraceInfo;
 import com.boc.accuratetest.mappers.UserMapper;
 import com.boc.accuratetest.pojo.Permission;
 import com.boc.accuratetest.pojo.User;
@@ -29,7 +30,6 @@ public class UserBizImpl implements UserBiz{
 		List<User> list = userMapper.selectByExample(e);
 		return list;
 	}
-
 	@Override
 	public List<Permission> getPermissionsBy(User user) {
 		return userMapper.getPermissionsBy(user);

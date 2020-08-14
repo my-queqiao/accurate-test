@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.boc.accuratetest.mappers.MethodChainOriginalMapper">
   <resultMap id="BaseResultMap" type="com.boc.accuratetest.pojo.MethodChainOriginal">
-    <id column="id" jdbcType="INTEGER" property="id" />
+    <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="package_name" jdbcType="VARCHAR" property="packageName" />
     <result column="javabean_name" jdbcType="VARCHAR" property="javabeanName" />
     <result column="method_name" jdbcType="VARCHAR" property="methodName" />
@@ -10,6 +10,7 @@
     <result column="call_time" jdbcType="VARCHAR" property="callTime" />
     <result column="call_time_long" jdbcType="BIGINT" property="callTimeLong" />
     <result column="production_task_number" jdbcType="VARCHAR" property="productionTaskNumber" />
+    <result column="last_method_id" jdbcType="VARCHAR" property="lastMethodId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -71,7 +72,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, package_name, javabean_name, method_name, param_type, call_time, call_time_long, 
-    production_task_number
+    production_task_number, last_method_id
   </sql>
   <select id="selectByExample" parameterType="com.boc.accuratetest.pojo.MethodChainOriginalExample" resultMap="BaseResultMap">
     select
@@ -87,15 +88,15 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from method_chain_original
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from method_chain_original
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </delete>
   <delete id="deleteByExample" parameterType="com.boc.accuratetest.pojo.MethodChainOriginalExample">
     delete from method_chain_original
@@ -106,10 +107,12 @@
   <insert id="insert" parameterType="com.boc.accuratetest.pojo.MethodChainOriginal">
     insert into method_chain_original (id, package_name, javabean_name, 
       method_name, param_type, call_time, 
-      call_time_long, production_task_number)
-    values (#{id,jdbcType=INTEGER}, #{packageName,jdbcType=VARCHAR}, #{javabeanName,jdbcType=VARCHAR}, 
+      call_time_long, production_task_number, last_method_id
+      )
+    values (#{id,jdbcType=VARCHAR}, #{packageName,jdbcType=VARCHAR}, #{javabeanName,jdbcType=VARCHAR}, 
       #{methodName,jdbcType=VARCHAR}, #{paramType,jdbcType=VARCHAR}, #{callTime,jdbcType=VARCHAR}, 
-      #{callTimeLong,jdbcType=BIGINT}, #{productionTaskNumber,jdbcType=VARCHAR})
+      #{callTimeLong,jdbcType=BIGINT}, #{productionTaskNumber,jdbcType=VARCHAR}, #{lastMethodId,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.boc.accuratetest.pojo.MethodChainOriginal">
     insert into method_chain_original
@@ -138,10 +141,13 @@
       <if test="productionTaskNumber != null">
         production_task_number,
       </if>
+      <if test="lastMethodId != null">
+        last_method_id,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
-        #{id,jdbcType=INTEGER},
+        #{id,jdbcType=VARCHAR},
       </if>
       <if test="packageName != null">
         #{packageName,jdbcType=VARCHAR},
@@ -164,6 +170,9 @@
       <if test="productionTaskNumber != null">
         #{productionTaskNumber,jdbcType=VARCHAR},
       </if>
+      <if test="lastMethodId != null">
+        #{lastMethodId,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.boc.accuratetest.pojo.MethodChainOriginalExample" resultType="java.lang.Long">
@@ -176,7 +185,7 @@
     update method_chain_original
     <set>
       <if test="record.id != null">
-        id = #{record.id,jdbcType=INTEGER},
+        id = #{record.id,jdbcType=VARCHAR},
       </if>
       <if test="record.packageName != null">
         package_name = #{record.packageName,jdbcType=VARCHAR},
@@ -199,6 +208,9 @@
       <if test="record.productionTaskNumber != null">
         production_task_number = #{record.productionTaskNumber,jdbcType=VARCHAR},
       </if>
+      <if test="record.lastMethodId != null">
+        last_method_id = #{record.lastMethodId,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -206,14 +218,15 @@
   </update>
   <update id="updateByExample" parameterType="map">
     update method_chain_original
-    set id = #{record.id,jdbcType=INTEGER},
+    set id = #{record.id,jdbcType=VARCHAR},
       package_name = #{record.packageName,jdbcType=VARCHAR},
       javabean_name = #{record.javabeanName,jdbcType=VARCHAR},
       method_name = #{record.methodName,jdbcType=VARCHAR},
       param_type = #{record.paramType,jdbcType=VARCHAR},
       call_time = #{record.callTime,jdbcType=VARCHAR},
       call_time_long = #{record.callTimeLong,jdbcType=BIGINT},
-      production_task_number = #{record.productionTaskNumber,jdbcType=VARCHAR}
+      production_task_number = #{record.productionTaskNumber,jdbcType=VARCHAR},
+      last_method_id = #{record.lastMethodId,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -242,8 +255,11 @@
       <if test="productionTaskNumber != null">
         production_task_number = #{productionTaskNumber,jdbcType=VARCHAR},
       </if>
+      <if test="lastMethodId != null">
+        last_method_id = #{lastMethodId,jdbcType=VARCHAR},
+      </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.boc.accuratetest.pojo.MethodChainOriginal">
     update method_chain_original
@@ -253,17 +269,19 @@
       param_type = #{paramType,jdbcType=VARCHAR},
       call_time = #{callTime,jdbcType=VARCHAR},
       call_time_long = #{callTimeLong,jdbcType=BIGINT},
-      production_task_number = #{productionTaskNumber,jdbcType=VARCHAR}
-    where id = #{id,jdbcType=INTEGER}
+      production_task_number = #{productionTaskNumber,jdbcType=VARCHAR},
+      last_method_id = #{lastMethodId,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
   </update>
-  <insert id="insertBatch" keyProperty="id" parameterType="java.util.List" useGeneratedKeys="true">
-    insert into method_chain_original (package_name, javabean_name, 
-      method_name, param_type, call_time, call_time_long,production_task_number)
+  <insert id="insertBatch" parameterType="java.util.List">
+    insert into method_chain_original (id,package_name, javabean_name, 
+      method_name, param_type, call_time, call_time_long,production_task_number,last_method_id)
     values 
     <foreach collection="list" index="index" item="item" separator=",">
-	    (#{item.packageName,jdbcType=VARCHAR}, #{item.javabeanName,jdbcType=VARCHAR}, 
+	    (#{item.id,jdbcType=VARCHAR},#{item.packageName,jdbcType=VARCHAR}, #{item.javabeanName,jdbcType=VARCHAR}, 
       #{item.methodName,jdbcType=VARCHAR}, #{item.paramType,jdbcType=VARCHAR}, #{item.callTime,jdbcType=VARCHAR}, 
-      #{item.callTimeLong,jdbcType=BIGINT},#{item.productionTaskNumber,jdbcType=VARCHAR})
+      #{item.callTimeLong,jdbcType=BIGINT},#{item.productionTaskNumber,jdbcType=VARCHAR}
+      ,#{item.lastMethodId,jdbcType=VARCHAR})
     </foreach>
   </insert>
   

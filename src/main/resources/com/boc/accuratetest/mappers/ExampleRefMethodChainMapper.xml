@@ -3,12 +3,93 @@
 <mapper namespace="com.boc.accuratetest.mappers.ExampleRefMethodChainMapper">
   <resultMap id="BaseResultMap" type="com.boc.accuratetest.pojo.ExampleRefMethodChain">
     <result column="testing_example_id" jdbcType="INTEGER" property="testingExampleId" />
-    <result column="method_chain_original_id" jdbcType="INTEGER" property="methodChainOriginalId" />
+    <result column="method_chain_original_id" jdbcType="VARCHAR" property="methodChainOriginalId" />
   </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    testing_example_id, method_chain_original_id
+  </sql>
+  <select id="selectByExample" parameterType="com.boc.accuratetest.pojo.ExampleRefMethodChainExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from example_ref_method_chain
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <delete id="deleteByExample" parameterType="com.boc.accuratetest.pojo.ExampleRefMethodChainExample">
+    delete from example_ref_method_chain
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
   <insert id="insert" parameterType="com.boc.accuratetest.pojo.ExampleRefMethodChain">
     insert into example_ref_method_chain (testing_example_id, method_chain_original_id
       )
-    values (#{testingExampleId,jdbcType=INTEGER}, #{methodChainOriginalId,jdbcType=INTEGER}
+    values (#{testingExampleId,jdbcType=INTEGER}, #{methodChainOriginalId,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.boc.accuratetest.pojo.ExampleRefMethodChain">
@@ -26,16 +107,44 @@
         #{testingExampleId,jdbcType=INTEGER},
       </if>
       <if test="methodChainOriginalId != null">
-        #{methodChainOriginalId,jdbcType=INTEGER},
+        #{methodChainOriginalId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
+  <select id="countByExample" parameterType="com.boc.accuratetest.pojo.ExampleRefMethodChainExample" resultType="java.lang.Long">
+    select count(*) from example_ref_method_chain
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update example_ref_method_chain
+    <set>
+      <if test="record.testingExampleId != null">
+        testing_example_id = #{record.testingExampleId,jdbcType=INTEGER},
+      </if>
+      <if test="record.methodChainOriginalId != null">
+        method_chain_original_id = #{record.methodChainOriginalId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update example_ref_method_chain
+    set testing_example_id = #{record.testingExampleId,jdbcType=INTEGER},
+      method_chain_original_id = #{record.methodChainOriginalId,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
   
   <insert id="insertBatch" parameterType="java.util.List">
     insert into example_ref_method_chain (testing_example_id, method_chain_original_id)
     values 
     <foreach collection="list" index="index" item="item" separator=",">
-	    (#{item.testingExampleId,jdbcType=INTEGER}, #{item.methodChainOriginalId,jdbcType=INTEGER})
+	    (#{item.testingExampleId,jdbcType=INTEGER}, #{item.methodChainOriginalId,jdbcType=VARCHAR})
     </foreach>
   </insert>
   

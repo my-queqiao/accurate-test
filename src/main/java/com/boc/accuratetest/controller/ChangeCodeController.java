@@ -3,6 +3,7 @@ package com.boc.accuratetest.controller;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
+import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpSession;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -66,6 +67,8 @@ public class ChangeCodeController {
 	private TestingExampleBiz testingExampleBiz;
 	@Autowired
 	private ProductionTaskBiz productionTaskBiz;
+	// < gitUrl  ,  分支名称 >
+	Map<String,JSONObject> giturlRefBranchtag = new ConcurrentHashMap<String, JSONObject>();
 	/**
 	 * 变更代码首页
 	 * @return
@@ -142,15 +145,39 @@ public class ChangeCodeController {
 		if(StringUtils.isEmpty(productionTaskNumber)) {
 			throw new NotSelectProductionTaskException("您未选择生产任务编号");
 		}
+		// 获取分支、tag。	1、分支、tag不能比较。	2、两个tag可以比较
+		JSONObject json2 = giturlRefBranchtag.get(git_url);
+		//JSONObject branchJson = json2.getJSONObject("branch");
+		JSONObject tagJson = json2.getJSONObject("tag");
+		
+		if(!tagJson.isNullObject() && !tagJson.isEmpty() &&
+				tagJson.containsValue(master_branch) && !tagJson.containsValue(test_branch)){
+			// 分支、和tag不能比较
+			jsonRes.put("res", "分支和tag不能直接比较");
+			return jsonRes;
+		}else if(!tagJson.isNullObject() && !tagJson.isEmpty() &&
+				!tagJson.containsValue(master_branch) && tagJson.containsValue(test_branch)){
+			// 分支、和tag不能比较
+			jsonRes.put("res", "分支和tag不能直接比较");
+			return jsonRes;
+		}
+		
 		List<ProductionTask> pts = productionTaskBiz.findBy(productionTaskNumber);
 		if(pts.size() > 0) {
 			ProductionTask pt = pts.get(0);
 			if(StringUtils.isEmpty(pt.getGitUrl())) {
-				// 可以获取数据
-			}else if(git_url.equals(pt.getGitUrl()) && master_branch.equals(pt.getMasterBranch()) 
+				// git地址为空，是第一次获取数据，可以获取数据
+				
+			}else if(git_url.equals(pt.getGitUrl()) 
+					&& master_branch.equals(pt.getMasterBranch()) 
 					&& test_branch.equals(pt.getTestBranch())) {
-				// 可以重新获取数据
-			}else {
+				// git地址，两个分支或tag相同，可以重新获取数据
+				
+			}else if(!tagJson.isNullObject() && !tagJson.isEmpty() &&
+					tagJson.containsValue(master_branch) && tagJson.containsValue(test_branch)){
+				// 如果本次分支是两个tag进行比较，可以获取数据
+				
+			}else{
 				jsonRes.put("res", "当前生产任务编号已经有数据了");
 				return jsonRes;
 			}
@@ -184,8 +211,10 @@ public class ChangeCodeController {
 			return jsonRes;
 		}
 		
-		// 每一个生产任务编号，对应唯一的git地址、稳定分支、测试分支
-		productionTaskBiz.updateByProductionTaskNumber(productionTaskNumber,git_url,master_branch,test_branch);
+		// 每一个生产任务编号，对应唯一的git地址、稳定分支、测试分支。（不记录tag）
+		if(!tagJson.containsValue(master_branch) && !tagJson.containsValue(test_branch)) {
+			productionTaskBiz.updateByProductionTaskNumber(productionTaskNumber,git_url,master_branch,test_branch);
+		}
 		
 		jsonRes.put("success", true);
 		jsonRes.put("res", "获取数据成功！");
@@ -280,6 +309,7 @@ public class ChangeCodeController {
 	@RequestMapping("getBranchList")
 	@ResponseBody
 	public JSONObject getBranchList(String git_url) {
+		git_url = git_url.trim();
 		JSONObject jsonRes = new JSONObject();
 		jsonRes.put("success", false);
 		ResponseEntity<String> response = null;
@@ -292,12 +322,39 @@ public class ChangeCodeController {
 		// 返回的数据
 		String res = response.getBody(); 
 		JSONObject json = JSONObject.fromObject(res);
-		Collection values = json.values();
-		Iterator iter = values.iterator();
+		giturlRefBranchtag.put(git_url, json);
+		JSONObject branchJson = json.getJSONObject("branch");
+		JSONObject tagJson = json.getJSONObject("tag");
+		
+		Collection valuesBranch = branchJson.values();
+		Collection valuesTag = tagJson.values();
+		
 		List<String> branchs = new ArrayList<>();
+		Iterator iter = valuesBranch.iterator();
 		while(iter.hasNext()) {
 			String v = (String)iter.next();
+			byte[] bytes = null;
+			try {
+				bytes = v.getBytes("gbk");
+				v = new String(bytes,"utf-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 			branchs.add(v);
+		}
+		if(!valuesTag.isEmpty()) {
+			Iterator iter2 = valuesTag.iterator();
+			while(iter2.hasNext()) {
+				String v = (String)iter2.next();
+				byte[] bytes = null;
+				try {
+					bytes = v.getBytes("gbk");
+					v = new String(bytes,"utf-8");
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+				}
+				branchs.add(v);
+			}
 		}
 		jsonRes.put("success", true);
 		jsonRes.put("list", branchs);
