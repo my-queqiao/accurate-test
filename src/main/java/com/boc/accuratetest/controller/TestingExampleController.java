@@ -221,8 +221,8 @@ public class TestingExampleController {
             	}
             }
             // 解析方法链，存储
-            System.out.println("contents======================"+contents);
-            List<MethodChainOriginal> ms = analyseMethodLink(contents.toString(),testExampleId);
+            //System.out.println("contents======================"+contents);
+            List<MethodChainOriginal> ms = analyseMethodLink2(contents.toString(),testExampleId);
             // 如果该测试用例已关联方法链，先取消关联
             methodChainOriginalBiz.deleteByTestingExampleId(testExampleId);
             // 批量存储方法链数据
@@ -261,6 +261,12 @@ public class TestingExampleController {
 		json.put("success", true);
 		return json;
 	}
+	/**
+	 * 小链
+	 * @param contents
+	 * @param testExampleId
+	 * @return
+	 */
 	public static List<MethodChainOriginal> analyseMethodLink(String contents,Integer testExampleId) {
 		List<MethodChainOriginal> mcos = new ArrayList<>();
 		if(StringUtils.isEmpty(contents)) { // 该测试用例，没有调用到该服务器
@@ -308,7 +314,13 @@ public class TestingExampleController {
 		}
 		return mcos;
 	}
-	public static String analyseMethodLink2(String contents,Integer testExampleId) {
+	/**
+	 * 收集的原始数据，补上参数类型。
+	 * @param contents
+	 * @param testExampleId
+	 * @return
+	 */
+	public static String appendParams(String contents) {
 		StringBuilder sb = new StringBuilder();
 		if(StringUtils.isEmpty(contents)) { // 该测试用例，没有调用到该服务器
 			return sb.toString();
@@ -334,430 +346,20 @@ public class TestingExampleController {
 		}
 		return sb.toString();
 	}
-	public static void main12(String[] args) {
-		String a = "1597712425895.com.boc.accuratetest.controller.IndexController.login(String,String,HttpSession)\r\n" + 
-				"51138&1597712425895.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426197.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426197.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword(String,String)\r\n" + 
-				"35283&1597712426197.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426197.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426197.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426197.com.boc.accuratetest.pojo.UserExample.createCriteria()\r\n" + 
-				"91966&1597712426197.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426197.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426197.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426197.com.boc.accuratetest.pojo.UserExample.createCriteria\r\n" + 
-				"1597712426197.com.boc.accuratetest.pojo.UserExample.createCriteriaInternal()\r\n" + 
-				"32544&1597712426197.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426275.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426275.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426275.com.boc.accuratetest.pojo.UserExample$Criteria.andUserNameEqualTo(String)\r\n" + 
-				"49525&1597712426275.java.lang.Thread.getStackTrace";
+	/**
+	 * 小链合并去重，形成大链
+	 * @param contents
+	 * @param testExampleId
+	 * @return
+	 */
+	public static List<MethodChainOriginal> analyseMethodLink2(String contents,Integer testExampleId) {
 		// 补充参数类型
-		String link2 = analyseMethodLink2(a, 234);
-		//System.out.println(link2);
-		// 收集直属用例的顶级方法
-		List<MethodChainOriginal> dingjiMcos = new ArrayList<>();
-		String[] methodLinksSplit = link2.split("java.lang.Thread.getStackTrace\\(\\)\r\n"); // 切割出 每一个方法打印的堆栈方法链
-		for (String stackLinks : methodLinksSplit) { // 每一个堆栈链
-			String[] lines = stackLinks.split("\r\n");
-			String dingji = lines[0];
-			MethodChainOriginal mco = insertPrepare2(dingji);
-			boolean flag = false;
-			for (MethodChainOriginal old : dingjiMcos) {
-				if(old.getPackageName().equals(mco.getPackageName()) 
-					&& old.getJavabeanName().equals(mco.getJavabeanName())
-					&& old.getMethodName().equals(mco.getMethodName())
-					&& old.getParamType().equals(mco.getParamType())) {
-					flag = true;
-				}
-			}
-			if(flag == false)dingjiMcos.add(mco);
-		}
-		// 寻找第二级方法
-		for (MethodChainOriginal dingji : dingjiMcos) {
-			for (String stackLinks : methodLinksSplit) {
-				String[] lines = stackLinks.split("\r\n"); // 一个小方法链中每一个方法
-				if(lines.length<=1) {
-					continue; // 小链中没有第二个方法
-				}
-				// 与小链中第一个方法比较，如果相等，收集第二个方法，作为大链的二级方法
-				MethodChainOriginal xiaolian1 = insertPrepare2(lines[0]);
-				if(dingji.getPackageName().equals(xiaolian1.getPackageName()) 
-						&& dingji.getJavabeanName().equals(xiaolian1.getJavabeanName())
-						&& dingji.getMethodName().equals(xiaolian1.getMethodName())
-						&& dingji.getParamType().equals(xiaolian1.getParamType())) {
-					// 当前大链的二级方法
-					MethodChainOriginal xiaolian2 = insertPrepare2(lines[1]);
-					
-				}
-			}
-		}
-		System.out.println(dingjiMcos);
-	}
-	public static void main(String[] args) {
-		String a = "1597712425895.com.boc.accuratetest.controller.IndexController.login(String,String,HttpSession)\r\n" + 
-				"51138&1597712425895.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426197.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426197.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword(String,String)\r\n" + 
-				"35283&1597712426197.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426197.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426197.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426197.com.boc.accuratetest.pojo.UserExample.createCriteria()\r\n" + 
-				"91966&1597712426197.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426197.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426197.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426197.com.boc.accuratetest.pojo.UserExample.createCriteria\r\n" + 
-				"1597712426197.com.boc.accuratetest.pojo.UserExample.createCriteriaInternal()\r\n" + 
-				"32544&1597712426197.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426275.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426275.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426275.com.boc.accuratetest.pojo.UserExample$Criteria.andUserNameEqualTo(String)\r\n" + 
-				"49525&1597712426275.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426275.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426275.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426275.com.boc.accuratetest.pojo.UserExample$Criteria.andUserNameEqualTo\r\n" + 
-				"1597712426275.com.boc.accuratetest.pojo.UserExample$GeneratedCriteria.andUserNameEqualTo(String)\r\n" + 
-				"25171&1597712426275.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426275.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426275.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426275.com.boc.accuratetest.pojo.UserExample$Criteria.andUserNameEqualTo\r\n" + 
-				"1597712426275.com.boc.accuratetest.pojo.UserExample$GeneratedCriteria.andUserNameEqualTo\r\n" + 
-				"1597712426275.com.boc.accuratetest.pojo.UserExample$GeneratedCriteria.addCriterion(String,Object,String)\r\n" + 
-				"43535&1597712426275.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426290.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426290.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426290.com.boc.accuratetest.pojo.UserExample$Criteria.andPassWordEqualTo(String)\r\n" + 
-				"36357&1597712426290.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426290.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426290.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426290.com.boc.accuratetest.pojo.UserExample$Criteria.andPassWordEqualTo\r\n" + 
-				"1597712426290.com.boc.accuratetest.pojo.UserExample$GeneratedCriteria.andPassWordEqualTo(String)\r\n" + 
-				"45558&1597712426290.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426290.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426290.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426290.com.boc.accuratetest.pojo.UserExample$Criteria.andPassWordEqualTo\r\n" + 
-				"1597712426290.com.boc.accuratetest.pojo.UserExample$GeneratedCriteria.andPassWordEqualTo\r\n" + 
-				"1597712426290.com.boc.accuratetest.pojo.UserExample$GeneratedCriteria.addCriterion(String,Object,String)\r\n" + 
-				"93491&1597712426290.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426309.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426309.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426309.com.boc.accuratetest.pojo.UserExample.isDistinct()\r\n" + 
-				"11119&1597712426309.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426341.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426341.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426341.com.boc.accuratetest.pojo.UserExample.getOredCriteria()\r\n" + 
-				"59895&1597712426341.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426372.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426372.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426372.com.boc.accuratetest.pojo.UserExample$Criteria.isValid()\r\n" + 
-				"28342&1597712426372.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426387.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426387.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426387.com.boc.accuratetest.pojo.UserExample$Criteria.isValid\r\n" + 
-				"1597712426387.com.boc.accuratetest.pojo.UserExample$GeneratedCriteria.isValid()\r\n" + 
-				"29917&1597712426387.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426387.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426387.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426387.com.boc.accuratetest.pojo.UserExample$Criteria.getCriteria()\r\n" + 
-				"66961&1597712426387.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426387.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426387.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426387.com.boc.accuratetest.pojo.UserExample$Criteria.getCriteria\r\n" + 
-				"1597712426387.com.boc.accuratetest.pojo.UserExample$GeneratedCriteria.getCriteria()\r\n" + 
-				"86642&1597712426387.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426387.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426387.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426387.com.boc.accuratetest.pojo.UserExample$Criterion.isNoValue()\r\n" + 
-				"53989&1597712426387.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426403.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426403.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426403.com.boc.accuratetest.pojo.UserExample$Criterion.isSingleValue()\r\n" + 
-				"66848&1597712426403.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426419.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426419.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426419.com.boc.accuratetest.pojo.UserExample$Criterion.getCondition()\r\n" + 
-				"42989&1597712426419.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426419.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426419.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426419.com.boc.accuratetest.pojo.UserExample$Criterion.isNoValue()\r\n" + 
-				"56536&1597712426419.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426419.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426419.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426419.com.boc.accuratetest.pojo.UserExample$Criterion.isSingleValue()\r\n" + 
-				"95987&1597712426419.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426419.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426419.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426419.com.boc.accuratetest.pojo.UserExample$Criterion.getCondition()\r\n" + 
-				"24995&1597712426419.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426434.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426434.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426434.com.boc.accuratetest.pojo.UserExample.getOrderByClause()\r\n" + 
-				"65658&1597712426434.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426450.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426450.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426450.com.boc.accuratetest.pojo.UserExample$Criterion.getValue()\r\n" + 
-				"99457&1597712426450.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426450.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426450.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426450.com.boc.accuratetest.pojo.UserExample$Criterion.getValue()\r\n" + 
-				"11572&1597712426450.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426591.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426591.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426591.com.boc.accuratetest.pojo.UserExample$Criterion.getValue()\r\n" + 
-				"55622&1597712426591.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426591.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426591.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426591.com.boc.accuratetest.pojo.UserExample$Criterion.getValue()\r\n" + 
-				"89395&1597712426591.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426762.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426762.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426762.com.boc.accuratetest.pojo.User.setId(Integer)\r\n" + 
-				"46463&1597712426762.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426778.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426778.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426778.com.boc.accuratetest.pojo.User.setUserName(String)\r\n" + 
-				"74918&1597712426778.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426778.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426778.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426778.com.boc.accuratetest.pojo.User.setPassWord(String)\r\n" + 
-				"99266&1597712426778.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426778.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426778.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426778.com.boc.accuratetest.pojo.User.getPs()\r\n" + 
-				"57289&1597712426778.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426778.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426778.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426778.com.boc.accuratetest.pojo.User.setPs(List)\r\n" + 
-				"19667&1597712426778.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426794.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426794.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426794.com.boc.accuratetest.pojo.Permission.setId(Integer)\r\n" + 
-				"83334&1597712426794.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426794.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426794.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword\r\n" + 
-				"1597712426794.com.boc.accuratetest.pojo.User.getPs()\r\n" + 
-				"29628&1597712426794.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426809.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426809.com.boc.accuratetest.biz.impl.UserBizImpl.getPermissionsBy(User)\r\n" + 
-				"62754&1597712426809.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426809.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426809.com.boc.accuratetest.biz.impl.UserBizImpl.getPermissionsBy\r\n" + 
-				"1597712426809.com.boc.accuratetest.pojo.User.getId()\r\n" + 
-				"88724&1597712426809.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426825.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426825.com.boc.accuratetest.biz.impl.UserBizImpl.getPermissionsBy\r\n" + 
-				"1597712426825.com.boc.accuratetest.pojo.User.getId()\r\n" + 
-				"43964&1597712426825.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426919.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426919.com.boc.accuratetest.biz.impl.UserBizImpl.getPermissionsBy\r\n" + 
-				"1597712426919.com.boc.accuratetest.pojo.Permission.setId(Integer)\r\n" + 
-				"65485&1597712426919.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426934.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426934.com.boc.accuratetest.biz.impl.UserBizImpl.getPermissionsBy\r\n" + 
-				"1597712426934.com.boc.accuratetest.pojo.Permission.setRankName(String)\r\n" + 
-				"55388&1597712426934.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426934.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426934.com.boc.accuratetest.biz.impl.UserBizImpl.getPermissionsBy\r\n" + 
-				"1597712426934.com.boc.accuratetest.pojo.Permission.setRankDesc(String)\r\n" + 
-				"16596&1597712426934.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426934.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426934.com.boc.accuratetest.biz.impl.UserBizImpl.getPermissionsBy\r\n" + 
-				"1597712426934.com.boc.accuratetest.pojo.Permission.setId(Integer)\r\n" + 
-				"93428&1597712426934.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426934.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426934.com.boc.accuratetest.biz.impl.UserBizImpl.getPermissionsBy\r\n" + 
-				"1597712426934.com.boc.accuratetest.pojo.Permission.setRankName(String)\r\n" + 
-				"87685&1597712426934.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426950.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426950.com.boc.accuratetest.biz.impl.UserBizImpl.getPermissionsBy\r\n" + 
-				"1597712426950.com.boc.accuratetest.pojo.Permission.setRankDesc(String)\r\n" + 
-				"67193&1597712426950.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426950.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426950.com.boc.accuratetest.biz.impl.UserBizImpl.getPermissionsBy\r\n" + 
-				"1597712426950.com.boc.accuratetest.pojo.Permission.setId(Integer)\r\n" + 
-				"58886&1597712426950.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426950.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426950.com.boc.accuratetest.biz.impl.UserBizImpl.getPermissionsBy\r\n" + 
-				"1597712426950.com.boc.accuratetest.pojo.Permission.setRankName(String)\r\n" + 
-				"34625&1597712426950.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712426950.com.boc.accuratetest.controller.IndexController.login\r\n" + 
-				"1597712426950.com.boc.accuratetest.biz.impl.UserBizImpl.getPermissionsBy\r\n" + 
-				"1597712426950.com.boc.accuratetest.pojo.Permission.setRankDesc(String)\r\n" + 
-				"27579&1597712426950.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712427566.com.boc.accuratetest.acore.springIntercept.IntercptSessionCheck.preHandle(HttpServletRequest,HttpServletResponse,Object)\r\n" + 
-				"47531&1597712427566.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712427570.com.boc.accuratetest.controller.IndexController.index()\r\n" + 
-				"36814&1597712427570.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712428433.com.boc.accuratetest.pojo.User.getUserName()\r\n" + 
-				"34334&1597712428433.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429264.com.boc.accuratetest.acore.springIntercept.IntercptSessionCheck.preHandle(HttpServletRequest,HttpServletResponse,Object)\r\n" + 
-				"38257&1597712429264.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429281.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber(HttpSession)\r\n" + 
-				"42454&1597712429281.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429305.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429305.com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll()\r\n" + 
-				"63347&1597712429305.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429401.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429401.com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll\r\n" + 
-				"1597712429401.com.boc.accuratetest.pojo.ProductionTask.setId(Integer)\r\n" + 
-				"47666&1597712429401.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429405.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429405.com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll\r\n" + 
-				"1597712429405.com.boc.accuratetest.pojo.ProductionTask.setProductionTaskNumber(String)\r\n" + 
-				"65139&1597712429405.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429410.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429410.com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll\r\n" + 
-				"1597712429410.com.boc.accuratetest.pojo.ProductionTask.setGitUrl(String)\r\n" + 
-				"89225&1597712429410.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429415.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429415.com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll\r\n" + 
-				"1597712429415.com.boc.accuratetest.pojo.ProductionTask.setMasterBranch(String)\r\n" + 
-				"83814&1597712429415.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429419.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429419.com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll\r\n" + 
-				"1597712429419.com.boc.accuratetest.pojo.ProductionTask.setTestBranch(String)\r\n" + 
-				"47512&1597712429419.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429425.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429425.com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll\r\n" + 
-				"1597712429425.com.boc.accuratetest.pojo.ProductionTask.setId(Integer)\r\n" + 
-				"56386&1597712429425.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429433.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429433.com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll\r\n" + 
-				"1597712429433.com.boc.accuratetest.pojo.ProductionTask.setProductionTaskNumber(String)\r\n" + 
-				"73226&1597712429433.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429438.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429438.com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll\r\n" + 
-				"1597712429438.com.boc.accuratetest.pojo.ProductionTask.setId(Integer)\r\n" + 
-				"85482&1597712429438.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429442.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429442.com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll\r\n" + 
-				"1597712429442.com.boc.accuratetest.pojo.ProductionTask.setProductionTaskNumber(String)\r\n" + 
-				"22188&1597712429442.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429446.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429446.com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll\r\n" + 
-				"1597712429446.com.boc.accuratetest.pojo.ProductionTask.setId(Integer)\r\n" + 
-				"48666&1597712429446.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429450.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429450.com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll\r\n" + 
-				"1597712429450.com.boc.accuratetest.pojo.ProductionTask.setProductionTaskNumber(String)\r\n" + 
-				"23267&1597712429450.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429455.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429455.com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll\r\n" + 
-				"1597712429455.com.boc.accuratetest.pojo.ProductionTask.setId(Integer)\r\n" + 
-				"64636&1597712429455.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429458.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429458.com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll\r\n" + 
-				"1597712429458.com.boc.accuratetest.pojo.ProductionTask.setProductionTaskNumber(String)\r\n" + 
-				"22968&1597712429458.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429462.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429462.com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll\r\n" + 
-				"1597712429462.com.boc.accuratetest.pojo.ProductionTask.setId(Integer)\r\n" + 
-				"19858&1597712429462.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429466.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429466.com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll\r\n" + 
-				"1597712429466.com.boc.accuratetest.pojo.ProductionTask.setProductionTaskNumber(String)\r\n" + 
-				"93745&1597712429466.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429950.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429950.com.boc.accuratetest.pojo.ProductionTask.getGitUrl()\r\n" + 
-				"13279&1597712429950.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429950.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429950.com.boc.accuratetest.pojo.ProductionTask.getId()\r\n" + 
-				"49485&1597712429950.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429950.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429950.com.boc.accuratetest.pojo.ProductionTask.getMasterBranch()\r\n" + 
-				"14973&1597712429950.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429950.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429950.com.boc.accuratetest.pojo.ProductionTask.getProductionTaskNumber()\r\n" + 
-				"51338&1597712429950.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429950.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429950.com.boc.accuratetest.pojo.ProductionTask.getTestBranch()\r\n" + 
-				"98218&1597712429950.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429966.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429966.com.boc.accuratetest.pojo.ProductionTask.getGitUrl()\r\n" + 
-				"95175&1597712429966.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429966.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429966.com.boc.accuratetest.pojo.ProductionTask.getId()\r\n" + 
-				"96548&1597712429966.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429966.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429966.com.boc.accuratetest.pojo.ProductionTask.getMasterBranch()\r\n" + 
-				"52891&1597712429966.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429981.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429981.com.boc.accuratetest.pojo.ProductionTask.getProductionTaskNumber()\r\n" + 
-				"98186&1597712429981.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429981.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429981.com.boc.accuratetest.pojo.ProductionTask.getTestBranch()\r\n" + 
-				"26245&1597712429981.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429981.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429981.com.boc.accuratetest.pojo.ProductionTask.getGitUrl()\r\n" + 
-				"68683&1597712429981.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429981.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429981.com.boc.accuratetest.pojo.ProductionTask.getId()\r\n" + 
-				"39696&1597712429981.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429981.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429981.com.boc.accuratetest.pojo.ProductionTask.getMasterBranch()\r\n" + 
-				"56567&1597712429981.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429981.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429981.com.boc.accuratetest.pojo.ProductionTask.getProductionTaskNumber()\r\n" + 
-				"63299&1597712429981.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429997.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429997.com.boc.accuratetest.pojo.ProductionTask.getTestBranch()\r\n" + 
-				"91488&1597712429997.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429997.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429997.com.boc.accuratetest.pojo.ProductionTask.getGitUrl()\r\n" + 
-				"59291&1597712429997.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429997.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429997.com.boc.accuratetest.pojo.ProductionTask.getId()\r\n" + 
-				"59829&1597712429997.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712429997.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712429997.com.boc.accuratetest.pojo.ProductionTask.getMasterBranch()\r\n" + 
-				"58755&1597712429997.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712430013.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712430013.com.boc.accuratetest.pojo.ProductionTask.getProductionTaskNumber()\r\n" + 
-				"61463&1597712430013.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712430013.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712430013.com.boc.accuratetest.pojo.ProductionTask.getTestBranch()\r\n" + 
-				"34438&1597712430013.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712430013.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712430013.com.boc.accuratetest.pojo.ProductionTask.getGitUrl()\r\n" + 
-				"91189&1597712430013.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712430013.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712430013.com.boc.accuratetest.pojo.ProductionTask.getId()\r\n" + 
-				"66956&1597712430013.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712430028.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712430028.com.boc.accuratetest.pojo.ProductionTask.getMasterBranch()\r\n" + 
-				"39287&1597712430028.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712430028.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712430028.com.boc.accuratetest.pojo.ProductionTask.getProductionTaskNumber()\r\n" + 
-				"63614&1597712430028.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712430028.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712430028.com.boc.accuratetest.pojo.ProductionTask.getTestBranch()\r\n" + 
-				"92489&1597712430028.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712430028.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712430028.com.boc.accuratetest.pojo.ProductionTask.getGitUrl()\r\n" + 
-				"54447&1597712430028.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712430044.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712430044.com.boc.accuratetest.pojo.ProductionTask.getId()\r\n" + 
-				"85213&1597712430044.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712430044.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712430044.com.boc.accuratetest.pojo.ProductionTask.getMasterBranch()\r\n" + 
-				"15869&1597712430044.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712430044.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712430044.com.boc.accuratetest.pojo.ProductionTask.getProductionTaskNumber()\r\n" + 
-				"54275&1597712430044.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712430044.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712430044.com.boc.accuratetest.pojo.ProductionTask.getTestBranch()\r\n" + 
-				"51499&1597712430044.java.lang.Thread.getStackTrace\r\n" + 
-				"1597712430059.com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber\r\n" + 
-				"1597712430059.com.boc.accuratetest.pojo.User.getProductionTaskNumber()\r\n" + 
-				"56399&1597712430059.java.lang.Thread.getStackTrace";
-		// 补充参数类型
-		String link2 = analyseMethodLink2(a, 234);
+		String link2 = appendParams(contents);
 		//System.out.println(link2);
 		String[] lines = link2.split("\r\n"); // 原始数据的每一行
 		List<MethodFromLine> fathers = new ArrayList<>();
 		for (int i=0;i<lines.length;i++) {
-			System.out.println("当前行："+lines[i]);
+			//System.out.println("当前行："+lines[i]);
 			if(i == 0 || lines[i-1].equals("java.lang.Thread.getStackTrace()")) {
 				// 收集所有的父节点
 				// 注意：父节点如果是同一个方法，则只保留一个
@@ -863,7 +465,7 @@ public class TestingExampleController {
 										}
 										
 									}
-									nexts = next.getNexts();
+									nexts = next.getNexts(); // 上一级找到一样的值，才执行这一行代码
 									break;
 								}
 							}
@@ -873,19 +475,35 @@ public class TestingExampleController {
 			}
 		}
 		// 每一行都处理完了
-		System.out.println(fathers);
+		//System.out.println(fathers);
 		// 处理链式数据，存储到数据库
 		List<MethodChainOriginal> mcos = new ArrayList<>();
 		for (MethodFromLine father : fathers) {
-			MethodChainOriginal mco = new MethodChainOriginal();
+			// 父节点
+			MethodChainOriginal mco = insertPrepare2(father.getMethodInfo());
 			mco.setId(father.getId());
-			mco.setPackageName(father.getMethodInfo()); // 暂时
+			mco.setLastMethodId("");
+			mco.setTestingExampleId(testExampleId);
 			mcos.add(mco);
+			
 			// 子节点
 			List<MethodFromLine> nexts = father.getNexts();
-			for (MethodFromLine next : nexts) {
-				// 这样next就没头了。
-			}
+			if(nexts.isEmpty()) continue;
+			findEveryMethodFromTree(nexts, mcos,testExampleId);
+		}
+		//System.out.println("节点总数："+mcos.size());
+		return mcos;
+	}
+	public static void findEveryMethodFromTree(List<MethodFromLine> nexts,List<MethodChainOriginal> mcos,Integer testExampleId) {
+		if(nexts.isEmpty()) return;
+		for (MethodFromLine next : nexts) {
+			MethodChainOriginal mco = insertPrepare2(next.getMethodInfo());
+			mco.setId(next.getId());
+			mco.setLastMethodId(next.getLast().getId());
+			mco.setTestingExampleId(testExampleId);
+			mcos.add(mco);
+			// 递归
+			findEveryMethodFromTree(next.getNexts(), mcos,testExampleId);
 		}
 	}
 	/**
@@ -930,7 +548,7 @@ public class TestingExampleController {
     	m.setJavabeanName(className);
     	m.setMethodName(methodName);
     	m.setParamType(params);
-    	m.setId(UUID.randomUUID().toString());
+    	//m.setId(UUID.randomUUID().toString());
     	return m;
 	}
 	/**

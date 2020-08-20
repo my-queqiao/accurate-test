@@ -15,6 +15,7 @@ public class MethodFromLine {
 	
 	private List<MethodFromLine> nexts; // 下一个方法
 	private MethodFromLine last; // 上一个方法
+	
 	public MethodFromLine() {
 		// TODO Auto-generated constructor stub
 	}
