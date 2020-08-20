@@ -723,6 +723,66 @@ public class MethodChainOriginalExample {
             addCriterion("last_method_id not between", value1, value2, "lastMethodId");
             return (Criteria) this;
         }
+
+        public Criteria andTestingExampleIdIsNull() {
+            addCriterion("testing_example_id is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTestingExampleIdIsNotNull() {
+            addCriterion("testing_example_id is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTestingExampleIdEqualTo(Integer value) {
+            addCriterion("testing_example_id =", value, "testingExampleId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTestingExampleIdNotEqualTo(Integer value) {
+            addCriterion("testing_example_id <>", value, "testingExampleId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTestingExampleIdGreaterThan(Integer value) {
+            addCriterion("testing_example_id >", value, "testingExampleId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTestingExampleIdGreaterThanOrEqualTo(Integer value) {
+            addCriterion("testing_example_id >=", value, "testingExampleId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTestingExampleIdLessThan(Integer value) {
+            addCriterion("testing_example_id <", value, "testingExampleId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTestingExampleIdLessThanOrEqualTo(Integer value) {
+            addCriterion("testing_example_id <=", value, "testingExampleId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTestingExampleIdIn(List<Integer> values) {
+            addCriterion("testing_example_id in", values, "testingExampleId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTestingExampleIdNotIn(List<Integer> values) {
+            addCriterion("testing_example_id not in", values, "testingExampleId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTestingExampleIdBetween(Integer value1, Integer value2) {
+            addCriterion("testing_example_id between", value1, value2, "testingExampleId");
+            return (Criteria) this;
+        }
+
+        public Criteria andTestingExampleIdNotBetween(Integer value1, Integer value2) {
+            addCriterion("testing_example_id not between", value1, value2, "testingExampleId");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

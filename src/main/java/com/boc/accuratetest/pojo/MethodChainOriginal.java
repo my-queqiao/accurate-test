@@ -1,5 +1,7 @@
 package com.boc.accuratetest.pojo;
 
+import java.util.List;
+
 public class MethodChainOriginal {
     private String id;
 
@@ -19,7 +21,19 @@ public class MethodChainOriginal {
 
     private String lastMethodId;
 
-    public String getId() {
+    private Integer testingExampleId;
+    
+    private List<MethodChainOriginal> nexts; // 方法链中下一个方法
+    
+    public List<MethodChainOriginal> getNexts() {
+		return nexts;
+	}
+
+	public void setNexts(List<MethodChainOriginal> nexts) {
+		this.nexts = nexts;
+	}
+
+	public String getId() {
         return id;
     }
 
@@ -89,5 +103,13 @@ public class MethodChainOriginal {
 
     public void setLastMethodId(String lastMethodId) {
         this.lastMethodId = lastMethodId == null ? null : lastMethodId.trim();
+    }
+
+    public Integer getTestingExampleId() {
+        return testingExampleId;
+    }
+
+    public void setTestingExampleId(Integer testingExampleId) {
+        this.testingExampleId = testingExampleId;
     }
 }

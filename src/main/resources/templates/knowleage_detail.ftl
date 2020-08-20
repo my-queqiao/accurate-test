@@ -196,9 +196,20 @@
 				function(json){
 				var list = json.list;
 				var yonglis="";
+				var number=0;
 				for(var j = 1; j < list.length+1; j++) {
 					var n = list[j-1];
-					yonglis += j+" . "+n.packageName+"."+n.javabeanName+"."+n.methodName+"("+n.paramType+")<br/>";
+					if(n.lastMethodId == null || n.lastMethodId == ""){
+						yonglis += (++number)+" . "+n.packageName+"."+n.javabeanName+"."+n.methodName+"("+n.paramType+")<br/>";
+						var number2=0;
+						for(var k = 1; k < list.length+1; k++) {
+							var p = list[k-1];
+							if(n.id == p.lastMethodId){ // 找下一层
+								yonglis += "<span style='color:red;'>"+"&nbsp&nbsp"+(++number2)+" . "+p.packageName
+									+"."+p.javabeanName+"."+p.methodName+"("+p.paramType+")</span><br/>";
+							}
+						}
+					}
 		    	}
 				$('#myModal').on('show.bs.modal', function (event) {
 		           	 var modal = $(this);

@@ -13,4 +13,6 @@ public interface MethodChainOriginalBiz {
 
 	List<MethodChainOriginal> getMethodLinkByTestExampleId(Integer testExampleId);
 
+	void deleteByTestingExampleId(Integer testExampleId);
+
 }

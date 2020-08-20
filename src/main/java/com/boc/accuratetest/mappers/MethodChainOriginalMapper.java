@@ -30,5 +30,4 @@ public interface MethodChainOriginalMapper {
 
 	void insertBatch(List<MethodChainOriginal> ms);
 
-	List<MethodChainOriginal> getMethodLinkByTestExampleId(Integer testExampleId);
 }

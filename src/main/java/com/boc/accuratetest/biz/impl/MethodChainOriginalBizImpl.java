@@ -11,6 +11,7 @@ import com.boc.accuratetest.mappers.ExampleRefMethodChainMapper;
 import com.boc.accuratetest.mappers.MethodChainOriginalMapper;
 import com.boc.accuratetest.mappers.TestedMethodsMapper;
 import com.boc.accuratetest.pojo.MethodChainOriginal;
+import com.boc.accuratetest.pojo.MethodChainOriginalExample;
 import com.boc.accuratetest.pojo.TestedMethods;
 @Service
 public class MethodChainOriginalBizImpl implements MethodChainOriginalBiz{
@@ -32,7 +33,16 @@ public class MethodChainOriginalBizImpl implements MethodChainOriginalBiz{
 
 	@Override
 	public List<MethodChainOriginal> getMethodLinkByTestExampleId(Integer testExampleId) {
-		return methodChainOriginalMapper.getMethodLinkByTestExampleId(testExampleId);
+		MethodChainOriginalExample e = new MethodChainOriginalExample();
+		e.createCriteria().andTestingExampleIdEqualTo(testExampleId);
+		return methodChainOriginalMapper.selectByExample(e);
+	}
+
+	@Override
+	public void deleteByTestingExampleId(Integer testExampleId) {
+		MethodChainOriginalExample e = new MethodChainOriginalExample();
+		e.createCriteria().andTestingExampleIdEqualTo(testExampleId);
+		methodChainOriginalMapper.deleteByExample(e);
 	}
 	
 }

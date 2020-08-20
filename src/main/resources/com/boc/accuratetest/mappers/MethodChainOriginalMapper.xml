@@ -11,6 +11,7 @@
     <result column="call_time_long" jdbcType="BIGINT" property="callTimeLong" />
     <result column="production_task_number" jdbcType="VARCHAR" property="productionTaskNumber" />
     <result column="last_method_id" jdbcType="VARCHAR" property="lastMethodId" />
+    <result column="testing_example_id" jdbcType="INTEGER" property="testingExampleId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -72,7 +73,7 @@
   </sql>
   <sql id="Base_Column_List">
     id, package_name, javabean_name, method_name, param_type, call_time, call_time_long, 
-    production_task_number, last_method_id
+    production_task_number, last_method_id, testing_example_id
   </sql>
   <select id="selectByExample" parameterType="com.boc.accuratetest.pojo.MethodChainOriginalExample" resultMap="BaseResultMap">
     select
@@ -107,12 +108,12 @@
   <insert id="insert" parameterType="com.boc.accuratetest.pojo.MethodChainOriginal">
     insert into method_chain_original (id, package_name, javabean_name, 
       method_name, param_type, call_time, 
-      call_time_long, production_task_number, last_method_id
-      )
+      call_time_long, production_task_number, last_method_id, 
+      testing_example_id)
     values (#{id,jdbcType=VARCHAR}, #{packageName,jdbcType=VARCHAR}, #{javabeanName,jdbcType=VARCHAR}, 
       #{methodName,jdbcType=VARCHAR}, #{paramType,jdbcType=VARCHAR}, #{callTime,jdbcType=VARCHAR}, 
-      #{callTimeLong,jdbcType=BIGINT}, #{productionTaskNumber,jdbcType=VARCHAR}, #{lastMethodId,jdbcType=VARCHAR}
-      )
+      #{callTimeLong,jdbcType=BIGINT}, #{productionTaskNumber,jdbcType=VARCHAR}, #{lastMethodId,jdbcType=VARCHAR}, 
+      #{testingExampleId,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.boc.accuratetest.pojo.MethodChainOriginal">
     insert into method_chain_original
@@ -144,6 +145,9 @@
       <if test="lastMethodId != null">
         last_method_id,
       </if>
+      <if test="testingExampleId != null">
+        testing_example_id,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -172,6 +176,9 @@
       </if>
       <if test="lastMethodId != null">
         #{lastMethodId,jdbcType=VARCHAR},
+      </if>
+      <if test="testingExampleId != null">
+        #{testingExampleId,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -211,6 +218,9 @@
       <if test="record.lastMethodId != null">
         last_method_id = #{record.lastMethodId,jdbcType=VARCHAR},
       </if>
+      <if test="record.testingExampleId != null">
+        testing_example_id = #{record.testingExampleId,jdbcType=INTEGER},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -226,7 +236,8 @@
       call_time = #{record.callTime,jdbcType=VARCHAR},
       call_time_long = #{record.callTimeLong,jdbcType=BIGINT},
       production_task_number = #{record.productionTaskNumber,jdbcType=VARCHAR},
-      last_method_id = #{record.lastMethodId,jdbcType=VARCHAR}
+      last_method_id = #{record.lastMethodId,jdbcType=VARCHAR},
+      testing_example_id = #{record.testingExampleId,jdbcType=INTEGER}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -258,6 +269,9 @@
       <if test="lastMethodId != null">
         last_method_id = #{lastMethodId,jdbcType=VARCHAR},
       </if>
+      <if test="testingExampleId != null">
+        testing_example_id = #{testingExampleId,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -270,25 +284,20 @@
       call_time = #{callTime,jdbcType=VARCHAR},
       call_time_long = #{callTimeLong,jdbcType=BIGINT},
       production_task_number = #{productionTaskNumber,jdbcType=VARCHAR},
-      last_method_id = #{lastMethodId,jdbcType=VARCHAR}
+      last_method_id = #{lastMethodId,jdbcType=VARCHAR},
+      testing_example_id = #{testingExampleId,jdbcType=INTEGER}
     where id = #{id,jdbcType=VARCHAR}
   </update>
   <insert id="insertBatch" parameterType="java.util.List">
     insert into method_chain_original (id,package_name, javabean_name, 
-      method_name, param_type, call_time, call_time_long,production_task_number,last_method_id)
+      method_name, param_type, call_time, call_time_long,production_task_number,last_method_id,testing_example_id)
     values 
     <foreach collection="list" index="index" item="item" separator=",">
 	    (#{item.id,jdbcType=VARCHAR},#{item.packageName,jdbcType=VARCHAR}, #{item.javabeanName,jdbcType=VARCHAR}, 
       #{item.methodName,jdbcType=VARCHAR}, #{item.paramType,jdbcType=VARCHAR}, #{item.callTime,jdbcType=VARCHAR}, 
       #{item.callTimeLong,jdbcType=BIGINT},#{item.productionTaskNumber,jdbcType=VARCHAR}
-      ,#{item.lastMethodId,jdbcType=VARCHAR})
+      ,#{item.lastMethodId,jdbcType=VARCHAR} , #{item.testingExampleId,jdbcType=INTEGER} )
     </foreach>
   </insert>
   
-  <select id="getMethodLinkByTestExampleId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    SELECT m.*
-	from example_ref_method_chain r,method_chain_original m
-	where r.testing_example_id = #{testExampleId}
-	and r.method_chain_original_id = m.id;
-  </select>
 </mapper>
