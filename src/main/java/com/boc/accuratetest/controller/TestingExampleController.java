@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -636,30 +637,99 @@ public class TestingExampleController {
 	public JSONObject getMethodLinkByTestExampleId(Integer testExampleId) {
 		JSONObject json = new JSONObject();
 		List<MethodChainOriginal> mcos = methodChainOriginalBiz.getMethodLinkByTestExampleId(testExampleId);
-		List<MethodChainOriginal> res = new ArrayList<>();
-		// 分析得出方法链数据
-		/*for (MethodChainOriginal m : mcos) {
-			String lastMethodId = m.getLastMethodId();
-			if(StringUtils.isEmpty(lastMethodId)) {
-				// 第一级方法
-				res.add(m);
-			}
-		}
-		
-		for (MethodChainOriginal re : res) {
-			List<MethodChainOriginal> nexts = new ArrayList<>();
-			for (MethodChainOriginal m : mcos) {
-				String lastMethodId = m.getLastMethodId();
-				if(StringUtils.isEmpty(lastMethodId)) continue;
-				if(lastMethodId.equals(re.getId())) {
-					nexts.add(m);
-				}
-			}
-			re.setNexts(nexts);
-		}*/
+//		List<MethodFromLine> fathers = new ArrayList<>();
+//		// 分析得出方法链数据
+//		for (MethodChainOriginal mco : mcos) {
+//			if(StringUtils.isEmpty(mco.getLastMethodId())) {
+//				// 父节点
+//				String line = mco.getPackageName()+"."+mco.getJavabeanName()+"."+mco.getMethodName()+"("+mco.getParamType()+")";
+//				MethodFromLine methodFromLine = new MethodFromLine(true, mco.getId(), line, null, new ArrayList<>());
+//				fathers.add(methodFromLine);
+//				mco.setShouji(true);
+//			}
+//		}
+//		// 剔除源数据中已收集的
+//		Iterator<MethodChainOriginal> iterator = mcos.iterator();
+//		while(iterator.hasNext()) {
+//			MethodChainOriginal mco = iterator.next();
+//			if(mco.isShouji()) iterator.remove();
+//		}
+//		// 收集第二级
+//		for (MethodFromLine father : fathers) {
+//			List<MethodFromLine> nexts = new ArrayList<>();
+//			for (MethodChainOriginal mco : mcos) {
+//				if(mco.getLastMethodId().equals(father.getId()) ) {
+//					// 下一级级子节点
+//					String line = mco.getPackageName()+"."+mco.getJavabeanName()+"."+mco.getMethodName()+"("+mco.getParamType()+")";
+//					MethodFromLine methodFromLine = new MethodFromLine(true, mco.getId(), line, null, new ArrayList<>());
+//					nexts.add(methodFromLine);
+//					mco.setShouji(true);
+//				}
+//			}
+//			father.setNexts(nexts);
+//		}
+//		// 剔除源数据中已收集的
+//		Iterator<MethodChainOriginal> iterator2 = mcos.iterator();
+//		while(iterator2.hasNext()) {
+//			MethodChainOriginal mco = iterator2.next();
+//			if(mco.isShouji()) iterator2.remove();
+//		}
+//		if(mcos.isEmpty()) {
+//			// 收集完毕
+//		}
+//		// 收集第三级
+//		for (MethodFromLine father : fathers) {
+//			List<MethodFromLine> nexts = father.getNexts(); // 前面这个第二级已经收集完毕了。
+//			if(nexts.isEmpty()) continue; // 这个父节点收集完了
+//			nexts(nexts, mcos); 
+//		}
+//		if(mcos.isEmpty()) {
+//			// 收集完毕
+//		}
+//		
+//		// 收集第四级
+//		for (MethodFromLine father : fathers) {
+//			List<MethodFromLine> nexts = father.getNexts(); // 前面这个第二级已经收集完毕了。
+//			if(nexts.isEmpty()) continue; // 这个父节点收集完了
+//			
+//			for (MethodFromLine next : nexts) {
+//				List<MethodFromLine> nexts2 = next.getNexts();
+//				if(nexts2.isEmpty()) continue;
+//				nexts(nexts2, mcos); 
+//			}
+//		}
+//		if(mcos.isEmpty()) {
+//			// 收集完毕
+//		}
 		
 		json.put("list", mcos);
 		return json;
+	}
+	/**
+	 * 寻找shangs的下一级
+	 * @param shangs
+	 * @param mcos
+	 */
+	public void nexts(List<MethodFromLine> shangs,List<MethodChainOriginal> mcos) {
+		for (MethodFromLine shang : shangs) {
+			List<MethodFromLine> nexts = new ArrayList<>();
+			for (MethodChainOriginal mco : mcos) {
+				if(mco.getLastMethodId().equals(shang.getId()) ) {
+					// 下一级级子节点
+					String line = mco.getPackageName()+"."+mco.getJavabeanName()+"."+mco.getMethodName()+"("+mco.getParamType()+")";
+					MethodFromLine methodFromLine = new MethodFromLine(true, mco.getId(), line, null, new ArrayList<>());
+					nexts.add(methodFromLine);
+					mco.setShouji(true);
+				}
+			}
+			shang.setNexts(nexts);
+		}
+		// 剔除源数据中已被收集的
+		Iterator<MethodChainOriginal> iterator2 = mcos.iterator();
+		while(iterator2.hasNext()) {
+			MethodChainOriginal mco = iterator2.next();
+			if(mco.isShouji()) iterator2.remove();
+		}
 	}
 }
 

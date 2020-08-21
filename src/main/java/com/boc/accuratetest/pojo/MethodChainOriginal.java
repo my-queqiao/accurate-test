@@ -25,7 +25,17 @@ public class MethodChainOriginal {
     
     private List<MethodChainOriginal> nexts; // 方法链中下一个方法
     
-    public List<MethodChainOriginal> getNexts() {
+    private boolean shouji = false; // 非数据库字段。页面展示方法链时使用，true表示已经收集了该对象
+    
+    public boolean isShouji() {
+		return shouji;
+	}
+
+	public void setShouji(boolean shouji) {
+		this.shouji = shouji;
+	}
+
+	public List<MethodChainOriginal> getNexts() {
 		return nexts;
 	}
 

@@ -187,10 +187,10 @@
     }
     function operateFormatter1(value, row, index) {
     	return [
-    		"<a class='btn btn-success' id='"+row.id+"start"+"' onclick='startTestExample("+row.id+");'>查看关联方法</a>"
+    		"<a class='btn btn-success' id='"+row.id+"start"+"' onclick='testExampleLinkMethod("+row.id+");'>查看关联方法</a>"
     		].join("");
     }
-	function startTestExample(id){
+	function testExampleLinkMethod(id){
 		$.ajaxSettings.async = false; //同步,默认就是异步
 		$.post('/testingExample/getMethodLinkByTestExampleId?testExampleId='+id,
 				function(json){
@@ -200,13 +200,52 @@
 				for(var j = 1; j < list.length+1; j++) {
 					var n = list[j-1];
 					if(n.lastMethodId == null || n.lastMethodId == ""){
-						yonglis += (++number)+" . "+n.packageName+"."+n.javabeanName+"."+n.methodName+"("+n.paramType+")<br/>";
+						// 父节点
+						yonglis += "<span style='color:blue;'>"+(++number)+" . "+n.packageName
+								+"."+n.javabeanName+"."+n.methodName+"("+n.paramType+")</span><br/>";
 						var number2=0;
 						for(var k = 1; k < list.length+1; k++) {
 							var p = list[k-1];
-							if(n.id == p.lastMethodId){ // 找下一层
-								yonglis += "<span style='color:red;'>"+"&nbsp&nbsp"+(++number2)+" . "+p.packageName
+							if(n.id == p.lastMethodId){
+								// 第二级
+								yonglis += "<span style='color:black;'>"
+									+"&nbsp&nbsp&nbsp&nbsp"+(++number2)+" . "+p.packageName
 									+"."+p.javabeanName+"."+p.methodName+"("+p.paramType+")</span><br/>";
+									var number3=0;
+									for(var k3 = 1; k3 < list.length+1; k3++) {
+										var p3 = list[k3-1];
+										if(p.id == p3.lastMethodId){
+											// 第三级
+											yonglis += "<span style='color:green;'>"
+												+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"+(++number3)
+												+" . "+p3.packageName
+												+"."+p3.javabeanName+"."+p3.methodName+"("+p3.paramType+")</span><br/>";
+												var number4=0;
+												for(var k4 = 1; k4 < list.length+1; k4++) {
+													var p4 = list[k4-1];
+													if(p3.id == p4.lastMethodId){
+														// 第四级
+														yonglis += "<span style='color:gray;'>"
+															+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
+															+(++number4)+" . "+p4.packageName
+															+"."+p4.javabeanName+"."+p4.methodName+"("+p4.paramType+")</span><br/>";
+															var number5=0;
+															for(var k5 = 1; k5 < list.length+1; k5++) {
+																var p5 = list[k5-1];
+																if(p4.id == p5.lastMethodId){
+																	// 第五级	（先展示到第五层方法）
+																	yonglis += "<span style='color:gray;'>"
+																		+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
+																		+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp"
+																		+(++number5)+" . "+p5.packageName
+																		+"."+p5.javabeanName+"."+p5.methodName
+																		+"("+p5.paramType+")</span><br/>";
+																}
+														    }
+													}
+											    }	
+										}
+								    }	
 							}
 						}
 					}
