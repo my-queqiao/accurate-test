@@ -32,5 +32,5 @@ public interface TestedMethodsMapper {
 
 	List<TestedMethods> getAll();
 
-	void updateChangeCodeTestingOrNot();
+	void updateChangeCodeTestingOrNot(String productionTaskNumber);
 }

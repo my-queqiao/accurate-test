@@ -324,7 +324,7 @@
 							method_chain_original mco,
 							testing_example te
 		where cc.production_task_number = #{productionTaskNumber,jdbcType=VARCHAR}
-			and cc.testing_or_not = 0 
+			and (cc.testing_or_not = 0 or cc.testing_or_not is null) 
 			and change_type = 3 <!-- 只推荐指定的生产任务下、未测试的、修改的方法 -->
 			and cc.package_name = mco.package_name 
 			and cc.javabean_name = mco.javabean_name 

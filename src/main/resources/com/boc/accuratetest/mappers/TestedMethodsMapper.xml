@@ -280,6 +280,7 @@
 			and c.method_name = t.method_name
 			and c.param_type = t.param_type
 			and c.production_task_number = t.production_task_number
+			and t.production_task_number = #{productionTaskNumber,jdbcType=VARCHAR}
 	;
   </update>
 </mapper>

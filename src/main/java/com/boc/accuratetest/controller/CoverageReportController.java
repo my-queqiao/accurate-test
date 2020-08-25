@@ -12,7 +12,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 
@@ -274,23 +276,32 @@ public class CoverageReportController {
         	client = new Socket(testServerIp, 8765);
         	os = client.getOutputStream();
         	pw = new PrintWriter(os);
-            pw.write("chazhuang.txt");
+            pw.write("chazhuang.txt_testedmethod");
             pw.flush();
             client.shutdownOutput();// 关闭输出流
             is = client.getInputStream();
             isr = new InputStreamReader(is);
             br = new BufferedReader(isr);
             List<TestedMethods> tms = new ArrayList<>();
+            StringBuilder sb = new StringBuilder();
             String info = null;
             while ((info = br.readLine()) != null) {
-            	System.out.println("info:"+info);
-            	TestedMethods tm = insertPrepareForTestedMethods(info);
+            	sb.append(info+"\r\n");
+            }
+            if(StringUtils.isEmpty(sb.toString())) {
+            	json.put("success", true);
+        		return json;
+            }
+            System.out.println("测试过的方法："+sb.toString());
+            String[] lines = sb.toString().split("\r\n");
+            for (String line : lines) {
+            	TestedMethods tm = insertPrepare2(line);
             	tm.setProductionTaskNumber(productionTaskNumber);
             	tms.add(tm);
-            }
+			}
             methodChainOriginalBiz.insertBatchForTestedMethods(tms);
             // 修改change_code代码表更表，标注已测试方法
-            testedMethodsBiz.updateChangeCodeTestingOrNot();
+            testedMethodsBiz.updateChangeCodeTestingOrNot(productionTaskNumber);
             
         } catch (UnknownHostException e) {
         	e.printStackTrace();
@@ -315,6 +326,57 @@ public class CoverageReportController {
         }
 		json.put("success", true);
 		return json;
+	}
+	/**
+	 * 	解析方法链中的一行
+	 * @param methodStr com.boc.accuratetest.biz.impl.TestingExampleBizImpl.page(String,Integer)
+	 * @return
+	 */
+	private static TestedMethods insertPrepare2(String methodStr) {
+		TestedMethods m = new TestedMethods();
+    	String params = methodStr.substring(methodStr.indexOf("(")+1, methodStr.indexOf(")")); // 参数
+    	String split = methodStr.split("\\(")[0];
+    	String[] split2 = split.split("\\.");
+    	String methodName = split2[split2.length-1]; // 方法名
+    	String className = split2[split2.length-2]; // 类名
+    	String packageName = methodStr.substring(0, methodStr.indexOf(className)-1); // 包路径
+    	m.setPackageName(packageName);
+    	m.setJavabeanName(className);
+    	m.setMethodName(methodName);
+    	m.setParamType(params);
+    	return m;
+	}
+	/**
+	 * 	收集的原始数据，补上参数类型。
+	 * @param contents
+	 * @param testExampleId
+	 * @return
+	 */
+	public static String appendParams(String contents) {
+		StringBuilder sb = new StringBuilder();
+		if(StringUtils.isEmpty(contents)) { // 该测试用例，没有调用到该服务器
+			return sb.toString();
+		}
+		String[] lines = contents.split("\r\n");
+		List<String> linesForFindParams = new ArrayList<>();
+		for (int i=0;i<lines.length;i++) { // 每一个方法的堆栈链 中 的每一行
+			// 截取（不要随机数、时间）
+			String line = lines[i].substring(lines[i].indexOf(".")+1, lines[i].length());
+			linesForFindParams.add(line);
+			if(!line.contains("(") && !line.contains("java.lang.Thread.getStackTrace")) {
+				// 补齐参数类型：后头找，使用第二个遇到的同包、同类、同方法名，并且有参数类型的（重载方法嵌套调用的、异步方法调用的，不能这样找，以后再解决）
+				for(int j=linesForFindParams.size()-1;j>=0;j--) {
+					if(linesForFindParams.get(j).contains(line+"(")) {
+						line = linesForFindParams.get(j);
+					}
+				}
+			}
+			if(!line.contains("(")) { // 没找到，暂时默认没有
+				line = line+"()";
+			}
+			sb.append(line+"\r\n");
+		}
+		return sb.toString();
 	}
 }
 

@@ -27,11 +27,6 @@
 	    	<span class="col-xs-12 " style="font-size: xx-large;">
 	    		<span style="margin-left: ;">精准测试项目</span>
 	    	</span>
-	    	<span class="" style="font-size:large;bottom:-20px;position: absolute; left: 88%;top: 33px;">
-	    		<a target="_blank" onclick="getTestedMethods();" style="margin-left: ;color: blue;
-	    			cursor: pointer;text-decoration:underline;float:left;">获取已测试方法</a>
-	    	</span>
-	    	
 	    </div>
 	    <div id="loading" style="color:blue; display:none; position:absolute;
 	    		top:120px; left:12em;z-index:9999;font-size: 38px;font-family: 宋体;" >正在请求数据，请稍等...</div>
@@ -134,6 +129,10 @@
             &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
             <a id="btn_recommend" class="btn btn-success">
                 <span>推荐测试用例</span>
+            </a>
+            &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+            <a id="" class="btn btn-success" onclick="getTestedMethods();">
+                <span>获取已测试方法</span>
             </a>
         </div>
         <table id="tb_departments"></table>

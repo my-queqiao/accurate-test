@@ -18,8 +18,8 @@ public class TestedMethodsBizImpl implements TestedMethodsBiz{
 		return testedMethodsMapper.getAll();
 	}
 	@Override
-	public void updateChangeCodeTestingOrNot() {
-		testedMethodsMapper.updateChangeCodeTestingOrNot();
+	public void updateChangeCodeTestingOrNot(String productionTaskNumber) {
+		testedMethodsMapper.updateChangeCodeTestingOrNot(productionTaskNumber);
 	}
 
 }

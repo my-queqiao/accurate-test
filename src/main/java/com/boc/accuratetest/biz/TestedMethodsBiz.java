@@ -8,6 +8,6 @@ public interface TestedMethodsBiz {
 
 	List<TestedMethods> getAll();
 
-	void updateChangeCodeTestingOrNot();
+	void updateChangeCodeTestingOrNot(String productionTaskNumber);
 
 }
