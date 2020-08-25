@@ -13,4 +13,6 @@ public interface TestingExampleBiz {
 	void batchSave(List<TestingExample> tes);
 
 	List<TestingExample> findByIds(List<Integer> teids);
+
+	void updateById(Integer testExampleId);
 }

@@ -322,12 +322,15 @@
     SELECT cc.id as id,te.id as package_name
 				 	from 	change_code cc,
 							method_chain_original mco,
-							example_ref_method_chain ermc,
 							testing_example te
 		where cc.production_task_number = #{productionTaskNumber,jdbcType=VARCHAR}
-			and cc.package_name=mco.package_name and cc.javabean_name=mco.javabean_name and cc.method_name=mco.method_name
-			and cc.param_type=mco.param_type
-			and mco.id=ermc.method_chain_original_id and ermc.testing_example_id=te.id
+			and cc.testing_or_not = 0 
+			and change_type = 3 <!-- 只推荐指定的生产任务下、未测试的、修改的方法 -->
+			and cc.package_name = mco.package_name 
+			and cc.javabean_name = mco.javabean_name 
+			and cc.method_name = mco.method_name
+			and cc.param_type = mco.param_type
+			and mco.testing_example_id = te.id
 		GROUP BY cc.id,te.id
   </select>
 </mapper>

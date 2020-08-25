@@ -43,4 +43,12 @@ public class TestingExampleBizImpl implements TestingExampleBiz{
 		return tes;
 	}
 
+	@Override
+	public void updateById(Integer testExampleId) {
+		TestingExample testingExample = new TestingExample();
+		testingExample.setId(testExampleId);
+		testingExample.setExecuted((byte)1);
+		testingExampleMapper.updateByPrimaryKeySelective(testingExample);
+	}
+
 }

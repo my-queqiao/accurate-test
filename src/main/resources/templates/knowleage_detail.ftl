@@ -103,14 +103,24 @@
                 paginationNextText: "下一页",
                 columns: [{
                     checkbox: true
-                }, 
+                }
+                , 
+                {
+                    field: 'id',
+                    title: '主键', //align: 'center'
+                    align: 'center',
+                	//events: operateEvents1,
+                	//formatter: operateFormatter
+                }
+                , 
                 {
                     field: 'belongProduct',
                     title: '所属产品', //align: 'center'
                     align: 'center',
                 	//events: operateEvents1,
                 	//formatter: operateFormatter
-                },
+                }
+                ,
                 {
                     field: 'function',
                     title: '功能', //align: 'center'
@@ -153,6 +163,14 @@
                 }
                 ,
                 {
+                    field: 'executed',
+                    title: '已执行', //align: 'center'
+                    align: 'center',
+                	//events: operateEvents1,
+                    formatter: executedFormatter
+                }
+                ,
+                {
                     field: '',
                     title: '操作', //align: 'center'
                     align: 'center',
@@ -179,6 +197,13 @@
         };
         return oTableInit;
     };
+    function executedFormatter(value, row, index) {
+    	if(value == 1){
+	    	return ["<span style='color:black;' >是</span>"].join("");
+    	}else{
+    		return ["<span style='color:red;' >否</span>"].join("");
+    	}
+    }
     function operateFormatter(value, row, index) {
     	return [
     		"<a title='查看关联的方法链' 	onclick='method_body_details("+row.id+")'"

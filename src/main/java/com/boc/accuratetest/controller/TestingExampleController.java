@@ -42,7 +42,6 @@ import com.boc.accuratetest.biz.TestingExampleBiz;
 import com.boc.accuratetest.constant.MethodFromLine;
 import com.boc.accuratetest.constant.NotLoginInException;
 import com.boc.accuratetest.constant.ProductionTaskSession;
-import com.boc.accuratetest.pojo.ExampleRefMethodChain;
 import com.boc.accuratetest.pojo.MethodChainOriginal;
 import com.boc.accuratetest.pojo.TestingExample;
 
@@ -50,8 +49,6 @@ import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
-
-import com.boc.accuratetest.biz.ExampleRefMethodChainBiz;
 import net.sf.json.JSONObject;
 
 @Controller
@@ -61,10 +58,8 @@ public class TestingExampleController {
 	private TestingExampleBiz testingExampleBiz;
 	@Autowired
 	private MethodChainOriginalBiz methodChainOriginalBiz;
-	@Autowired
-	private ExampleRefMethodChainBiz exampleRefMethodChainBiz;
 	// < 测试用例主键  ,  最后一行数据@测试用例所在的服务器ip >
-		Map<Integer,String> testExampleIdRef = new ConcurrentHashMap<Integer, String>();
+	Map<Integer,String> testExampleIdRef = new ConcurrentHashMap<Integer, String>();
 	/**
 	 * 	跳转到知识库创建页面
 	 * @return
@@ -222,12 +217,20 @@ public class TestingExampleController {
             	}
             }
             // 解析方法链，存储
-            //System.out.println("contents======================"+contents);
+            //System.out.println("点击结束后读取到的全部内容======================"+contents);
+            if(StringUtils.isEmpty(contents.toString())) {
+            	// 没有读取到内容，正常情况：测试用例没有调用到目标服务器
+            	json.put("success", true);
+        		return json;
+            }
             List<MethodChainOriginal> ms = analyseMethodLink2(contents.toString(),testExampleId);
             // 如果该测试用例已关联方法链，先取消关联
             methodChainOriginalBiz.deleteByTestingExampleId(testExampleId);
             // 批量存储方法链数据
             methodChainOriginalBiz.insertBatch(ms);
+            // 更新测试用例主表，当前测试用例已执行
+            testingExampleBiz.updateById(testExampleId);
+            
             // 收集方法链表主键，测试用例、方法链 做关联
             // 如果该测试用例已关联方法链，先取消关联
             /*exampleRefMethodChainBiz.deleteByTestingExampleId(testExampleId);
@@ -637,99 +640,8 @@ public class TestingExampleController {
 	public JSONObject getMethodLinkByTestExampleId(Integer testExampleId) {
 		JSONObject json = new JSONObject();
 		List<MethodChainOriginal> mcos = methodChainOriginalBiz.getMethodLinkByTestExampleId(testExampleId);
-//		List<MethodFromLine> fathers = new ArrayList<>();
-//		// 分析得出方法链数据
-//		for (MethodChainOriginal mco : mcos) {
-//			if(StringUtils.isEmpty(mco.getLastMethodId())) {
-//				// 父节点
-//				String line = mco.getPackageName()+"."+mco.getJavabeanName()+"."+mco.getMethodName()+"("+mco.getParamType()+")";
-//				MethodFromLine methodFromLine = new MethodFromLine(true, mco.getId(), line, null, new ArrayList<>());
-//				fathers.add(methodFromLine);
-//				mco.setShouji(true);
-//			}
-//		}
-//		// 剔除源数据中已收集的
-//		Iterator<MethodChainOriginal> iterator = mcos.iterator();
-//		while(iterator.hasNext()) {
-//			MethodChainOriginal mco = iterator.next();
-//			if(mco.isShouji()) iterator.remove();
-//		}
-//		// 收集第二级
-//		for (MethodFromLine father : fathers) {
-//			List<MethodFromLine> nexts = new ArrayList<>();
-//			for (MethodChainOriginal mco : mcos) {
-//				if(mco.getLastMethodId().equals(father.getId()) ) {
-//					// 下一级级子节点
-//					String line = mco.getPackageName()+"."+mco.getJavabeanName()+"."+mco.getMethodName()+"("+mco.getParamType()+")";
-//					MethodFromLine methodFromLine = new MethodFromLine(true, mco.getId(), line, null, new ArrayList<>());
-//					nexts.add(methodFromLine);
-//					mco.setShouji(true);
-//				}
-//			}
-//			father.setNexts(nexts);
-//		}
-//		// 剔除源数据中已收集的
-//		Iterator<MethodChainOriginal> iterator2 = mcos.iterator();
-//		while(iterator2.hasNext()) {
-//			MethodChainOriginal mco = iterator2.next();
-//			if(mco.isShouji()) iterator2.remove();
-//		}
-//		if(mcos.isEmpty()) {
-//			// 收集完毕
-//		}
-//		// 收集第三级
-//		for (MethodFromLine father : fathers) {
-//			List<MethodFromLine> nexts = father.getNexts(); // 前面这个第二级已经收集完毕了。
-//			if(nexts.isEmpty()) continue; // 这个父节点收集完了
-//			nexts(nexts, mcos); 
-//		}
-//		if(mcos.isEmpty()) {
-//			// 收集完毕
-//		}
-//		
-//		// 收集第四级
-//		for (MethodFromLine father : fathers) {
-//			List<MethodFromLine> nexts = father.getNexts(); // 前面这个第二级已经收集完毕了。
-//			if(nexts.isEmpty()) continue; // 这个父节点收集完了
-//			
-//			for (MethodFromLine next : nexts) {
-//				List<MethodFromLine> nexts2 = next.getNexts();
-//				if(nexts2.isEmpty()) continue;
-//				nexts(nexts2, mcos); 
-//			}
-//		}
-//		if(mcos.isEmpty()) {
-//			// 收集完毕
-//		}
-		
 		json.put("list", mcos);
 		return json;
-	}
-	/**
-	 * 寻找shangs的下一级
-	 * @param shangs
-	 * @param mcos
-	 */
-	public void nexts(List<MethodFromLine> shangs,List<MethodChainOriginal> mcos) {
-		for (MethodFromLine shang : shangs) {
-			List<MethodFromLine> nexts = new ArrayList<>();
-			for (MethodChainOriginal mco : mcos) {
-				if(mco.getLastMethodId().equals(shang.getId()) ) {
-					// 下一级级子节点
-					String line = mco.getPackageName()+"."+mco.getJavabeanName()+"."+mco.getMethodName()+"("+mco.getParamType()+")";
-					MethodFromLine methodFromLine = new MethodFromLine(true, mco.getId(), line, null, new ArrayList<>());
-					nexts.add(methodFromLine);
-					mco.setShouji(true);
-				}
-			}
-			shang.setNexts(nexts);
-		}
-		// 剔除源数据中已被收集的
-		Iterator<MethodChainOriginal> iterator2 = mcos.iterator();
-		while(iterator2.hasNext()) {
-			MethodChainOriginal mco = iterator2.next();
-			if(mco.isShouji()) iterator2.remove();
-		}
 	}
 }
 

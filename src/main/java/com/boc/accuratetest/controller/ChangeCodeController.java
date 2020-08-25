@@ -675,7 +675,6 @@ public class ChangeCodeController {
 		//System.out.println("每一个测试用例出现的次数："+map); // 每一个测试用例出现的次数：{用例5=1, 用例9=1, 用例2=1}	（比如：用例2、9应该二选一）
 		// 拿到出现次数最大的测试用例
 		int maxnum = Collections.max(map.values()); // 
-		StringBuilder sb = new StringBuilder();
 		for(Entry<String, Integer> entry1:map.entrySet()) {
 			if(entry1.getValue().intValue() == maxnum) {
 				// recommend.add(entry1.getKey());// 推荐该测试用例
@@ -696,30 +695,33 @@ public class ChangeCodeController {
 				if(maxnum > 1) {
 					recommend.add(entry1.getKey());// 推荐该测试用例
 				}
-			}
-		}
-		// 将含有推荐测试用例的用例组合剔除
-		Set<String> keySet = teidRefCcid.keySet();
-		List<String> keyLeft = new ArrayList<>(); // 收集现有key
-		for (String string : keySet) {
-			keyLeft.add(string);
-		}
-		List<String> recommend2 = new ArrayList<>(); // 目前推荐的测试用例
-		for(String r : recommend) {
-			String[] split = r.split("@");
-			for (String s : split) {
-				recommend2.add(s);
-			}
-		}
-		for (String key : keyLeft) {
-			String[] split = key.split(",");
-			for (String s : split) {
-				if(recommend2.contains(s)) {
-					teidRefCcid.remove(key); // 剔除
+				/** 推荐一次之后，就应该剔除含有该用例的用例组合
+				 	将含有推荐测试用例的用例组合剔除	 */
+				Set<String> keySet = teidRefCcid.keySet();
+				List<String> keyLeft = new ArrayList<>(); // 收集现有key
+				for (String string : keySet) {
+					keyLeft.add(string);
 				}
+				List<String> recommend2 = new ArrayList<>(); // 目前推荐的测试用例
+				for(String r : recommend) {
+					String[] split = r.split("@");
+					for (String s : split) {
+						recommend2.add(s);
+					}
+				}
+				for (String key : keyLeft) {
+					String[] split = key.split(",");
+					for (String s : split) {
+						if(recommend2.contains(s)) {
+							teidRefCcid.remove(key); // 剔除
+						}
+					}
+				}
+				recommend(keyQuchong, teidRefCcid, recommend);// 递归推荐	
+				break; // 出现次数相同的用例，只推荐一个
 			}
 		}
-		recommend(keyQuchong, teidRefCcid, recommend);// 递归推荐	
+		
 	}
 }
 

@@ -21,6 +21,8 @@ public class TestingExample {
 
     private String productionTaskNumber;
 
+    private Byte executed;
+
     public Integer getId() {
         return id;
     }
@@ -99,5 +101,13 @@ public class TestingExample {
 
     public void setProductionTaskNumber(String productionTaskNumber) {
         this.productionTaskNumber = productionTaskNumber == null ? null : productionTaskNumber.trim();
+    }
+
+    public Byte getExecuted() {
+        return executed;
+    }
+
+    public void setExecuted(Byte executed) {
+        this.executed = executed;
     }
 }

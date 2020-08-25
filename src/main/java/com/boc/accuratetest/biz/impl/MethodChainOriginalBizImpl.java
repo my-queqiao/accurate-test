@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.boc.accuratetest.biz.MethodChainOriginalBiz;
-import com.boc.accuratetest.mappers.ExampleRefMethodChainMapper;
 import com.boc.accuratetest.mappers.MethodChainOriginalMapper;
 import com.boc.accuratetest.mappers.TestedMethodsMapper;
 import com.boc.accuratetest.pojo.MethodChainOriginal;

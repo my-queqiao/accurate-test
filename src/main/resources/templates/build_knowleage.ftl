@@ -23,7 +23,7 @@
 </head>
 <body class="container-fiuled" style="background-color: aliceblue;">
 <div id="loading" style="color:blue; display:none; position:absolute;
-	    		top:22px; left:1em;z-index:9999;font-size: 25px;font-family: 宋体;" >上传成功</div>
+	    		top:120px; left:12em;z-index:9999;font-size: 38px;font-family: 宋体;" >正在请求数据，请稍等...</div>
     <div class="panel-body" style="padding-bottom:0px;">
 	    <div class="row text-center">
 	    	<!--  <span class="col-xs-8 " style="font-size: xx-large;position:fixed;top: 85px;">
@@ -31,14 +31,18 @@
 	    	</span>-->
 	    </div>
 	    <div class="row text-center">
-	    	<div class="col-xs-12" style="">
+	    	<div class="col-xs-8" style="">
 	    		<form style=""
 	    			action="${request.contextPath}/testingExample/upload" method="post" enctype="multipart/form-data">
 					<input type="file" name="file" style="float: left;" required/>
 					<input type="submit" value="上传测试用例（文件类型xls）"	style="margin-left: -45%;"/>
 				</form>
-		        <table id="tb_testingExample"></table>
 	    	</div>
+	    	<div class="col-xs-4" style="float: right;">
+					<input type="text" id="testExampleIpForAll" style="float: left;" placeholder="#.#.#.#"/>
+					<input type="submit" value="确认目标服务器地址" id="btn_save_forAll" style="margin-left: -20%;"/>
+	    	</div>
+		    <table id="tb_testingExample"></table>
 	    	
 	    </div>
 	    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -55,7 +59,7 @@
 	                </div>
 	                <div class="modal-footer">
 	                	<button type="button" id="btn_save" class="btn btn-primary" data-dismiss="modal">
-	                		<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>保存</button>
+	                		<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>确定</button>
 	                    <button type="button" class="btn btn-default" data-dismiss="modal">
 	                    	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
 	                </div>
@@ -187,6 +191,14 @@
                 }
                 ,
                 {
+                    field: 'executed',
+                    title: '已执行', //align: 'center'
+                    align: 'center',
+                	//events: operateEvents1,
+                    formatter: executedFormatter
+                }
+                ,
+                {
                     field: '',
                     title: '操作', //align: 'center'
                     align: 'center',
@@ -213,11 +225,35 @@
         };
         return oTableInit;
     };
+    var currentTestExampleIdForAll = localStorage.getItem("testExampleIpForAll"); // 当前正在操作的用例id
+    if(currentTestExampleIdForAll != null){
+	    $("#testExampleIpForAll").val(currentTestExampleIdForAll);
+    }
+    $("#btn_save_forAll").click(function(){
+    	var testExampleIpForAll = $("#testExampleIpForAll").val();
+    	if(null != testExampleIpForAll) {
+    		if(checkIp(testExampleIpForAll)){
+    			currentTestExampleIdForAll = testExampleIpForAll;
+    			localStorage.setItem("testExampleIpForAll", testExampleIpForAll);
+    			alert("设置成功");
+    		}else{
+    			alert("ip地址格式有误");
+    		}
+    	}
+    });
+    
     function operateFormatter(value, row, index) {
     	return [
     		"<a title='查看关联的方法链' 	onclick='method_body_details("+row.id+")'"
     		+"style='background-color: ;cursor: pointer;text-decoration:underline;'>"+value+"</a>",  
     		].join("");
+    }
+    function executedFormatter(value, row, index) {
+    	if(value == 1){
+	    	return ["<span style='color:black;' >是</span>"].join("");
+    	}else{
+    		return ["<span style='color:red;' >否</span>"].join("");
+    	}
     }
     function operateFormatter1(value, row, index) {
     	return [
@@ -242,30 +278,41 @@
     	}
     });
 	function startTestExample(id){
+		$('#myModal').on('show.bs.modal', function (event) {
+          	 var modal = $(this);
+          	 if(currentTestExampleIdForAll != null){
+	           	 modal.find('#testExampleIp').val(currentTestExampleIdForAll);
+          	 }else{
+          	 }
+      	});
+		
 		currentTestExampleId = id;
 		$("#myModalLabel").text("目标服务器ip地址");
         $('#myModal').modal();
 	}
 	function sendStart(testExampleIp){
+		$("#loading").show();
 		$.post('/testingExample/testExampleStart?testExampleId='+currentTestExampleId+'&ipOnTestExample='+testExampleIp,
 				function(json){
     				if(json.success == true){
     					testExampleIp2 = testExampleIp;
     					alert("开始成功");
-            			//$("#tb_departments").bootstrapTable('refresh');
-            			$("#"+currentTestExampleId+"start").html("执行中。。");
+    					$("#loading").hide();
+            			$("#"+currentTestExampleId+"start").html("执行中。。"); // 开始执行四个字，改成执行中。。。
     				}else{
     					alert("开始失败："+json.msg);
     				}
 		});
 	}
 	function endTestExample(id){
+		$("#loading").show();
 		$.post('/testingExample/testExampleEnd?testExampleId='+id+'&ipOnTestExample='+testExampleIp2,
 			function(json){
    				if(json.success == true){
    					alert("结束成功");
            			//$("#tb_departments").bootstrapTable('refresh');
            			$("#"+currentTestExampleId+"end").html("已结束");
+           			$("#loading").hide();
    				}else{
    					alert("结束失败");
    				}
