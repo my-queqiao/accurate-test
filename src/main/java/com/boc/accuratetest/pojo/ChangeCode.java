@@ -19,9 +19,29 @@ public class ChangeCode {
 
     private String productionTaskNumber;
     
-    private String linkTestExample; // 关联的测试用例
+    private String linkTestExample; // 非数据库字段，关联的测试用例
+    
+    private String testExampleId; // 非数据库字段，关联的测试用例（一对一、一对多的关系。该字段仅表示一个用例的主键id）
+    
+    private String mcoid; // 非数据库字段，知识库表主键
+    
+    public String getMcoid() {
+		return mcoid;
+	}
 
-    public String getLinkTestExample() {
+	public void setMcoid(String mcoid) {
+		this.mcoid = mcoid;
+	}
+
+	public String getTestExampleId() {
+		return testExampleId;
+	}
+
+	public void setTestExampleId(String testExampleId) {
+		this.testExampleId = testExampleId;
+	}
+
+	public String getLinkTestExample() {
 		return linkTestExample;
 	}
 

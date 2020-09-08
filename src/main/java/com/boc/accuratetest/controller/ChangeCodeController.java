@@ -15,7 +15,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+
 import javax.servlet.http.HttpSession;
+
+import org.apache.ibatis.scripting.xmltags.ForEachSqlNode;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -39,14 +43,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
+
 import com.boc.accuratetest.annotation.SecurityIgnoreHandler;
 import com.boc.accuratetest.biz.ChangeCodeBiz;
+import com.boc.accuratetest.biz.MethodChainOriginalBiz;
 import com.boc.accuratetest.biz.ProductionTaskBiz;
 import com.boc.accuratetest.biz.TestingExampleBiz;
 import com.boc.accuratetest.constant.NotLoginInException;
 import com.boc.accuratetest.constant.NotSelectProductionTaskException;
 import com.boc.accuratetest.constant.ProductionTaskSession;
 import com.boc.accuratetest.pojo.ChangeCode;
+import com.boc.accuratetest.pojo.MethodChainOriginal;
 import com.boc.accuratetest.pojo.ProductionTask;
 import com.boc.accuratetest.pojo.TestingExample;
 import com.boc.accuratetest.pojo.User;
@@ -67,6 +75,8 @@ public class ChangeCodeController {
 	private TestingExampleBiz testingExampleBiz;
 	@Autowired
 	private ProductionTaskBiz productionTaskBiz;
+	@Autowired
+	private MethodChainOriginalBiz methodChainOriginalBiz;
 	// < gitUrl  ,  分支名称 >
 	Map<String,JSONObject> giturlRefBranchtag = new ConcurrentHashMap<String, JSONObject>();
 	/**
@@ -110,7 +120,7 @@ public class ChangeCodeController {
 			StringBuilder sb = new StringBuilder();
 			for (ChangeCode link : links) {
 				if(pg.getId().intValue() == link.getId().intValue()) {
-					sb.append(link.getPackageName()+",");
+					sb.append(link.getTestExampleId()+",");
 				}
 			}
 			String linkTestExample = sb.toString();
@@ -524,7 +534,7 @@ public class ChangeCodeController {
 		return json;
 	}
 	/**
-	 * 	推荐测试用例
+	 * 	推荐测试用例（考虑方法链）
 	 * @return
 	 */
 	@SecurityIgnoreHandler
@@ -539,8 +549,334 @@ public class ChangeCodeController {
 		}
 		List<ChangeCode> list = changeCodeBiz.findChangeCodeLinkTestExample(productionTaskNumber);
 		// list.get(0).getId(); // 变更表主键id
-		// list.get(0).getPackageName(); // 测试用例表主键id（借用字段暂存）
-		// <"'用例1','用例2'"   ,   变更表主键id> // 用例组———》及其对应的某个变更方法
+		// list.get(0).getTestExampleId(); // 测试用例主键id
+		// list.get(0).getMcoid(); // 知识库表主键id
+		Set<Integer> testExampleIds = new HashSet<>(); // 收集所有的案例id
+		Set<String> mcoids = new HashSet<>(); // 收集所有的知识库主键id（）
+		for (ChangeCode cc : list) {
+			testExampleIds.add(Integer.valueOf(cc.getTestExampleId()));
+			mcoids.add(cc.getMcoid());
+		}
+		// 获取方法链
+		List<MethodChainOriginal> mcos = methodChainOriginalBiz.getMethodLinkByTestExampleIds(testExampleIds);
+		// 案例去重、合并
+		/**
+		 *	以每一个变更方法当作最底层方法往上找方法链，这个方法链就作为案例合并、去重的基本数据
+		 *	然后，先在同一个案例中合并、去重，再在不同的案例间合并、去重
+		 *	方法链样式：
+		 *	案例1："方法链1，方法链2，方法链3"	案例2："方法链4，方法链5，方法链6"
+		 *	方法链1样式：
+		 *	"abc" // 那边是父节点待定，注意：两个方法链必须先比较父节点是否相等
+		 *	链内方法分隔符，三个字符	:	$-$		不能用英文逗号	,	因为参数类型使用了
+		 */
+		// <案例id , 以变更方法为底的方法链集合>
+		Map<Integer,List<String>> testExampleRefUpdateMethodLinks = new HashMap<>();
+		for (String mcoid : mcoids) { // mcoids 变更方法在知识库中，对应的主键ids
+			StringBuilder link = new StringBuilder();
+			Integer testExampleId = null;
+			testExampleId = lastMethod(mcoid, mcos, link,testExampleId); // 找到该变更方法（为底）所在的方法链，及案例id
+			// 
+			List<String> list2 = testExampleRefUpdateMethodLinks.get(testExampleId);
+			if(null == list2) {
+				list2 = new ArrayList<>();
+			}
+			list2.add(link.toString().substring(0, link.toString().length()-3)); //  (去掉最后的链内方法分隔符:$-$)
+			testExampleRefUpdateMethodLinks.put(testExampleId, list2);
+		}
+		// System.out.println("最初数据："+testExampleRefUpdateMethodLinks);
+		// 整理数据
+		Map<Integer,List<String>> testExampleRefUpdateMethodLinks2 = new HashMap<>();
+		for (Entry<Integer, List<String>> entry : testExampleRefUpdateMethodLinks.entrySet()) {
+			List<String> links = entry.getValue();
+			List<String> links2 = new ArrayList<>();
+			
+			for (String link : links) {
+				// 改成父节点在前面
+				StringBuilder sb = new StringBuilder();
+				String[] methods = link.split("\\$-\\$"); // 不能用英文	,	分割，因为参数类型使用	,	分割的
+				for(int i=methods.length-1;i>=0;i--) {
+					sb.append(methods[i]);
+					if(i != 0) sb.append("$-$");
+				}
+				links2.add(sb.toString());
+			}
+			
+			testExampleRefUpdateMethodLinks2.put(entry.getKey(), links2);
+		}
+		// System.out.println("整理数据2，已改成父节点在前："+testExampleRefUpdateMethodLinks2);
+		/*
+		 241=[
+		 com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber(HttpSession),
+		 com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll(),
+		 com.boc.accuratetest.pojo.ProductionTask.setMasterBranch(String), 
+		 // 上下一共两个方法链。（链中方法也是用英文逗号分割的，看上去混淆了，集合中数据没有混淆）
+		 // 每一个方法链都是按照一个单独的字符串存储的，所以放到set中方法链中的方法调用顺序也不会乱
+		 com.boc.accuratetest.controller.IndexController.getPuductionTaskNumber(HttpSession),
+		 com.boc.accuratetest.biz.impl.ProductionTaskBizImpl.getAll(),
+		 com.boc.accuratetest.pojo.ProductionTask.setTestBranch(String)],
+		 */
+		// 去重、去包含
+		// 1、同一个案例去重、去包含（有可能有重复、包含的数据，比如：方法链：123.2、3都是变更方法，那么就有12、123两个方法链。）
+		Map<Integer,Set<String>> testExampleRefUpdateMethodLinks3 = new HashMap<>();
+		Set<Integer> keySet = testExampleRefUpdateMethodLinks2.keySet();
+		for (Integer teid : keySet) {
+			List<String> list2 = testExampleRefUpdateMethodLinks2.get(teid);
+			// 去重、去包含
+			List<String> removes = new ArrayList<>();
+			for (String link : list2) {
+				for (String link2 : list2) {
+					if(link.substring(0, 1).equals(link2.subSequence(0, 1)) 
+							&& !link2.equals(link) && link2.contains(link) ) {
+						// 包含关系，去掉link
+						removes.add(link);
+						break;
+					}
+				}
+			}
+			// 从list2中去掉removes
+			Set<String> links = new HashSet<>();
+			for (String linkOld : list2) {
+				if(!removes.contains(linkOld)) {
+					links.add(linkOld);
+				}
+			}
+			testExampleRefUpdateMethodLinks3.put(teid, links); // 收集去重后的数据
+		}
+		// System.out.println("整理数据3，同一个案例下去重、去包含："+testExampleRefUpdateMethodLinks3);
+		/**
+		 * 	 不同案例间去重、去包含，并推荐案例
+		 *  1、先找出所有需要测试的方法链（去重，去包含）
+		 *	2、从拥有方法链最多的案例找起，再次多，直到找全需要测试的方法链，并推荐对应的案例
+		 */
+		Set<String> linksQuchong = new HashSet<>();
+		for (Set<String> links : testExampleRefUpdateMethodLinks3.values()) {
+			for (String link : links) {
+				String[] methods = link.split("$-$");
+				boolean repeat = false;
+				// 遍历所有方法链，如果没有方法链包含link（规则举例：三个方法链abc、ab、bc，  abc包含ab，但不包含bc），就收集
+				for (Set<String> links2 : testExampleRefUpdateMethodLinks3.values()) {
+					for (String link2 : links2) {
+						String[] methods2 = link2.split("$-$");
+						// link、link2比较，只查看link2是否包含link即可。
+						if(methods2[0].equals(methods[0]) && link2.contains(link) && !link2.equals(link)) {
+							// 满足这三个条件，link就是被包含的，不收集
+							repeat = true;
+							break;
+						}
+					}
+					if(repeat) break;
+				}
+				if(repeat == false) linksQuchong.add(link); // 收集
+			}
+		}
+		// System.out.println("linksQuchong:"+linksQuchong);
+		// 推荐案例，从拥有方法链最多的案例开始找，再次多，直到覆盖了所有的待测试方法链：linksQuchong
+		// testExampleRefUpdateMethodLinks3
+		Set<Integer> recommendTeids = new HashSet<>();
+		Set<Integer> recommendByLink = recommendByLink(testExampleRefUpdateMethodLinks3, linksQuchong,recommendTeids);
+		
+		// 推荐的案例id
+		Set<String> recommend = new HashSet<>();
+		for (Integer teid : recommendByLink) {
+			recommend.add(String.valueOf(teid));
+		}
+		Set<String> recommend2 = recommend2(recommend);
+		json.put("list", recommend2);
+		
+		/** 变更方法关联的所有案例的主键id	*/
+		Set<String> all = new HashSet<>();
+		for (MethodChainOriginal mco : mcos) {
+			all.add(String.valueOf(mco.getTestingExampleId()));
+		}
+		Set<String> all2 = recommend2(all);
+		json.put("listAll", all2); // 变更方法方法链关联的所有案例
+		return json;
+	}
+	/**
+	 * 	推荐案例（依据修改方法所在的方法链进行推荐）
+	 * @param testExampleRefUpdateMethodLinks3	用例id 对应 修改方法所在的方法链
+	 * @param linksQuchong	也是所有待测的方法链
+	 * @return 
+	 */
+	private Set<Integer> recommendByLink(Map<Integer,Set<String>> testExampleRefUpdateMethodLinks3
+			,Set<String> linksQuchong,Set<Integer> recommendTeids) {
+		
+		Map<Integer,Integer> linksnumberRefTeid = new HashMap<>();
+		for (Entry<Integer, Set<String>> entry : testExampleRefUpdateMethodLinks3.entrySet()) {
+			linksnumberRefTeid.put(entry.getValue().size(),entry.getKey());
+		}
+		//System.out.println("linksnumberRefTeid:"+linksnumberRefTeid);
+		Integer max = Collections.max(linksnumberRefTeid.keySet());
+		Integer teid = linksnumberRefTeid.get(max);
+		Set<String> links = testExampleRefUpdateMethodLinks3.get(teid);
+		// 先查看links中是否拥有linksQuchong中的任意一个，如果有一个就推荐？ 并且把该案例已覆盖的方法链从linksQuchong中剔除。
+		// 再处理次多的案例，次多的案例不一定拥有linksQuchong中的方法链，所以要查看是否拥有
+		boolean recommendCurrentTeid = false;
+		for (String link : links) {
+			if(linksQuchong.contains(link)) {
+				recommendCurrentTeid = true;
+				linksQuchong.remove(link); // 剔除
+			}
+		}
+		testExampleRefUpdateMethodLinks3.remove(teid); // 剔除当前案例（不管当前案例有没有包含当前的待测试方法链）
+		if(recommendCurrentTeid) {
+			recommendTeids.add(teid);
+		}
+		if(linksQuchong.isEmpty()) {
+			return recommendTeids;
+		}
+		return recommendByLink(testExampleRefUpdateMethodLinks3, linksQuchong,recommendTeids);
+	}
+	public static void main(String[] args) {
+		Map<Integer,Set<String>> map = new HashMap<>();
+		Set<String> set1 = new HashSet<>();
+		set1.add("a,b,c");
+		set1.add("a,m,n");
+		set1.add("x,y,z");
+		map.put(234, set1);
+		Set<String> set2 = new HashSet<>();
+		set2.add("a,b,c");
+		set2.add("m,n,z");
+		map.put(235, set2);
+		Set<String> set3 = new HashSet<>();
+		set3.add("a,b,c");
+		set3.add("m,n,z");
+		map.put(236, set3);
+		Set<String> set4 = new HashSet<>();
+		set4.add("a,b");
+		set4.add("m,n");
+		map.put(237, set4);
+		Set<String> set5 = new HashSet<>();
+		set5.add("a,b,c");
+		set5.add("b,c");
+		map.put(238, set5);
+		System.out.println(map);
+				
+		// 不用父节点的方式
+		Set<String> linksQuchong = new HashSet<>();
+		for (Set<String> links : map.values()) {
+			for (String link : links) {
+				String[] methods = link.split(",");
+				boolean repeat = false;
+				// 遍历所有方法链，如果没有方法链包含link（规则举例：三个方法链abc、ab、bc，  abc包含ab，但不包含bc），就收集
+				for (Set<String> links2 : map.values()) {
+					for (String link2 : links2) {
+						String[] methods2 = link2.split(",");
+						// link、link2比较，只查看link2是否包含link即可。
+						if(methods2[0].equals(methods[0]) && link2.contains(link) && !link2.equals(link)) {
+							// 满足这三个条件，link就是被包含的，不收集
+							repeat = true;
+							break;
+						}
+					}
+					if(repeat) break;
+				}
+				if(repeat == false) linksQuchong.add(link); // 收集
+			}
+		}
+		System.out.println("linksQuchong:"+linksQuchong);
+	}
+	private Integer lastMethod(String mcoid,List<MethodChainOriginal> mcos, StringBuilder link,Integer testExampleId) {
+		for (MethodChainOriginal mco : mcos) { // 知识库（案例筛选过了，只包含变更方法对应的案例）
+			// 开始找每一个变更方法为底的方法链，需要确定方法链属于那个案例
+			if(mco.getId().equals(mcoid)) {
+				
+				StringBuilder sb = new StringBuilder();
+				sb.append(mco.getPackageName()).append(".").append(mco.getJavabeanName())
+					.append(".").append(mco.getMethodName()).append("(").append(mco.getParamType()).append(")");
+				
+				link.append(sb.toString()+"$-$");
+				testExampleId = mco.getTestingExampleId();
+				String lastMethodId = mco.getLastMethodId(); // 需要用递归，直到LastMethodId为空
+				mcoid = lastMethodId;
+				break;
+			}
+		}
+		if(StringUtils.isEmpty(mcoid)) {
+			return testExampleId;
+		}
+		return lastMethod(mcoid, mcos, link,testExampleId);
+	}
+	public void removeLinkNotHasUpdateMethod(List<MethodChainOriginal> mcos) {
+		// 方法链去重，去包含。（只计算变更方法所在的链的去重、去包含，其他不包含变更方法的链不用管。
+		// 所以发现了重复、被包含，整个用例就可以剔除了）
+		// 分割用例?
+		int latchCount = 0;
+		for (MethodChainOriginal mco : mcos) {
+			if(StringUtils.isEmpty(mco.getLastMethodId())) {
+				latchCount++;
+			}
+		}
+		CountDownLatch latch = new CountDownLatch(latchCount);
+		for (MethodChainOriginal mco : mcos) {
+			// 不管测试案例，以方法链为单位，剔除不包含变更方法的方法链？有必要吗？
+			if(StringUtils.isEmpty(mco.getLastMethodId())) {
+				
+				new Thread(new Runnable() {
+					
+					@Override
+					public void run() {
+						List<MethodChainOriginal> father = new ArrayList<>();
+						father.add(mco);
+						List<MethodChainOriginal> links = new ArrayList<>();
+						links.add(mco);
+						findLink(mcos, father, links);
+						for (MethodChainOriginal link : links) {
+							StringBuilder sb = new StringBuilder();
+							sb.append(link.getPackageName()).append(".").append(link.getJavabeanName())
+								.append(".").append(link.getMethodName()).append("(").append(link.getParamType()).append(")");
+							System.out.println(sb.toString());
+						}
+						System.out.println("=====================================================================================");
+						latch.countDown();
+					}
+				}).start();
+				
+			}
+		}
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(mcos.size());
+	}
+	// 找出指定父节点所在方法链的所有方法
+	private void findLink(List<MethodChainOriginal> mcos,List<MethodChainOriginal> father,List<MethodChainOriginal> links) {
+		for (MethodChainOriginal shang : father) {
+			List<MethodChainOriginal> shang2 = new ArrayList<>();
+			for (MethodChainOriginal mco : mcos) {
+				if(mco.getLastMethodId().equals(shang.getId())) {
+					// 下一级
+					links.add(mco);
+					shang2.add(mco);
+				}
+			}
+			father = shang2;
+		}
+		if(!father.isEmpty()) {
+			findLink(mcos, father, links);
+		}
+	}
+	/**
+	 * 	推荐测试用例第一种方式（不使用这种方式，太简单）
+	 * @return
+	 */
+	@SecurityIgnoreHandler
+	@RequestMapping("recommendTestExample_1")
+	@ResponseBody
+	public JSONObject recommendTestExample_1(HttpSession session) {
+		JSONObject json = new JSONObject();
+		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		String productionTaskNumber = user.getProductionTaskNumber();
+		if(StringUtils.isEmpty(productionTaskNumber)) {
+			throw new NotSelectProductionTaskException("请选择一个生产任务编号");
+		}
+		List<ChangeCode> list = changeCodeBiz.findChangeCodeLinkTestExample(productionTaskNumber);
+		// list.get(0).getId(); // 变更表主键id
+		// list.get(0).getTestExampleId(); // 测试用例表主键id
+		// <"'用例1id','用例2id'"   ,   变更表主键id> // 用例组———》及其对应的某个变更方法
 		Map<String, Integer> teidRefCcid = teidRefCcid(list);
 		// 测试用例去重，得到所有的测试用例
 		Set<String> keyQuchong = new HashSet<>();
@@ -550,10 +886,97 @@ public class ChangeCodeController {
 				keyQuchong.add(s);
 			}
 		}
+		// 一、暂不使用这样的方式推荐用例
 		Set<String> recommend = new HashSet<>();
-		recommend(keyQuchong, teidRefCcid, recommend);
-		// 推荐的测试用例(数字是用例表主键id)：[234@235@236,240,260]
+		recommend(keyQuchong, teidRefCcid, recommend); 
+		// 推荐的测试用例(数字是用例表主键id，@表示或者)：[234@235@236,240,260]
 		System.out.println("推荐的测试用例："+recommend); // 推荐的测试用例
+		// 返回相应的用例的编号
+		Set<String> recommend2 = recommend2(recommend);
+		json.put("list", recommend2);
+		return json;
+	}
+	/**
+	 * 	推荐测试用例第二种方式（使用了方法链）
+	 * @return
+	 */
+	@SecurityIgnoreHandler
+	@RequestMapping("recommendTestExample_2")
+	@ResponseBody
+	public JSONObject recommendTestExample_2(HttpSession session) {
+		JSONObject json = new JSONObject();
+		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		String productionTaskNumber = user.getProductionTaskNumber();
+		if(StringUtils.isEmpty(productionTaskNumber)) {
+			throw new NotSelectProductionTaskException("请选择一个生产任务编号");
+		}
+		List<ChangeCode> list = changeCodeBiz.findChangeCodeLinkTestExample(productionTaskNumber);
+		// list.get(0).getId(); // 变更表主键id
+		// list.get(0).getTestExampleId(); // 测试用例表主键id
+		Set<String> updateMethods = new HashSet<>();// 获取所有的变更方法
+		for (ChangeCode cc : list) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(cc.getPackageName()).append(".").append(cc.getJavabeanName())
+				.append(".").append(cc.getMethodName()).append("(").append(cc.getParamType()).append(")");
+			updateMethods.add(sb.toString());
+		}
+		Set<String> updateMethodIds = new HashSet<>();// 获取所有的变更方法主键id
+		for (ChangeCode cc : list) {
+			updateMethodIds.add(String.valueOf(cc.getId()));
+		}
+		/*
+		 * 	二、推荐测试用例时，用上方法链
+		 */
+		// 得到<用例id,"'变更方法id','变更方法id'">
+		Map<Integer, String> teidRefCcid2 = teidRefCcid2(list);
+		/** updateMethodIds所有的变更方法id ，teidRefCcid2各个测试用例	  对应	它的所有变更方法id（到此数据准备好了，接下来是用哪些方式来推荐）	*/
+		// 只要计算出来哪个、或哪几个用例能覆盖所有变更方法id，就可以了。
+		// 先统计各个用例对应的变更方法个数
+		Map<Integer, Integer> teidRefCcid2Count = new HashMap<>();
+		Set<Integer> keySet = teidRefCcid2.keySet();
+		for (Integer teid : keySet) {
+			String ccids = teidRefCcid2.get(teid);
+			teidRefCcid2Count.put(teid, ccids.split(",").length);
+		}
+		Set<String> recommend = new HashSet<>();
+		// 测试时teidRefCcid2会存在value值相等的情况，实际可能不会出现这种情况。（<234,"2001">,<235,"2001">）
+		recommend_2(updateMethodIds, teidRefCcid2, teidRefCcid2Count,recommend);
+		// 返回相应的用例的编号
+		Set<String> recommend2 = recommend2(recommend);
+		json.put("list", recommend2);
+		return json;
+	}
+	private static void recommend_2(Set<String> updateMethodIds,Map<Integer, String> teidRefCcid2,
+			Map<Integer, Integer> teidRefCcid2Count,Set<String> recommend){
+		// 先推荐拥有变更方法个数最多的用例，如果没有全覆盖，再根据个数依次推荐，直到全覆盖。
+		int maxnum = Collections.max(teidRefCcid2Count.values()); // 
+		Integer temp = null;
+		for(Entry<Integer, Integer> entry1:teidRefCcid2Count.entrySet()) {
+			if(entry1.getValue().intValue() == maxnum) {
+				Integer key = entry1.getKey();
+				recommend.add(String.valueOf(key));
+				temp = key;
+				break;
+			}
+		}
+		// 剔除最大计数
+		teidRefCcid2Count.remove(temp);
+		// 查看是否还有未覆盖的变更方法，如果有就继续推荐
+		Set<String> coveredMethodIds = new HashSet<>();
+		for (String teid : recommend) {
+			String ccids = teidRefCcid2.get(Integer.valueOf(teid));
+			String[] split = ccids.split(",");
+			for (String id : split) {
+				coveredMethodIds.add(id);
+			}
+		}
+		if(coveredMethodIds.size() == updateMethodIds.size()) {
+			return ;
+		}else {
+			recommend_2(updateMethodIds, teidRefCcid2, teidRefCcid2Count,recommend);
+		}
+	}
+	public Set<String> recommend2(Set<String> recommend) {
 		// 根据推荐的测试用例主键，获取其测试案例编号
 		List<Integer> testExampleIds = new ArrayList<>();
 		for (String r : recommend) {
@@ -563,8 +986,7 @@ public class ChangeCodeController {
 			}
 		}
 		if(testExampleIds.isEmpty()) {
-			json.put("list", new ArrayList<>());
-			return json;
+			return new HashSet<>();
 		}
 		List<TestingExample> tes = testingExampleBiz.findByIds(testExampleIds);
 		Set<String> recommend2 = new HashSet<>();
@@ -590,11 +1012,29 @@ public class ChangeCodeController {
 			}
 		}
 		System.out.println(recommend2);
-		json.put("list", recommend2);
-		return json;
+		return recommend2;
 	}
 	/**
-	 * 整理数据，得到：用例组——》变更方法 : <"'用例1主键','用例2主键'"   ,   变更表主键>
+	 * 	整理数据，得到：用例——》对应的所有变更方法 	: <用例1主键	,	"'变更表主键','变更表主键'">
+	 * @param list
+	 * @return
+	 */
+	private static Map<Integer, String> teidRefCcid2(List<ChangeCode> list) {
+		
+		// <用例1主键	,	"'变更表主键','变更表主键'"> // 用例———》及其对应的所有变更方法
+		Map<Integer, String> teidRefCcid = new HashMap<>();
+		for (ChangeCode cc : list) {
+			String teid = teidRefCcid.get(Integer.valueOf(cc.getTestExampleId()));
+			if(StringUtils.isEmpty(teid)) {
+				teidRefCcid.put(Integer.valueOf(cc.getTestExampleId()), String.valueOf(cc.getId()));
+			}else {
+				teidRefCcid.put(Integer.valueOf(cc.getTestExampleId()), teid+","+cc.getId());
+			}
+		}
+		return teidRefCcid;
+	}
+	/**
+	 *	 整理数据，得到：用例组——》变更方法 : <"'用例1主键','用例2主键'"   ,   变更表主键>
 	 * @param list
 	 * @return
 	 */
@@ -611,7 +1051,7 @@ public class ChangeCodeController {
 			sb.append(ccid+":");
 			for (ChangeCode c2 : list) {
 				if(ccid.intValue() == c2.getId().intValue()) {
-					sb.append(c2.getPackageName()+",");
+					sb.append(c2.getTestExampleId()+",");
 				}
 			}
 			String substring = sb.toString().substring(0, sb.toString().length()-1);
@@ -624,32 +1064,6 @@ public class ChangeCodeController {
 			teidRefCcid.put(split[1], Integer.valueOf(split[0]));
 		}
 		return teidRefCcid;
-	}
-	public static void main(String[] args) {
-		// <"'用例1','用例2'"   ,   变更表主键id>
-		Map<String,Integer> teidRefCcid = new HashMap<>();
-		teidRefCcid.put("用例1,用例4", 234);
-		teidRefCcid.put("用例1", 235);
-		teidRefCcid.put("用例1,用例2", 235);
-		teidRefCcid.put("用例2,用例9", 236);
-		teidRefCcid.put("用例19,用例12", 236);
-		teidRefCcid.put("用例5", 236);
-		System.out.println(teidRefCcid.size());
-		// 得到所有测试用例，找出出现次数最高的用例
-		
-		// 测试用例去重，得到所有的测试用例
-		Set<String> keyQuchong = new HashSet<>();
-		for (String key : teidRefCcid.keySet()) {
-			String[] split = key.split(",");
-			for (String s : split) {
-				keyQuchong.add(s);
-			}
-		}
-		Set<String> recommend = new HashSet<>();
-		recommend(keyQuchong, teidRefCcid, recommend);
-		System.out.println("最终推荐："+recommend); // 最终推荐：[用例2@用例9, 用例5, 用例19@用例12, 用例1]
-		
-		
 	}
 	/**
 	 * 	当前逻辑：从用例组中查找出现次数最高的用例，并推荐。然后剔除包含该用例的用例组。再从头递归，直到teidRefCcid为空。
@@ -667,8 +1081,12 @@ public class ChangeCodeController {
 		Map<String,Integer> map = new HashMap<>();
 		for (String s : keyQuchong) {
 			for (String key : teidRefCcid.keySet()) {
-				if(key.contains(s)) {
-					map.put(s, (map.get(s)==null?0:map.get(s)) +1);
+				String[] split = key.split(",");
+				for (String k : split) {
+					if(k.equals(s)) {
+						map.put(s, (map.get(s)==null?0:map.get(s)) +1);
+						break;
+					}
 				}
 			}
 		}

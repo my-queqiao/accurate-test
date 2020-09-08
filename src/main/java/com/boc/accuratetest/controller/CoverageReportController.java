@@ -292,7 +292,7 @@ public class CoverageReportController {
             	json.put("success", true);
         		return json;
             }
-            System.out.println("测试过的方法："+sb.toString());
+            //System.out.println("测试过的方法："+sb.toString());
             String[] lines = sb.toString().split("\r\n");
             for (String line : lines) {
             	TestedMethods tm = insertPrepare2(line);

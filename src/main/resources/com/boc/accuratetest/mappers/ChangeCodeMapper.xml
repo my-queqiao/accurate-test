@@ -319,18 +319,32 @@
   </select>
   
   <select id="findChangeCodeLinkTestExample" resultMap="BaseResultMap">
-    SELECT cc.id as id,te.id as package_name
+    <!-- SELECT cc.id as id,te.id as testExampleId,
+    	   cc.package_name,cc.javabean_name,cc.method_name,cc.param_type
 				 	from 	change_code cc,
 							method_chain_original mco,
 							testing_example te
 		where cc.production_task_number = #{productionTaskNumber,jdbcType=VARCHAR}
 			and (cc.testing_or_not = 0 or cc.testing_or_not is null) 
-			and change_type = 3 <!-- 只推荐指定的生产任务下、未测试的、修改的方法 -->
+			and change_type = 3 只推荐指定的生产任务下、未测试的、修改的方法
 			and cc.package_name = mco.package_name 
 			and cc.javabean_name = mco.javabean_name 
 			and cc.method_name = mco.method_name
 			and cc.param_type = mco.param_type
 			and mco.testing_example_id = te.id
-		GROUP BY cc.id,te.id
+		GROUP BY cc.id,te.id -->
+		
+		SELECT cc.id as id,mco.testing_example_id as testExampleId, mco.id as mcoid
+				 	from 	change_code cc,
+							method_chain_original mco
+		where cc.production_task_number = #{productionTaskNumber,jdbcType=VARCHAR}
+			and (cc.testing_or_not = 0 or cc.testing_or_not is null) 
+			and change_type = 3 
+			and cc.package_name = mco.package_name 
+			and cc.javabean_name = mco.javabean_name 
+			and cc.method_name = mco.method_name
+			and cc.param_type = mco.param_type
+		GROUP BY cc.id,mco.testing_example_id ,mco.id
+		
   </select>
 </mapper>

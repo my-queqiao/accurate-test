@@ -139,9 +139,17 @@
                 clickToSelect: false,                //是否启用点击选中行
                 paginationPreText: "上一页",
                 paginationNextText: "下一页",
-                columns: [{
+                columns: [
+                /* {
                     checkbox: true
-                }, 
+                }, */ 
+                {
+                    field: 'id',
+                    title: '主键', //align: 'center'
+                    align: 'center',
+                	//events: operateEvents1,
+                	//formatter: operateFormatter
+                },
                 {
                     field: 'belongProduct',
                     title: '所属产品', //align: 'center'

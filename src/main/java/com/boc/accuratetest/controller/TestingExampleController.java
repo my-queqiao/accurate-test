@@ -217,7 +217,7 @@ public class TestingExampleController {
             	}
             }
             // 解析方法链，存储
-            //System.out.println("点击结束后读取到的全部内容======================"+contents);
+            System.out.println("点击结束后读取到的全部内容======================"+contents);
             if(StringUtils.isEmpty(contents.toString())) {
             	// 没有读取到内容，正常情况：测试用例没有调用到目标服务器
             	json.put("success", true);

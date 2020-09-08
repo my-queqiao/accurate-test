@@ -9,7 +9,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 /**
  * springBoot启动类
  * @author tom
- * 注意：启动类的位置，可以放到controller的上级包、同一个包，但不能放到平级包、下级包
+ * 	注意：AccuratetestStart可以放到controller的上级包、同一个包，但不能放到平级包、下级包
  */
 @SpringBootApplication
 @MapperScan("com.boc.accuratetest.mappers")

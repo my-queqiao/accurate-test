@@ -1,6 +1,8 @@
 package com.boc.accuratetest.biz.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,6 +44,17 @@ public class MethodChainOriginalBizImpl implements MethodChainOriginalBiz{
 		MethodChainOriginalExample e = new MethodChainOriginalExample();
 		e.createCriteria().andTestingExampleIdEqualTo(testExampleId);
 		methodChainOriginalMapper.deleteByExample(e);
+	}
+
+	@Override
+	public List<MethodChainOriginal> getMethodLinkByTestExampleIds(Set<Integer> testExampleIds) {
+		List<Integer> testExampleIds2 = new ArrayList<Integer>();
+		for (Integer id : testExampleIds) {
+			testExampleIds2.add(id);
+		}
+		MethodChainOriginalExample e = new MethodChainOriginalExample();
+		e.createCriteria().andTestingExampleIdIn(testExampleIds2);
+		return methodChainOriginalMapper.selectByExample(e);
 	}
 	
 }

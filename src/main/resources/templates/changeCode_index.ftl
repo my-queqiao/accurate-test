@@ -80,7 +80,11 @@
 	                </div>
 	                <div class="modal-body">
 	                    <div class="form-group">
+	                        <div style="color:blue;" id="">推荐案例：</div>
 	                        <div id="methodDetail"></div>
+	                        <br/>
+	                        <div style="color:blue;" id="">变更方法关联的所有案例：</div>
+	                        <div id="allTestExample"></div>
 	                    </div>
 	                </div>
 	                <div class="modal-footer">
@@ -591,6 +595,24 @@
 					}
 					
 		    	}
+				// 变更方法关联的所有案例
+				var all = json.listAll; //遍历集合，model展示
+				var yonglisAll="";
+				for(var j = 1; j < all.length+1; j++) {
+					
+					var n = all[j-1];
+					if(n.indexOf("@") >= 0){
+						var n5 = n.split("@");
+						var reg = new RegExp("@","g");//g,表示全部替换。
+		    			var n2 = n.replace(reg,"<br>");
+		    			yonglisAll += j+" . "+n2+"";
+		    			yonglisAll += "<span style='color:red;'>以上"+(n5.length-1)+"个测试用例，任选一个执行即可</span><br/>";
+					}else{
+						yonglisAll += j+" . "+all[j-1]+"<br/>";
+					}
+					
+		    	}
+				
 				$('#myModal').on('show.bs.modal', function (event) {
 		           	 var modal = $(this);
 		           	 if(yonglis == ""){
@@ -598,6 +620,8 @@
 		           	 }else{
 			           	 modal.find('#methodDetail').html(yonglis);
 		           	 }
+		           	 // 变更方法关联的所有案例
+			         modal.find('#allTestExample').html(yonglisAll);
 	           	});
 	           $("#myModalLabel").text("推荐测试用例");
 	           $('#myModal').modal();
