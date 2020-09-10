@@ -803,7 +803,7 @@ public class ChangeCodeController {
 						newLinks.add(oldLink);
 					}
 				}
-				temp.put(entry.getKey(), newLinks);
+				if(!newLinks.isEmpty()) temp.put(entry.getKey(), newLinks); // 可能为空，该案例下的方法链都被已推荐案例包含了。
 			}
 		}
 		testExampleRefUpdateMethodLinks3 = temp; // 替换
