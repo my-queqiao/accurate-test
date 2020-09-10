@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width" />
-    <title>精准测试-知识库查看</title>
+    <title>精准测试-推荐案例</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css"/>
     <link rel="stylesheet" href="../css/bootstrap-table/bootstrap-table.css"/>
     <link rel="stylesheet" href="../css/font-awesome.min.css"/>
@@ -69,7 +69,7 @@
         //初始化Table
         oTableInit.Init = function () {
             $('#tb_testingExample').bootstrapTable({
-                url: '/testingExample/getAllForKnoledgeDetail',         //请求后台的URL（*）
+                url: '/changeCode/recommendTestExample',         //请求后台的URL（*）
                 method: 'get',                      //请求方式（*）
                 dataType: 'json',  
                 toolbar: '#toolbar',                //工具按钮用哪个容器
@@ -85,13 +85,14 @@
                 queryParamsType: '',                //如果要在oTableInit.queryParams方法获取pageNumber和pageSize的值，需要将此值设置为空字符串（*）
                 sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
                 pageNumber:1,                       //初始化加载第一页，默认第一页
-                pageSize: 10,                       //每页的记录行数（*）
-                pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                pageSize: 2147483647,                       //每页的记录行数（*）
+                pageList: 'all',        //可供选择的每页的行数（*）
+                //pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
                 search: false,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
                 strictSearch: true,
                 minimumCountColumns: 2,             //最少允许的列数
                 singleSelect: true,                 //是否单选模式
-                height: $(window).height()-100,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                //height: $(window).height()-100,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
                 showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
                 cardView: false,                    //是否显示详细视图
                 detailView: false,                   //是否显示父子表
@@ -164,11 +165,11 @@
                 }
                 ,
                 {
-                    field: 'executed',
-                    title: '已执行', //align: 'center'
+                    field: 'teType',
+                    title: '案例类型', //align: 'center'
                     align: 'center',
                 	//events: operateEvents1,
-                    formatter: executedFormatter
+                    formatter: teTypeFormatter
                 }
                 ,
                 {
@@ -198,11 +199,11 @@
         };
         return oTableInit;
     };
-    function executedFormatter(value, row, index) {
-    	if(value == 1){
-	    	return ["<span style='color:black;' >是</span>"].join("");
+    function teTypeFormatter(value, row, index) {
+    	if(value == 2){
+	    	return ["<span style='background-color: green;color:white;' >推荐案例</span>"].join("");
     	}else{
-    		return ["<span style='color:red;' >否</span>"].join("");
+    		return ["<span style='color:black;' >关联案例</span>"].join("");
     	}
     }
     function operateFormatter(value, row, index) {

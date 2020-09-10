@@ -25,7 +25,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.boc.accuratetest.acl.CoverageReportRank;
+import com.boc.accuratetest.acl.GetAllMethodsRank;
+import com.boc.accuratetest.acl.GetTestedMethodsRank;
 import com.boc.accuratetest.annotation.SecurityIgnoreHandler;
+import com.boc.accuratetest.annotation.SecurityManagement;
 import com.boc.accuratetest.biz.AllMethodsBiz;
 import com.boc.accuratetest.biz.MethodChainOriginalBiz;
 import com.boc.accuratetest.biz.TestedMethodsBiz;
@@ -50,7 +54,7 @@ public class CoverageReportController {
 	 * 	跳转到覆盖率报告页面
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(CoverageReportRank.class)
 	@RequestMapping("index")
 	public String index() {
 		return "coverageReport";
@@ -62,7 +66,7 @@ public class CoverageReportController {
 	 * @param search
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(CoverageReportRank.class)
 	@RequestMapping("getAll")
 	@ResponseBody
 	public JSONObject getAll(Integer pageNumber,Integer pageSize,String search) {
@@ -81,7 +85,7 @@ public class CoverageReportController {
 	 * @param model
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(CoverageReportRank.class)
 	@RequestMapping("toClassInfo")
 	public String toClassInfo(String packageName,Model model) {
 		model.addAttribute("packageName", packageName);
@@ -92,7 +96,7 @@ public class CoverageReportController {
 	 * @param packageName
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(CoverageReportRank.class)
 	@RequestMapping("getClassInfo")
 	@ResponseBody
 	public JSONObject getClassInfo(String packageName) {
@@ -111,7 +115,7 @@ public class CoverageReportController {
 	 * @param model
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(CoverageReportRank.class)
 	@RequestMapping("toMethodInfo")
 	public String toMethodInfo(String className,Model model) {
 		model.addAttribute("className", className);
@@ -122,7 +126,7 @@ public class CoverageReportController {
 	 * @param className
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(CoverageReportRank.class)
 	@RequestMapping("getMethodInfo")
 	@ResponseBody
 	public JSONObject getMethodInfo(String className) {
@@ -142,7 +146,7 @@ public class CoverageReportController {
 	 * @param ipOnTestExample
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(GetAllMethodsRank.class)
 	@RequestMapping("getAllMethodInfo")
 	@ResponseBody
 	public JSONObject getAllMethodInfo(String ipOnTestExample) {
@@ -252,7 +256,7 @@ public class CoverageReportController {
 	 * 从测试服务获取已经测试过的方法
 	 * @return 
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(GetTestedMethodsRank.class)
 	@RequestMapping("getTestedMethods")
 	@ResponseBody
 	public JSONObject getTestedMethods(String testServerIp,HttpSession session) {

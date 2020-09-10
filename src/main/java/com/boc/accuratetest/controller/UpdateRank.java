@@ -1,4 +1,4 @@
-package com.boc.accuratetest.constant;
+package com.boc.accuratetest.controller;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -37,11 +37,11 @@ public class UpdateRank implements CommandLineRunner {
 			p.setRankDesc(c.getAnnotation(SecurityAclDesc.class).value());// 该类注解的value字段值
 			ps.add(p);
 		}
-		permissionBiz.insertBatch(ps);
+		permissionBiz.insertBatch(ps); // 如果有相同记录，则忽略新数据
 	}
 
 	/**
-	 * 	从包package中获取所有的Class
+	 * 	从指定 包package 中获取所有的Class
 	 * @param pack
 	 * @return
 	 */

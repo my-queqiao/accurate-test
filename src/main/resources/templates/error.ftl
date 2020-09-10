@@ -5,6 +5,6 @@
 </head>
 <body>
 	<span>出错了。。。</span><br>
-	<span>${error}</span>
+	<span>${errorInfo}</span>
 </body>
 </html>

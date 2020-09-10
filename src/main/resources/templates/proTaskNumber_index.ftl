@@ -116,6 +116,10 @@
                 clickToSelect: true,                //是否启用点击选中行
                 paginationPreText: "上一页",
                 paginationNextText: "下一页",
+                onCheck:function(row){ //点击每一个单选框时触发的操作
+                    //alert(row.id);
+                	selectProductionTaskNumber(row);
+                  },
                 columns: [{
                     checkbox: true
                 }, 
@@ -261,6 +265,24 @@
     				}
     		});
     });
+    function selectProductionTaskNumber(row){
+       	/* var arrselections1 = $("#tb_departments").bootstrapTable('getSelections');
+       	if (arrselections1.length <= 0) {
+               alert('请选择有效数据');
+               return;
+        }
+        var ptNumberId = arrselections1[0].productionTaskNumber; */
+        // 指定生产任务编号，区分后台数据
+       	$.post('/selectProductionTaskNumber?productionTaskNumber='+row.productionTaskNumber,
+       			function(json){
+       				if(json.success == false){
+       					alert(json.msg);
+       				}else{
+       					alert(json.msg);
+       					//currentProductionTaskNumber = grade;
+       				}
+       	});
+    }
     </script>
     
     

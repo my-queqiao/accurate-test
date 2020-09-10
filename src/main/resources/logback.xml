@@ -131,12 +131,14 @@
     <logger name="org.hibernate" level="WARN" />
 
     <!-- 生产环境下，将此级别配置为适合的级别，以免日志文件太多或影响程序性能 -->
-    <root level="DEBUG">
+    <root level="debug">
         <appender-ref ref="FILEERROR" />
-        <!-- <appender-ref ref="FILEWARN" />
+        <!-- 
+        <appender-ref ref="FILEWARN" />
         <appender-ref ref="FILEINFO" /> -->
 
-        <!-- 生产环境将请stdout,testfile去掉 -->
+        <!-- 生产环境将请stdout,testfile去掉  standard output stream
+        	好像就是记录debug信息。用于开发时控制台输出信息-->
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

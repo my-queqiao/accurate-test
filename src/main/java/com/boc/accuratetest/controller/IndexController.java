@@ -4,13 +4,18 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.boc.accuratetest.acl.IndexRank;
+import com.boc.accuratetest.acl.ProductionTaskNumberRank;
 import com.boc.accuratetest.annotation.SecurityIgnoreHandler;
+import com.boc.accuratetest.annotation.SecurityManagement;
 import com.boc.accuratetest.biz.ProductionTaskBiz;
 import com.boc.accuratetest.biz.UserBiz;
 import com.boc.accuratetest.constant.NotLoginInException;
@@ -24,6 +29,7 @@ import net.sf.json.JSONObject;
 
 @Controller
 public class IndexController {
+	Logger logger = LoggerFactory.getLogger(IndexController.class);
 	@Autowired
 	private ProductionTaskBiz productionTaskBiz;
 	@Autowired
@@ -90,7 +96,7 @@ public class IndexController {
 	/*
 	 * 	首页	(登陆成功之后)
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(IndexRank.class)
 	@RequestMapping("/index")
 	public String index() {
 		return "index";
@@ -100,7 +106,7 @@ public class IndexController {
 	 * @param session
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(ProductionTaskNumberRank.class)
 	@RequestMapping("/getPuductionTaskNumber")
 	@ResponseBody
 	public JSONObject getPuductionTaskNumber(HttpSession session) {
@@ -129,16 +135,13 @@ public class IndexController {
 	 * @param session
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(ProductionTaskNumberRank.class)
 	@RequestMapping("/selectProductionTaskNumber")
 	@ResponseBody
 	public JSONObject selectProductionTaskNumber(HttpSession session,String productionTaskNumber) {
 		JSONObject json = new JSONObject();
 		json.put("success", false);
 		Object u = session.getAttribute(ProductionTaskSession.loginUser);
-		if(null == u) {
-			throw new NotLoginInException("您尚未登陆");
-		}
 		User user = null;
 		try {
 			user = (User)(u);
@@ -158,17 +161,13 @@ public class IndexController {
 	 * @param session
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(ProductionTaskNumberRank.class)
 	@RequestMapping("/addProductionTaskNumber")
 	@ResponseBody
 	public JSONObject addProductionTaskNumber(HttpSession session,String productionTaskNumber) {
 		productionTaskNumber = productionTaskNumber.trim();
 		JSONObject json = new JSONObject();
 		json.put("success", false);
-		Object u = session.getAttribute(ProductionTaskSession.loginUser);
-		if(null == u) {
-			throw new NotLoginInException("您尚未登陆");
-		}
 		List<ProductionTask> findBy = productionTaskBiz.findBy(productionTaskNumber);
 		if(!findBy.isEmpty()) {
 			json.put("msg", "该生产任务编号已存在");
@@ -181,7 +180,7 @@ public class IndexController {
 		json.put("success", true);
 		return json;
 	}
-	@SecurityIgnoreHandler
+	@SecurityManagement(ProductionTaskNumberRank.class)
 	@RequestMapping("/proTaskNumberIndex")
 	public String proTaskNumberIndex(HttpSession session) {
 		Object u = session.getAttribute(ProductionTaskSession.loginUser);

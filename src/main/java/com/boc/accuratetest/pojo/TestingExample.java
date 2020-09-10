@@ -22,8 +22,18 @@ public class TestingExample {
     private String productionTaskNumber;
 
     private Byte executed;
+    
+    private Integer teType = 1; // 非数据库字段，1关联案例，2推荐案例
+    
+	public Integer getTeType() {
+		return teType;
+	}
 
-    public Integer getId() {
+	public void setTeType(Integer teType) {
+		this.teType = teType;
+	}
+
+	public Integer getId() {
         return id;
     }
 

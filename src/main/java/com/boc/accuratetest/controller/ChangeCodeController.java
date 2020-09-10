@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,6 +30,8 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -45,7 +48,10 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
+import com.boc.accuratetest.acl.ChangeCodeRank;
+import com.boc.accuratetest.acl.RecommendTestExampleRank;
 import com.boc.accuratetest.annotation.SecurityIgnoreHandler;
+import com.boc.accuratetest.annotation.SecurityManagement;
 import com.boc.accuratetest.biz.ChangeCodeBiz;
 import com.boc.accuratetest.biz.MethodChainOriginalBiz;
 import com.boc.accuratetest.biz.ProductionTaskBiz;
@@ -65,6 +71,7 @@ import net.sf.json.JSONObject;
 @Controller
 @RequestMapping("changeCode")
 public class ChangeCodeController {
+	Logger logger=LoggerFactory.getLogger(ChangeCodeController.class);
 	@Value("${release_diff_url}")
 	private String release_diff_url;
 	@Value("${release_branch_url}")
@@ -83,25 +90,21 @@ public class ChangeCodeController {
 	 * 变更代码首页
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(ChangeCodeRank.class)
 	@RequestMapping("index")
 	public String index(HttpSession session) {
 		//HttpServletRequest request = ( (ServletRequestAttributes)RequestContextHolder.getRequestAttributes() ).getRequest();
-		Object u = session.getAttribute(ProductionTaskSession.loginUser);
-		if(null == u) {
-			throw new NotLoginInException("您尚未登陆");
-		}
 		return "changeCode_index";
 	}
 	/**
 	 * 展示差异代码
 	 * @param pageNumber 页码
 	 * @param pageSize 每页行数
-	 * @param dataOfPart 部分数据  增加、修改、删除、全部
+	 * @param dataOfPart 部分数据 ：增加、修改、删除、全部
 	 * @param search
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(ChangeCodeRank.class)
 	@RequestMapping("getAll")
 	@ResponseBody
 	public JSONObject getList(Integer pageNumber,Integer pageSize,Integer search,Byte dataOfPart,HttpSession session) {
@@ -141,7 +144,7 @@ public class ChangeCodeController {
 	 * @param test_branch
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(ChangeCodeRank.class)
 	@RequestMapping("getChangeData")
 	@ResponseBody
 	public JSONObject getChangeData(String git_url,String master_branch,String test_branch,HttpSession session) {
@@ -315,7 +318,7 @@ public class ChangeCodeController {
 	 * @return
 	 */
 	@SuppressWarnings("rawtypes")
-	@SecurityIgnoreHandler
+	@SecurityManagement(ChangeCodeRank.class)
 	@RequestMapping("getBranchList")
 	@ResponseBody
 	public JSONObject getBranchList(String git_url) {
@@ -503,7 +506,7 @@ public class ChangeCodeController {
 	 * 	统计方法的增删改的个数
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(ChangeCodeRank.class)
 	@RequestMapping("statistics")
 	@ResponseBody
 	public JSONObject statistics(HttpSession session) {
@@ -517,8 +520,12 @@ public class ChangeCodeController {
 		json.put("data", statistics);
 		return json;
 	}
-	
-	@SecurityIgnoreHandler
+	/**
+	 * 查看某个变更方法关联的案例
+	 * @param testExampleIds 变更方法关联的案例id
+	 * @return
+	 */
+	@SecurityManagement(ChangeCodeRank.class)
 	@RequestMapping("getLinkTestExample")
 	@ResponseBody
 	public JSONObject getLinkTestExample(String testExampleIds) {
@@ -534,13 +541,23 @@ public class ChangeCodeController {
 		return json;
 	}
 	/**
+	 * 推荐案例页面
+	 * @return
+	 */
+	@SecurityManagement(RecommendTestExampleRank.class)
+	@RequestMapping("recommend_testExample")
+	public String recommend_testExample() {
+		return "recommend_testExample";
+	}
+	
+	/**
 	 * 	推荐测试用例（考虑方法链）
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(RecommendTestExampleRank.class)
 	@RequestMapping("recommendTestExample")
 	@ResponseBody
-	public JSONObject recommendTestExample(HttpSession session) {
+	public JSONObject recommendTestExample(Integer pageNumber,Integer pageSize,String search,HttpSession session) {
 		JSONObject json = new JSONObject();
 		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
 		String productionTaskNumber = user.getProductionTaskNumber();
@@ -625,8 +642,8 @@ public class ChangeCodeController {
 			List<String> removes = new ArrayList<>();
 			for (String link : list2) {
 				for (String link2 : list2) {
-					if(link.substring(0, 1).equals(link2.subSequence(0, 1)) 
-							&& !link2.equals(link) && link2.contains(link) ) {
+					if(//link.substring(0, 1).equals(link2.subSequence(0, 1)) &&
+							 !link2.equals(link) && link2.contains(link) ) {
 						// 包含关系，去掉link
 						removes.add(link);
 						break;
@@ -651,15 +668,15 @@ public class ChangeCodeController {
 		Set<String> linksQuchong = new HashSet<>();
 		for (Set<String> links : testExampleRefUpdateMethodLinks3.values()) {
 			for (String link : links) {
-				String[] methods = link.split("$-$");
 				boolean repeat = false;
 				// 遍历所有方法链，如果没有方法链包含link（规则举例：三个方法链abc、ab、bc，  abc包含ab，但不包含bc），就收集
+				// 修改规则：推荐的案例只要能够测试到变更方法所在的方法链就可以，所以abc包含ab，也包含bc
 				for (Set<String> links2 : testExampleRefUpdateMethodLinks3.values()) {
 					for (String link2 : links2) {
-						String[] methods2 = link2.split("$-$");
 						// link、link2比较，只查看link2是否包含link即可。
-						if(methods2[0].equals(methods[0]) && link2.contains(link) && !link2.equals(link)) {
-							// 满足这三个条件，link就是被包含的，不收集
+						if(//methods2[0].equals(methods[0]) && 
+								link2.contains(link) && !link2.equals(link)) {
+							// 满足这两个条件，link就是被包含的，不收集
 							repeat = true;
 							break;
 						}
@@ -671,25 +688,43 @@ public class ChangeCodeController {
 		}
 		// System.out.println("linksQuchong:"+linksQuchong);
 		// 推荐案例，从拥有方法链最多的案例开始找，再次多，直到覆盖了所有的待测试方法链：linksQuchong
-		// testExampleRefUpdateMethodLinks3
 		Set<Integer> recommendTeids = new HashSet<>();
-		Set<Integer> recommendByLink = recommendByLink(testExampleRefUpdateMethodLinks3, linksQuchong,recommendTeids);
+		// 推荐案例计算		recommendByLink	推荐案例的主键id
+		// Set<Integer> recommendByLink = recommendByLink(testExampleRefUpdateMethodLinks3, linksQuchong,recommendTeids);
+		Set<Integer> recommendByLink = recommendByLink2(testExampleRefUpdateMethodLinks3, linksQuchong,recommendTeids);
 		
-		// 推荐的案例id
+		/*// 推荐的案例id
 		Set<String> recommend = new HashSet<>();
 		for (Integer teid : recommendByLink) {
 			recommend.add(String.valueOf(teid));
 		}
 		Set<String> recommend2 = recommend2(recommend);
-		json.put("list", recommend2);
+		json.put("list", recommend2);*/
 		
-		/** 变更方法关联的所有案例的主键id	*/
-		Set<String> all = new HashSet<>();
-		for (MethodChainOriginal mco : mcos) {
-			all.add(String.valueOf(mco.getTestingExampleId()));
+		// 改成返回案例的全部内容
+		List<Integer> testExampleIds2 = new ArrayList<>();
+		for (Integer testExampleId : testExampleIds) {
+			testExampleIds2.add(testExampleId);
 		}
-		Set<String> all2 = recommend2(all);
-		json.put("listAll", all2); // 变更方法方法链关联的所有案例
+		List<TestingExample> tes = testingExampleBiz.findByIds(testExampleIds2);
+		for (TestingExample te : tes) {
+			if(recommendByLink.contains(te.getId())) {
+				te.setTeType(2); // 推荐案例
+				continue;
+			}
+		}
+		// 排序，推荐案例放到前面
+		Collections.sort(tes, new Comparator<TestingExample>() {
+			@Override
+			public int compare(TestingExample o1, TestingExample o2) {
+				int a = o1.getTeType() - o2.getTeType();
+				return -a;
+			}
+		});
+		// 分页 pageSize: 10	pageNumber: 1
+		
+		json.put("rows", tes);
+		json.put("total", tes.size());
 		return json;
 	}
 	/**
@@ -727,12 +762,63 @@ public class ChangeCodeController {
 		}
 		return recommendByLink(testExampleRefUpdateMethodLinks3, linksQuchong,recommendTeids);
 	}
+	/**
+	 * 	推荐案例（依据修改方法所在的方法链进行推荐）
+	 * @param testExampleRefUpdateMethodLinks3	用例id 对应 修改方法所在的方法链
+	 * @param linksQuchong	也是所有待测的方法链
+	 * @return 
+	 */
+	private Set<Integer> recommendByLink2(Map<Integer,Set<String>> testExampleRefUpdateMethodLinks3
+			,Set<String> linksQuchong,Set<Integer> recommendTeids) {
+		
+		Map<Integer,Integer> linksnumberRefTeid = new HashMap<>();
+		for (Entry<Integer, Set<String>> entry : testExampleRefUpdateMethodLinks3.entrySet()) {
+			linksnumberRefTeid.put(entry.getValue().size(),entry.getKey());
+		}
+		//System.out.println("linksnumberRefTeid:"+linksnumberRefTeid);
+		Integer max = Collections.max(linksnumberRefTeid.keySet());
+		Integer teid = linksnumberRefTeid.get(max);
+		Set<String> links = testExampleRefUpdateMethodLinks3.get(teid);
+		// 先查看links中是否拥有linksQuchong中的任意一个，如果有一个就推荐？ 并且把该案例已覆盖的方法链从linksQuchong中剔除。
+		// 再处理次多的案例，次多的案例不一定拥有linksQuchong中的方法链，所以要查看是否拥有
+		boolean recommendCurrentTeid = false;
+		for (String link : links) {
+			if(linksQuchong.contains(link)) {
+				recommendCurrentTeid = true; // 只要该links有一个link在linksQuchong中就推荐
+				linksQuchong.remove(link); // 剔除
+			}
+		}
+		testExampleRefUpdateMethodLinks3.remove(teid); // 剔除当前案例（不管当前案例有没有包含当前的待测试方法链）
+		Map<Integer,Set<String>> temp = new HashMap<>();
+		if(recommendCurrentTeid) {
+			recommendTeids.add(teid);
+			/**优化：从testExampleRefUpdateMethodLinks3中，剔除掉推荐过的案例对应的方法链。
+			 * 这样查找下一个含待测试案例最多时，就准确了，因为剔除之后剩下的方法链都是待测试的*/
+			for (Entry<Integer, Set<String>> entry : testExampleRefUpdateMethodLinks3.entrySet()) {
+				Set<String> oldLinks = entry.getValue();
+				Set<String> newLinks = new HashSet<>();
+				for (String oldLink : oldLinks) {
+					if(!links.contains(oldLink)) {
+						// 如果已推荐的方法链不包含该剩余方法链，就保留下来
+						newLinks.add(oldLink);
+					}
+				}
+				temp.put(entry.getKey(), newLinks);
+			}
+		}
+		testExampleRefUpdateMethodLinks3 = temp; // 替换
+		if(linksQuchong.isEmpty()) {
+			return recommendTeids;
+		}
+		return recommendByLink2(testExampleRefUpdateMethodLinks3, linksQuchong,recommendTeids);
+	}
 	public static void main(String[] args) {
 		Map<Integer,Set<String>> map = new HashMap<>();
 		Set<String> set1 = new HashSet<>();
 		set1.add("a,b,c");
 		set1.add("a,m,n");
 		set1.add("x,y,z");
+		set1.add("y,z");
 		map.put(234, set1);
 		Set<String> set2 = new HashSet<>();
 		set2.add("a,b,c");
@@ -747,11 +833,10 @@ public class ChangeCodeController {
 		set4.add("m,n");
 		map.put(237, set4);
 		Set<String> set5 = new HashSet<>();
-		set5.add("a,b,c");
+		set5.add("a,c");
 		set5.add("b,c");
 		map.put(238, set5);
 		System.out.println(map);
-				
 		// 不用父节点的方式
 		Set<String> linksQuchong = new HashSet<>();
 		for (Set<String> links : map.values()) {
@@ -763,7 +848,10 @@ public class ChangeCodeController {
 					for (String link2 : links2) {
 						String[] methods2 = link2.split(",");
 						// link、link2比较，只查看link2是否包含link即可。
-						if(methods2[0].equals(methods[0]) && link2.contains(link) && !link2.equals(link)) {
+						if(//methods2[0].equals(methods[0]) && 
+								link2.contains(link) 
+								&& !link2.equals(link)
+								) {
 							// 满足这三个条件，link就是被包含的，不收集
 							repeat = true;
 							break;
@@ -863,7 +951,7 @@ public class ChangeCodeController {
 	 * 	推荐测试用例第一种方式（不使用这种方式，太简单）
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(RecommendTestExampleRank.class)
 	@RequestMapping("recommendTestExample_1")
 	@ResponseBody
 	public JSONObject recommendTestExample_1(HttpSession session) {
@@ -900,7 +988,7 @@ public class ChangeCodeController {
 	 * 	推荐测试用例第二种方式（使用了方法链）
 	 * @return
 	 */
-	@SecurityIgnoreHandler
+	@SecurityManagement(RecommendTestExampleRank.class)
 	@RequestMapping("recommendTestExample_2")
 	@ResponseBody
 	public JSONObject recommendTestExample_2(HttpSession session) {

@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.boc.accuratetest.acl.KnowledgeDetailRank;
 import com.boc.accuratetest.acl.KnowledgeRank;
 import com.boc.accuratetest.annotation.SecurityManagement;
 import com.boc.accuratetest.biz.MethodChainOriginalBiz;
@@ -67,10 +68,6 @@ public class TestingExampleController {
 	@SecurityManagement(KnowledgeRank.class)
 	@RequestMapping("buildKnowleage")
 	public String buildKnowleage(@ModelAttribute("success") String success, Model model,HttpSession session) {
-		Object u = session.getAttribute(ProductionTaskSession.loginUser);
-		if(null == u) {
-			throw new NotLoginInException("您尚未登陆");
-		}
 		System.out.println("拿到重定向得到的参数success:" + success);
 		if(success == null || success.equals("")) success = "-1";
 		model.addAttribute("success", success);
@@ -201,14 +198,14 @@ public class TestingExampleController {
             if(StringUtils.isEmpty(split[0])) { // 只可能是第一个测试用例
             	String info = null;
             	while ((info = br.readLine()) != null) {
-            		// 全部读取，保存到数据库
+            		// 
             		contents.append(info+"\r\n");
             	}
             }else {
             	int start = 0;
             	String info = null;
             	while ((info = br.readLine()) != null) {
-            		if(start == 1) { // 读取，保存到数据库
+            		if(start == 1) { // 
             			contents.append(info+"\r\n");
             		}
             		if(info.equals(split[0])) { // 从下一行开始读取
@@ -352,7 +349,18 @@ public class TestingExampleController {
 	}
 	/**
 	 * 小链合并去重，形成大链
-	 * @param contents
+	 * 思路：
+	 * 1、补足参数类型。向上逐行寻找，采用最近的有参数类型的同名方法
+	 * 2、使用树、链表的数据格式，分析小链，最终汇成大链。
+	 * java.lang.Thread.getStackTrace依此隔开的是各个小链，每一个小链的第一行都视为父节点，父节点视为唯一的，相同父节点的小链必须合并为一个大链，
+	 * 具体思路：小链a-b,a-b-c,a-b2	汇成大链：a-b-c 同时a-b2（这是树+链表结构的数据，代码虽然有点长，但汇成大链的关键仍然是认识到了这是树+链表的数据结构）
+	 * 
+	 * @param contents 原始数据的每一行：
+	 * 	1599629997342.com.boc.accuratetest.controller.IndexController.login(String,String,HttpSession)
+		59263&1599629997342.java.lang.Thread.getStackTrace
+		1599629997501.com.boc.accuratetest.controller.IndexController.login
+		1599629997501.com.boc.accuratetest.biz.impl.UserBizImpl.findByNameAndPassword(String,String)
+		87276&1599629997501.java.lang.Thread.getStackTrace
 	 * @param testExampleId
 	 * @return
 	 */
@@ -625,7 +633,7 @@ public class TestingExampleController {
 	 * 	跳转到知识库详情页面
 	 * @return
 	 */
-	@SecurityManagement(KnowledgeRank.class)
+	@SecurityManagement(KnowledgeDetailRank.class)
 	@RequestMapping("knowleageDetail")
 	public String knowleageDetail(HttpSession session) {
 		Object u = session.getAttribute(ProductionTaskSession.loginUser);
@@ -634,7 +642,30 @@ public class TestingExampleController {
 		}
 		return "knowleage_detail";
 	}
-	@SecurityManagement(KnowledgeRank.class)
+	/**
+	 * 	获取测试用例列表
+	 * @param pageNumber
+	 * @param pageSize
+	 * @param search
+	 * @return
+	 */
+	@SecurityManagement(KnowledgeDetailRank.class)
+	@RequestMapping("getAllForKnoledgeDetail")
+	@ResponseBody
+	public JSONObject getAllForKnoledgeDetail(Integer pageNumber,Integer pageSize,String search,HttpSession session) {
+		JSONObject json = new JSONObject();
+		List<TestingExample> page = testingExampleBiz.page(pageNumber, pageSize, search,null);
+		Integer total = testingExampleBiz.findTotal(search,null);
+		json.put("rows", page);
+		json.put("total", total);
+		return json;
+	}
+	/**
+	 * 查看指定的案例的方法链
+	 * @param testExampleId
+	 * @return
+	 */
+	@SecurityManagement(KnowledgeDetailRank.class)
 	@RequestMapping("getMethodLinkByTestExampleId")
 	@ResponseBody
 	public JSONObject getMethodLinkByTestExampleId(Integer testExampleId) {

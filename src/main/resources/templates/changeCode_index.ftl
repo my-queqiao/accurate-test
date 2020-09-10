@@ -81,7 +81,7 @@
 	                <div class="modal-body">
 	                    <div class="form-group">
 	                        <div style="color:blue;" id="">推荐案例：</div>
-	                        <div id="methodDetail"></div>
+	                        <div id="recommendTestExample"></div>
 	                        <br/>
 	                        <div style="color:blue;" id="">变更方法关联的所有案例：</div>
 	                        <div id="allTestExample"></div>
@@ -93,6 +93,26 @@
 	            </div>
 	        </div>
 	    </div>
+	    
+        <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+	        <div class="modal-dialog" role="document">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+	                    <h4 class="modal-title" id="myModalLabel2">方法详情</h4>
+	                </div>
+	                <div class="modal-body">
+	                    <div class="form-group">
+	                        <div id="methodDetail"></div>
+	                    </div>
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    
 	    <div class="modal fade" id="myModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3">
 	        <div class="modal-dialog" role="document">
 	            <div class="modal-content">
@@ -114,8 +134,8 @@
 	            </div>
 	        </div>
 	    </div>
-    <!-- 用于列表点击下一页时传值，点击button按钮时赋值 -->
-        <input id="dataOfPart" value="1" style="display:none;"/>
+    	
+        <input id="dataOfPart" value="1" style="display:none;"/><!-- 用于列表点击下一页时传值	(点击button按钮时赋值) -->
         <div>
         	<span style="font-size: 18px;">方法变更统计：</span>
             <a id="btn_add" class="btn btn-success">
@@ -131,7 +151,8 @@
                 <span>总计：0个</span>
             </a>
             &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-            <a id="btn_recommend" class="btn btn-success">
+            <a id="" class="btn btn-success" 
+            	href="${request.contextPath}/changeCode/recommend_testExample" target="_blank">
                 <span>推荐测试用例</span>
             </a>
             &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
@@ -247,7 +268,7 @@
             var temp = {   
                 pageSize: params.pageSize,   //页面大小
                 pageNumber: params.pageNumber,  //页码
-                dataOfPart: $("#dataOfPart").val(),
+                dataOfPart: $("#dataOfPart").val(), // 增删改全部，四种数据类型
                 statu: $("#txt_search_statu").val()
             };
             return temp;
@@ -262,7 +283,7 @@
     		'<a title="查看方法变更详情" onclick="method_body_details(\''+row.methodBody+'\')"'
     }*/
 
-    var list = []; // 数组，存放bootstrap-table的行数据。
+    var list = []; // 数组，存放bootstrap-table的行数据。（用于展示变更方法详情）
     var ids = []; // 存放行数据的id
     function methodNameFormatter(value, row, index) {
     	for(j = 0; j < list.length; j++) {
@@ -283,15 +304,15 @@
     			var md = list[j].methodBody;
     			var reg = new RegExp("\n","g");//g,表示全部替换。
     			var md2 = md.replace(reg,"<br>");
-	    		$('#myModal').on('show.bs.modal', function (event) {
+	    		$('#myModal2').on('show.bs.modal', function (event) {
 	           	 //var a = $(event.relatedTarget) // a that triggered the modal
 	           	 //var id = a.data('id'), title = a.data('title'), description = a.data('description'); 
 	           	 var modal = $(this);
 	           	 //modal.find('#cm-modal-title').val(title);
 	           	 modal.find('#methodDetail').html(md2);
 	           	});
-	           $("#myModalLabel").text("方法详情");
-	           $('#myModal').modal();
+	           $("#myModalLabel2").text("方法详情");
+	           $('#myModal2').modal();
 	    		
 	    		break;
     		}
@@ -345,12 +366,12 @@
     					for(var j = 1; j < list.length+1; j++) {
     						yonglis += j+"."+list[j-1].testCaseNumber+"<br/>";
 				    	}
-    					$('#myModal').on('show.bs.modal', function (event) {
+    					$('#myModal2').on('show.bs.modal', function (event) {
 				           	 var modal = $(this);
 				           	 modal.find('#methodDetail').html(yonglis);
 			           	});
-			           $("#myModalLabel").text("关联的测试用例详情");
-			           $('#myModal').modal();
+			           $("#myModalLabel2").text("关联的测试用例详情");
+			           $('#myModal2').modal();
 				    }
 		});
     }
@@ -577,7 +598,7 @@
     	}
     });
     $("#btn_recommend").click(function () {
-    	$.post('/changeCode/recommendTestExample',
+    	/* $.post('/changeCode/recommendTestExample',
 			function(json){
 	    		var list = json.list; //遍历集合，model展示
 				var yonglis="";
@@ -616,16 +637,16 @@
 				$('#myModal').on('show.bs.modal', function (event) {
 		           	 var modal = $(this);
 		           	 if(yonglis == ""){
-			           	 modal.find('#methodDetail').html("无");
+			           	 modal.find('#recommendTestExample').html("无");
 		           	 }else{
-			           	 modal.find('#methodDetail').html(yonglis);
+			           	 modal.find('#recommendTestExample').html(yonglis);
 		           	 }
 		           	 // 变更方法关联的所有案例
 			         modal.find('#allTestExample').html(yonglisAll);
 	           	});
 	           $("#myModalLabel").text("推荐测试用例");
 	           $('#myModal').modal();
-			});
+			}); */
 	});
     </script>
     
