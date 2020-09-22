@@ -20,7 +20,6 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.servlet.http.HttpSession;
 
-import org.apache.ibatis.scripting.xmltags.ForEachSqlNode;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -46,17 +45,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
 import com.boc.accuratetest.acl.ChangeCodeRank;
 import com.boc.accuratetest.acl.RecommendTestExampleRank;
-import com.boc.accuratetest.annotation.SecurityIgnoreHandler;
 import com.boc.accuratetest.annotation.SecurityManagement;
 import com.boc.accuratetest.biz.ChangeCodeBiz;
 import com.boc.accuratetest.biz.MethodChainOriginalBiz;
 import com.boc.accuratetest.biz.ProductionTaskBiz;
 import com.boc.accuratetest.biz.TestingExampleBiz;
-import com.boc.accuratetest.constant.NotLoginInException;
 import com.boc.accuratetest.constant.NotSelectProductionTaskException;
 import com.boc.accuratetest.constant.ProductionTaskSession;
 import com.boc.accuratetest.pojo.ChangeCode;
@@ -97,7 +93,7 @@ public class ChangeCodeController {
 		return "changeCode_index";
 	}
 	/**
-	 * 展示差异代码
+	 * 	展示差异代码
 	 * @param pageNumber 页码
 	 * @param pageSize 每页行数
 	 * @param dataOfPart 部分数据 ：增加、修改、删除、全部

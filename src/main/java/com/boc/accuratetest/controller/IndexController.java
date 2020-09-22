@@ -18,9 +18,7 @@ import com.boc.accuratetest.annotation.SecurityIgnoreHandler;
 import com.boc.accuratetest.annotation.SecurityManagement;
 import com.boc.accuratetest.biz.ProductionTaskBiz;
 import com.boc.accuratetest.biz.UserBiz;
-import com.boc.accuratetest.constant.NotLoginInException;
 import com.boc.accuratetest.constant.ProductionTaskSession;
-import com.boc.accuratetest.demo.StackTraceInfo;
 import com.boc.accuratetest.pojo.Permission;
 import com.boc.accuratetest.pojo.ProductionTask;
 import com.boc.accuratetest.pojo.User;
@@ -34,6 +32,7 @@ public class IndexController {
 	private ProductionTaskBiz productionTaskBiz;
 	@Autowired
 	private UserBiz userBiz;
+	
 	/*
 	 * 	登陆
 	 */

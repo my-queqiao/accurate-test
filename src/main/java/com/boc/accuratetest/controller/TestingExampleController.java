@@ -351,9 +351,9 @@ public class TestingExampleController {
 	 * 小链合并去重，形成大链
 	 * 思路：
 	 * 1、补足参数类型。向上逐行寻找，采用最近的有参数类型的同名方法
-	 * 2、使用树、链表的数据格式，分析小链，最终汇成大链。
+	 * 2、使用树的数据格式，分析小链，最终汇成大链。
 	 * java.lang.Thread.getStackTrace依此隔开的是各个小链，每一个小链的第一行都视为父节点，父节点视为唯一的，相同父节点的小链必须合并为一个大链，
-	 * 具体思路：小链a-b,a-b-c,a-b2	汇成大链：a-b-c 同时a-b2（这是树+链表结构的数据，代码虽然有点长，但汇成大链的关键仍然是认识到了这是树+链表的数据结构）
+	 * 具体思路：小链a-b,a-b-c,a-b2	汇成大链：a-b-c 同时a-b2（这是树结构的数据，汇成大链的关键是认识到了数据结构是树）
 	 * 
 	 * @param contents 原始数据的每一行：
 	 * 	1599629997342.com.boc.accuratetest.controller.IndexController.login(String,String,HttpSession)
@@ -442,7 +442,8 @@ public class TestingExampleController {
 							num++;
 							if(everyLine.equals(father)) break;
 						}
-						// map的value倒序  (map2中存储：1、father，然后依次是下一行， 最后一行是当前行的上一行)
+						// map的value倒序  
+						// (map2中存储：1、father，然后依次是下一行， 最后一行是当前行的上一行)
 						Map<Integer,String> map2 = new HashMap<>();
 						int num2 = 1;
 						for(int k=map.size();k>=1;k--) {
@@ -451,8 +452,9 @@ public class TestingExampleController {
 						}
 						// map2 与 收集到的fujiedian比较，找出当前行的上一个节点
 						// fujiedian.getNexts(); 与  map2.get(2); 比较
+						// 思路：map2中的每一行、和收集的每一行进行比较，每一行都一样的话，就收集当前行
 						List<MethodFromLine> nexts = null;
-						for(int o=2;o<=map2.size();o++) {
+						for(int o=2;o<=map2.size();o++) { // o==2，是一个父节点的下一行，下一个方法
 							String line = map2.get(o);
 							if(o == 2) nexts = fujiedian.getNexts();
 							for (MethodFromLine next : nexts) { // nexts中不可能有两个一样的方法。

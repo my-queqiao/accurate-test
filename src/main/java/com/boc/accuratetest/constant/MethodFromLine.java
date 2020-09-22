@@ -7,13 +7,13 @@ import java.util.List;
  */
 public class MethodFromLine {
 	/**
-	 * 注意：主键id是唯一的，可以确定唯一一个当前对象，methodInfo不同方法链中可以有同一个方法
+	 * 注意：主键id是唯一的，可以确定唯一一个当前对象，methodInfo 不同方法链中可以有同一个方法
 	 */
 	private String id; // 这一行数据的主键id
 	private boolean father = false; // 是否为顶级方法
 	private String methodInfo; // 包、类、方法名、参数类型（就是收集的原始数据的任意一行）
 	
-	private List<MethodFromLine> nexts; // 下一个、或多个方法
+	private List<MethodFromLine> nexts; // 下一个(或多个)方法
 	private MethodFromLine last; // 上一个方法
 	
 	public MethodFromLine() {
