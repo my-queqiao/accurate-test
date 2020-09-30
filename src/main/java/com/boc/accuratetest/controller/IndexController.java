@@ -101,6 +101,15 @@ public class IndexController {
 		return "index";
 	}
 	/**
+	 *	 跳转到生产任务页面
+	 * @return
+	 */
+	@SecurityManagement(ProductionTaskNumberRank.class)
+	@RequestMapping("/puductionTask")
+	public String puductionTask() {
+		return "puductionTask";
+	}
+	/**
 	 * 	获取生产任务编号
 	 * @param session
 	 * @return

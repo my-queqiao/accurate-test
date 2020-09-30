@@ -1,39 +1,24 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
-	<meta charset="utf-8">
-    <meta name="viewport" content="width=device-width" />
-    <title>精准测试</title>
-    <link rel="stylesheet" href="../css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="../css/bootstrap-table/bootstrap-table.css"/>
-    <link rel="stylesheet" href="../css/font-awesome.min.css"/>
-    <link rel="stylesheet" href="../css/ionicons.min.css"/>
-    <link rel="stylesheet" href="../css/datatables/dataTables.bootstrap.css"/>
-    
-    <script src="../js/jquery3.2.1.min.js"></script>
-    <script src="../js/bootstrap3.3.7.min.js"></script>
-    <link rel="stylesheet" href="../css/bootstrap-table1.15.3.min.css">
-    <script src="../js/bootstrap-table1.15.3.min.js"></script>
-    <script src="../js/bootstrap-table-zh-CN1.15.3.min.js"></script>
-    <script src=""></script>
-    <!--@*4、页面Js文件的引用*@
-    <script src="~/Scripts/table/Home/Index.js"></script>
-    -->
+<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<title>精准测试</title>
+  		<#include "includes/head.ftl">
 </head>
-<body class="container-fiuled" style="background-color: aliceblue;">
-    <div class="panel-body" style="padding-bottom:0px;">
-	    <div class="row text-center">
-	    	<span class="col-xs-12 " style="font-size: xx-large;">
-	    		<span style="margin-left: ;">精准测试项目</span>
-	    	</span>
-	    </div>
-	    <div id="loading" style="color:blue; display:none; position:absolute;
-	    		top:120px; left:12em;z-index:9999;font-size: 38px;font-family: 宋体;" >正在请求数据，请稍等...</div>
-        <div class="panel panel-default" style="height: 50px;">
-            <div class="panel-body">
-                <form id="formSearch" class="form-horizontal">
-                    <div class="form-group" style="margin-top:-6px">
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+  <#include "includes/head-menu-bar.ftl">
+  <#include "includes/left-menu-bar.ftl">
+  <!--右侧内容开始-->
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-12">    
+        	 <form id="formSearch" class="form-horizontal">
+                    <div class="form-group row" style="margin-top:-6px">
                         <label class="control-label col-sm-1" for="txt_search_departmentname">git仓库</label>
                         <div class="col-sm-3" style="width:30%;">
                             <input type="text" class="form-control" id="git_url" onBlur=getBranchs(this)>
@@ -51,92 +36,12 @@
 							</select>
                         </div>
                         <div class="col-sm-2" style="text-align:left;">
-                            <button type="button" style="margin-left:50px" id="btn_query" class="btn btn-primary">获取变更代码</button>
+                            <button type="button" style="margin-left:0px" id="btn_query" class="btn btn-primary">获取变更代码</button>
                         </div>
                     </div>
-                </form>
-            </div>
-        </div>
-        <!--  
-        <div id="toolbar" class="btn-group">
-            <button id="btn_add" type="button" class="btn btn-success">
-                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
-            </button>
-            <button id="btn_edit" type="button" class="btn btn-primary">
-                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>修改
-            </button>
-            <button id="btn_delete" type="button" class="btn btn-danger">
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>删除
-            </button>
-        </div>
-        -->
-        
-        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-	        <div class="modal-dialog" role="document">
-	            <div class="modal-content">
-	                <div class="modal-header">
-	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-	                    <h4 class="modal-title" id="myModalLabel">方法详情</h4>
-	                </div>
-	                <div class="modal-body">
-	                    <div class="form-group">
-	                        <div style="color:blue;" id="">推荐案例：</div>
-	                        <div id="recommendTestExample"></div>
-	                        <br/>
-	                        <div style="color:blue;" id="">变更方法关联的所有案例：</div>
-	                        <div id="allTestExample"></div>
-	                    </div>
-	                </div>
-	                <div class="modal-footer">
-	                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
-	                </div>
-	            </div>
-	        </div>
-	    </div>
-	    
-        <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
-	        <div class="modal-dialog" role="document">
-	            <div class="modal-content">
-	                <div class="modal-header">
-	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-	                    <h4 class="modal-title" id="myModalLabel2">方法详情</h4>
-	                </div>
-	                <div class="modal-body">
-	                    <div class="form-group">
-	                        <div id="methodDetail"></div>
-	                    </div>
-	                </div>
-	                <div class="modal-footer">
-	                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
-	                </div>
-	            </div>
-	        </div>
-	    </div>
-	    
-	    <div class="modal fade" id="myModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3">
-	        <div class="modal-dialog" role="document">
-	            <div class="modal-content">
-	                <div class="modal-header">
-	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-	                    <h4 class="modal-title" id="myModalLabel3">请输入测试服务器ip地址：</h4>
-	                </div>
-	                <div class="modal-body">
-	                    <div class="form-group">
-	                        <input id="testServerIp" placeholder="#.#.#.#" />
-	                    </div>
-	                </div>
-	                <div class="modal-footer">
-	                	<button type="button" id="btn_save_testserverip" class="btn btn-primary" data-dismiss="modal">
-	                		<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>确认</button>
-	                    <button type="button" class="btn btn-default" data-dismiss="modal">
-	                    	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
-	                </div>
-	            </div>
-	        </div>
-	    </div>
-    	
-        <input id="dataOfPart" value="1" style="display:none;"/><!-- 用于列表点击下一页时传值	(点击button按钮时赋值) -->
-        <div>
+                </form> 
+                
+          <div>
         	<span style="font-size: 18px;">方法变更统计：</span>
             <a id="btn_add" class="btn btn-success">
                 <span>新增：0个</span>
@@ -159,10 +64,91 @@
             <a id="" class="btn btn-success" onclick="getTestedMethods();">
                 <span>获取已测试方法</span>
             </a>
+       	</div>
+        <input id="dataOfPart" value="1" style="display:none;"/><!-- 用于列表点击下一页时传值	(点击button按钮时赋值) -->
+                	
         </div>
-        <table id="tb_departments"></table>
+     </div>
     </div>
+  </div>
+  <section class="content">
+   <div class="container-fluid">
+       <table id="tb_departments"></table>
+   </div>
+  </section>
+</div>
+<!--右侧内容结束-->
+</div>
+    
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	        <div class="modal-dialog" role="document">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <h4 class="modal-title" id="myModalLabel">方法详情</h4>
+	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+	                </div>
+	                <div class="modal-body">
+	                    <div class="form-group">
+	                        <div style="color:blue;" id="">推荐案例：</div>
+	                        <div id="recommendTestExample"></div>
+	                        <br/>
+	                        <div style="color:blue;" id="">变更方法关联的所有案例：</div>
+	                        <div id="allTestExample"></div>
+	                    </div>
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    
+        <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+	        <div class="modal-dialog" role="document">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <h4 class="modal-title" id="myModalLabel2">方法详情</h4>
+	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+	                </div>
+	                <div class="modal-body">
+	                    <div class="form-group">
+	                        <div id="methodDetail"></div>
+	                    </div>
+	                </div>
+	                <div class="modal-footer">
+	                    <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    
+	    <div class="modal fade" id="myModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3">
+	        <div class="modal-dialog" role="document">
+	            <div class="modal-content">
+	                <div class="modal-header">
+	                    <h4 class="modal-title" id="myModalLabel3">请输入测试服务器ip地址：</h4>
+	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+	                </div>
+	                <div class="modal-body">
+	                    <div class="form-group">
+	                        <input id="testServerIp" placeholder="#.#.#.#" />
+	                    </div>
+	                </div>
+	                <div class="modal-footer">
+	                	<button type="button" id="btn_save_testserverip" class="btn btn-primary" data-dismiss="modal">
+	                		<span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>确认</button>
+	                    <button type="button" class="btn btn-default" data-dismiss="modal">
+	                    	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭</button>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
     <script>
+    $("#childMenuName").html("变更代码");
+    var a = "${Session['loginUser'].productionTaskNumber ? default('')}";
+    if(a == ""){
+    	alert("请先选择生产任务编号");
+    }
     $(function () {
 
         //1.初始化Table
@@ -244,8 +230,8 @@
                     field: 'changeType',
                     title: '变更类型',
                     formatter: changeTypeFormatter
-                }, 
-                {
+                },  
+                 {
                     field: 'testingOrNot',
                     title: '是否已完成测试',
                     formatter: testOrNotFormatter
@@ -449,28 +435,6 @@
                });
 
             $("#btn_submit").click(function () {
-                //postdata.DEPARTMENT_NAME = $("#txt_departmentname").val();
-                //postdata.PARENT_ID = $("#txt_parentdepartment").val();
-                //postdata.DEPARTMENT_LEVEL = $("#txt_departmentlevel").val();
-                //postdata.STATUS = $("#txt_statu").val();
-                //$.ajax({
-                //    type: "post",
-                //    url: "/Home/GetEdit",
-                //    data: { "": JSON.stringify(postdata) },
-                //    success: function (data, status) {
-                //        if (status == "success") {
-                //            toastr.success('提交数据成功');
-                //            $("#tb_departments").bootstrapTable('refresh');
-                //        }
-                //    },
-                //    error: function () {
-                //        toastr.error('Error');
-                //    },
-                //    complete: function () {
-
-                //    }
-
-                //});
             });
 
             $("#btn_query").click(function () {
@@ -597,59 +561,6 @@
     		alert("输入不能为空");
     	}
     });
-    $("#btn_recommend").click(function () {
-    	/* $.post('/changeCode/recommendTestExample',
-			function(json){
-	    		var list = json.list; //遍历集合，model展示
-				var yonglis="";
-				for(var j = 1; j < list.length+1; j++) {
-					
-					var n = list[j-1];
-					if(n.indexOf("@") >= 0){
-						var n5 = n.split("@");
-						var reg = new RegExp("@","g");//g,表示全部替换。
-		    			var n2 = n.replace(reg,"<br>");
-		    			yonglis += j+" . "+n2+"";
-		    			yonglis += "<span style='color:red;'>以上"+(n5.length-1)+"个测试用例，任选一个执行即可</span><br/>";
-					}else{
-						yonglis += j+" . "+list[j-1]+"<br/>";
-					}
-					
-		    	}
-				// 变更方法关联的所有案例
-				var all = json.listAll; //遍历集合，model展示
-				var yonglisAll="";
-				for(var j = 1; j < all.length+1; j++) {
-					
-					var n = all[j-1];
-					if(n.indexOf("@") >= 0){
-						var n5 = n.split("@");
-						var reg = new RegExp("@","g");//g,表示全部替换。
-		    			var n2 = n.replace(reg,"<br>");
-		    			yonglisAll += j+" . "+n2+"";
-		    			yonglisAll += "<span style='color:red;'>以上"+(n5.length-1)+"个测试用例，任选一个执行即可</span><br/>";
-					}else{
-						yonglisAll += j+" . "+all[j-1]+"<br/>";
-					}
-					
-		    	}
-				
-				$('#myModal').on('show.bs.modal', function (event) {
-		           	 var modal = $(this);
-		           	 if(yonglis == ""){
-			           	 modal.find('#recommendTestExample').html("无");
-		           	 }else{
-			           	 modal.find('#recommendTestExample').html(yonglis);
-		           	 }
-		           	 // 变更方法关联的所有案例
-			         modal.find('#allTestExample').html(yonglisAll);
-	           	});
-	           $("#myModalLabel").text("推荐测试用例");
-	           $('#myModal').modal();
-			}); */
-	});
     </script>
-    
-    
 </body>
 </html>

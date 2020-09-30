@@ -1,44 +1,29 @@
 package com.boc.accuratetest.demo;
 
-import java.io.IOException;
-
-import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtMethod;
-import javassist.LoaderClassPath;
-import javassist.NotFoundException;
-
 public class User_beifen {
-	public static void main(String[] args) {
+	public volatile int counts = 0;
+	public synchronized void inc() {
 		try {
-			String gen = System.getProperty("user.dir");
-			System.out.println("gen目录:"+gen);
-			ClassPool classPool = ClassPool.getDefault();
-			ClassLoader loader = Thread.currentThread().getContextClassLoader();
-			classPool.appendClassPath(new LoaderClassPath(loader));
-//			classPool.appendClassPath(gen+"/target/classses/"); // notFoundException
-			CtClass ctclass = classPool.get("com.example.controller.SaoLeiController");
-			// modify class,like aop
-			for (CtMethod ctMethod : ctclass.getDeclaredMethods()) {
-				String methodName = ctMethod.getName();
-				String classname2 = ctclass.getName();
-				if (!ctMethod.isEmpty()) { // have method body
-					StringBuilder before = new StringBuilder();
-					before.append("System.err.println(\"=============="	
-							+ classname2 + "." + methodName	+ " ==============\");\n");
-					ctMethod.insertBefore(before.toString());
-				}
-			}
-			
-			//这里会将这个创建的类对象编译为.class文件
-			ctclass.writeFile(gen+"/target/classes");
-		} catch (NotFoundException e) {
-			e.printStackTrace();
-		} catch (CannotCompileException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+			Thread.sleep(1);
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+//		this.counts++;
+		synchronized(this) {
+			this.counts++;
+		}
+	}
+	public static void main(String[] args) throws InterruptedException {
+		User_beifen ub = new User_beifen();
+		for(int i=0;i<1000;i++) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					ub.inc();
+				}
+			}).start();
+		}
+		Thread.sleep(1000); // main线程休眠1秒
+		System.out.println(ub.counts);
 	}
 }
