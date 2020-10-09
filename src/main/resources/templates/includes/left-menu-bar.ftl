@@ -11,7 +11,7 @@
       <span class="brand-text font-weight-light ">精准测试</span>
     </a>
 
-    <div class="sidebar">
+    <div class="sidebar" style="font-size: 16px;">
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column sidebar-menu" data-widget="treeview" role="menu" data-accordion="false">
         	<li class="nav-item">
@@ -39,19 +39,19 @@
 	            </a>
 	        </li>
         	<li class="nav-item">
-	            <a href="${request.contextPath}/index2" class="nav-link">
+	            <a href="${request.contextPath}/testingExample/knowleageDetail" class="nav-link">
 	              <i class="nav-icon fas fa-search"></i>
 	              <p>查看知识库</p>
 	            </a>
 	        </li>
         	<li class="nav-item">
-	            <a href="${request.contextPath}/index2" class="nav-link">
+	            <a href="${request.contextPath}/coverageReport/index" class="nav-link">
 	              <i class="nav-icon fas fa-file"></i>
 	              <p>覆盖率报告</p>
 	            </a>
 	        </li>
         	<li class="nav-item">
-	            <a href="${request.contextPath}/index2" class="nav-link">
+	            <a href="${request.contextPath}/permission/index" class="nav-link">
 	              <i class="nav-icon fas fa-key"></i>
 	              <p>权限设置</p>
 	            </a>
@@ -87,16 +87,17 @@
 	  <!-- 左侧导航栏结束 -->
 <script>
 $(function(){
-        console.log("12212121232423");
+        //console.log("12212121232423");
     $('.sidebar-menu li:not(.treeview) > a').on('click', function(){
         console.log(this.href);
-        var $parent = $(this).parent().addClass('active');
+        var $parent = $(this).addClass('active');
         $parent.siblings('.treeview.active').find('> a').trigger('click');
         $parent.siblings().removeClass('active').find('li').removeClass('active');
     });
     $('.sidebar-menu a').each(function(){
         if(this.href === window.location.href){
-            $(this).parent().addClass('active')
+            //$(this).parent().addClass('active') // 目前该项目没有设置二级菜单
+            $(this).addClass('active')
                     .closest('.treeview-menu').addClass('.menu-open')
                     .closest('.treeview').addClass('active');
         }

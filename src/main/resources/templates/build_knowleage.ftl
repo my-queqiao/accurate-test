@@ -43,15 +43,17 @@
       </div>
     </div>
   </div>
+  </div>
   <section class="content">
    <div class="container-fluid">
        <table id="tb_testingExample"></table>
    </div>
   </section>
+
 </div>
 <!-- 右侧页面结束 -->
 </div>
-	    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	    <div class="modal fade in" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 	        <div class="modal-dialog" role="document">
 	            <div class="modal-content">
 	                <div class="modal-header">
@@ -72,11 +74,11 @@
 	            </div>
 	        </div>
 	    </div>
-	    <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
-	        <div class="modal-dialog" role="document" style="width:1000px; height:100px;">
-	            <div class="modal-content">
+	    <div class="modal fade in" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+	        <div class="modal-dialog" role="document">
+	            <div class="modal-content" style="width:1000px;margin-left: -40%;">
 	                <div class="modal-header">
-	                    <h4 class="modal-title" id="myModalLabel2">关联方法链</h4>
+	                    <h4 class="modal-title" id="myModalLabel2">关联方法列表</h4>
 	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
 	                </div>
 	                <div class="modal-body">
@@ -134,7 +136,7 @@
                 strictSearch: true,
                 minimumCountColumns: 2,             //最少允许的列数
                 singleSelect: true,                 //是否单选模式
-                height: $(window).height()-150,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                //height: $(window).height()-150,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
                 showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
                 cardView: false,                    //是否显示详细视图
                 detailView: false,                   //是否显示父子表
@@ -363,7 +365,7 @@
 		           	 }
 	           	});
 		});
-		$("#myModalLabel2").text("关联方法链详情");
+		$("#myModalLabel2").text("关联方法列表");
         $('#myModal2').modal();
     }
     // 方法传参为英文字母字符串

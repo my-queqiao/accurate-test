@@ -1,49 +1,53 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
-	<meta charset="utf-8">
-    <meta name="viewport" content="width=device-width" />
-    <title>精准测试-用户授权</title>
-    <link rel="stylesheet" href="../css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="../css/bootstrap-table/bootstrap-table.css"/>
-    <link rel="stylesheet" href="../css/font-awesome.min.css"/>
-    <link rel="stylesheet" href="../css/ionicons.min.css"/>
-    <link rel="stylesheet" href="../css/datatables/dataTables.bootstrap.css"/>
-    
-    <script src="../js/jquery3.2.1.min.js"></script>
-    <script src="../js/bootstrap3.3.7.min.js"></script>
-    <link rel="stylesheet" href="../css/bootstrap-table1.15.3.min.css">
-    <script src="../js/bootstrap-table1.15.3.min.js"></script>
-    <script src="../js/bootstrap-table-zh-CN1.15.3.min.js"></script>
-    <script src=""></script>
-    <!--@*4、页面Js文件的引用*@
-    <script src="~/Scripts/table/Home/Index.js"></script>
-    -->
+<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<title>精准测试</title>
+  		<#include "includes/head.ftl">
 </head>
-<body class="container-fiuled" style="background-color: aliceblue;">
-    <div class="panel-body" style="padding-bottom:0px;">
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+  <#include "includes/head-menu-bar.ftl">
+  <#include "includes/left-menu-bar.ftl">
+<!--右侧内容开始-->
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-12">
+          
 	    <div class="row text-center">
-	    	<!--  <span class="col-xs-8 " style="font-size: xx-large;position:fixed;top: 85px;">
-	    		<span style="margin-left: 45%;">知识库创建与查看</span>
-	    	</span>-->
+	    		<div><button style="background-color: #5cb85c;color: white;" onclick="guanlian()">确认关联</button></div>
+	    		<div style="color:black; cursor: pointer;text-decoration:underline;margin-left: 80%;
+	    		    z-index:9999;font-size: 20px;font-family: 宋体;">
+	    		    <a href="${request.contextPath}/permission/roleIndex">角色配置</a>
+	    		</div>
 	    </div>
-	    <div class="row text-center">
-	    	<div class="col-xs-3" style="position:fixed;top: 15px;">
-	    		<button style="background-color: #5cb85c;color: white;" onclick="guanlian()">确认关联</button>
-		        <table id="tb_getAllUsers"></table>
-	    	</div>
-	    	<div class="col-xs-3">
-	    	</div>
-	    	<div class="col-xs-9" style="top: 0px;">
-	    		<a id="loading" href="${request.contextPath}/permission/roleIndex" 
-	    			style="color:black; cursor: pointer;text-decoration:underline;margin-left: 90%;
-	    		    top: 10px;z-index:9999;font-size: 20px;font-family: 宋体;" >角色配置</a>
-	    		<table id="tb_getAllRoles"></table>
-	    	</div>
-	    </div>
+	    
+      </div>
     </div>
+  </div>
+  </div>
+  <section class="content">
+   <div class="container-fluid">
+   <div class="row text-center">
+   				<div class="col-sm-3">
+		        	<table id="tb_getAllUsers"></table>
+		        </div>
+		        <div class="col-sm-1"></div>
+		        <div class="col-sm-7">
+	    			<table id="tb_getAllRoles"></table>
+	    		</div>
+   </div>
+   </div>
+  </section>
+</div>
+<!-- 右侧页面结束 -->
+</div>	    
     <script>
+    $("#childMenuName").html("权限配置");
     $(function () {
     	var tfte = TableInit_forGetAllRoles();
     	tfte.Init();
@@ -83,7 +87,7 @@
                 strictSearch: true,
                 minimumCountColumns: 2,             //最少允许的列数
                 singleSelect: true,                 //是否单选模式
-                height: $(window).height()-100,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                height: $(window).height()-150,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
                 showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
                 cardView: false,                    //是否显示详细视图
                 detailView: false,                   //是否显示父子表
@@ -185,7 +189,7 @@
                 strictSearch: true,
                 minimumCountColumns: 2,             //最少允许的列数
                 singleSelect: false,                 //是否单选模式
-                //height: $(window).height()-200,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                height: $(window).height()-150,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
                 showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
                 cardView: false,                    //是否显示详细视图
                 detailView: false,                   //是否显示父子表

@@ -1,45 +1,42 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
-	<meta charset="utf-8">
-    <meta name="viewport" content="width=device-width" />
-    <title>精准测试-知识库查看</title>
-    <link rel="stylesheet" href="../css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="../css/bootstrap-table/bootstrap-table.css"/>
-    <link rel="stylesheet" href="../css/font-awesome.min.css"/>
-    <link rel="stylesheet" href="../css/ionicons.min.css"/>
-    <link rel="stylesheet" href="../css/datatables/dataTables.bootstrap.css"/>
-    
-    <script src="../js/jquery3.2.1.min.js"></script>
-    <script src="../js/bootstrap3.3.7.min.js"></script>
-    <link rel="stylesheet" href="../css/bootstrap-table1.15.3.min.css">
-    <script src="../js/bootstrap-table1.15.3.min.js"></script>
-    <script src="../js/bootstrap-table-zh-CN1.15.3.min.js"></script>
-    <script src=""></script>
-    <!--@*4、页面Js文件的引用*@
-    <script src="~/Scripts/table/Home/Index.js"></script>
-    -->
+<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<title>精准测试</title>
+  		<#include "includes/head.ftl">
 </head>
-<body class="container-fiuled" style="background-color: aliceblue;">
-    <div class="panel-body" style="padding-bottom:0px;">
-	    <div class="row text-center">
-	    	<!--  <span class="col-xs-8 " style="font-size: xx-large;position:fixed;top: 85px;">
-	    		<span style="margin-left: 45%;">知识库创建与查看</span>
-	    	</span>-->
-	    </div>
-	    <div class="row text-center">
-	    	<div class="col-xs-12" style="">
-		        <table id="tb_testingExample"></table>
-	    	</div>
-	    	
-	    </div>
-	    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-	        <div class="modal-dialog" role="document" style="width:1000px; height:100px;">
-	            <div class="modal-content">
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+  <#include "includes/head-menu-bar.ftl">
+  <#include "includes/left-menu-bar.ftl">
+<!--右侧内容开始-->
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-12">
+	    
+	      </div>
+    </div>
+  </div>
+</div>
+  <section class="content">
+   <div class="container-fluid">
+       <table id="tb_testingExample"></table>
+   </div>
+  </section>
+</div>
+</div>
+<!-- 右侧页面结束 -->
+
+	<div class="modal fade in" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	        <div class="modal-dialog">
+	            <div class="modal-content" style="width:1000px;margin-left: -40%;">
 	                <div class="modal-header">
-	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
 	                    <h4 class="modal-title" id="myModalLabel">关联方法链</h4>
+	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
 	                </div>
 	                <div class="modal-body">
 	                    <div class="form-group">
@@ -51,10 +48,10 @@
 	                </div>
 	            </div>
 	        </div>
-	    </div>
-    </div>
+	    </div>  
     <script>
     $(function () {
+    $("#childMenuName").html("查看知识库");
         //1.初始化Table
         var oTable = new TableInit();
         oTable.Init();
@@ -62,7 +59,6 @@
         var oButtonInit = new ButtonInit();
         oButtonInit.Init();
     });
-
 
     var TableInit = function () {
         var oTableInit = new Object();
@@ -91,7 +87,7 @@
                 strictSearch: true,
                 minimumCountColumns: 2,             //最少允许的列数
                 singleSelect: true,                 //是否单选模式
-                height: $(window).height()-100,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                //height: $(window).height()-150,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
                 showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
                 cardView: false,                    //是否显示详细视图
                 detailView: false,                   //是否显示父子表

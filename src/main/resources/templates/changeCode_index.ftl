@@ -41,8 +41,8 @@
                     </div>
                 </form> 
                 
-          <div>
-        	<span style="font-size: 18px;">方法变更统计：</span>
+          <div style="font-size: 15px;">
+        	<span>方法变更统计：</span>
             <a id="btn_add" class="btn btn-success">
                 <span>新增：0个</span>
             </a>
@@ -80,7 +80,7 @@
 <!--右侧内容结束-->
 </div>
     
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal fade in" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 	        <div class="modal-dialog" role="document">
 	            <div class="modal-content">
 	                <div class="modal-header">
@@ -103,7 +103,7 @@
 	        </div>
 	    </div>
 	    
-        <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
+        <div class="modal fade in" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
 	        <div class="modal-dialog" role="document">
 	            <div class="modal-content">
 	                <div class="modal-header">
@@ -122,7 +122,7 @@
 	        </div>
 	    </div>
 	    
-	    <div class="modal fade" id="myModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3">
+	    <div class="modal fade in" id="myModal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel3">
 	        <div class="modal-dialog" role="document">
 	            <div class="modal-content">
 	                <div class="modal-header">
@@ -162,7 +162,6 @@
         statistics();
     });
 
-
     var TableInit = function () {
         var oTableInit = new Object();
         //初始化Table
@@ -190,7 +189,7 @@
                 strictSearch: true,
                 minimumCountColumns: 2,             //最少允许的列数
                 singleSelect: false,                 //是否单选模式
-                height: $(window).height() - 200,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                //height: $(window).height() - 150,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
                 showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
                 cardView: false,                    //是否显示详细视图
                 detailView: false,                   //是否显示父子表

@@ -1,50 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html>
 <head>
-<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<meta http-equiv="x-ua-compatible" content="ie=edge">
-		<title>精准测试</title>
-  		<#include "includes/head.ftl">
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>精准测试-用户授权</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="../css/bootstrap-table/bootstrap-table.css"/>
+    <link rel="stylesheet" href="../css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="../css/ionicons.min.css"/>
+    <link rel="stylesheet" href="../css/datatables/dataTables.bootstrap.css"/>
+    
+    <script src="../js/jquery3.2.1.min.js"></script>
+    <script src="../js/bootstrap3.3.7.min.js"></script>
+    <link rel="stylesheet" href="../css/bootstrap-table1.15.3.min.css">
+    <script src="../js/bootstrap-table1.15.3.min.js"></script>
+    <script src="../js/bootstrap-table-zh-CN1.15.3.min.js"></script>
+    <script src=""></script>
+    <!--@*4、页面Js文件的引用*@
+    <script src="~/Scripts/table/Home/Index.js"></script>
+    -->
 </head>
-<body class="hold-transition sidebar-mini">
-<div class="wrapper">
-  <#include "includes/head-menu-bar.ftl">
-  <#include "includes/left-menu-bar.ftl">
-<!--右侧内容开始-->
-  <div class="content-wrapper">
-    <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <button style="background-color: #5cb85c;color: white;" onclick="guanlian()">确认关联</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <section class="content">
-	    <div class="container-fluid">
-	    
+<body class="container-fiuled" style="background-color: aliceblue;">
+    <div class="panel-body" style="padding-bottom:0px;">
 	    <div class="row text-center">
-	    	<div class="col-sm-5" >
-		        <table id="tb_getAllRoles"></table>
+	    	<!--  <span class="col-xs-8 " style="font-size: xx-large;position:fixed;top: 85px;">
+	    		<span style="margin-left: 45%;">知识库创建与查看</span>
+	    	</span>-->
+	    </div>
+	    <div class="row text-center">
+	    	<div class="col-xs-3" style="position:fixed;top: 15px;">
+	    		<button style="background-color: #5cb85c;color: white;" onclick="guanlian()">确认关联</button>
+		        <table id="tb_getAllUsers"></table>
 	    	</div>
-	    	<div class="col-sm-1">
+	    	<div class="col-xs-3">
 	    	</div>
-	    	<div class="col-sm-5">
-	    		<table id="tb_getAllPermissions"></table>
+	    	<div class="col-xs-9" style="top: 0px;">
+	    		<a id="loading" href="${request.contextPath}/permission/roleIndex" 
+	    			style="color:black; cursor: pointer;text-decoration:underline;margin-left: 90%;
+	    		    top: 10px;z-index:9999;font-size: 20px;font-family: 宋体;" >角色配置</a>
+	    		<table id="tb_getAllRoles"></table>
 	    	</div>
 	    </div>
-	    
-	    </div>
-    </section>
-  </div>
-  <!-- 右侧页面结束 -->
-</div>
+    </div>
     <script>
-    $("#childMenuName").html("角色配置");
     $(function () {
-    	var tfte = TableInit_forgetAllPermissions();
+    	var tfte = TableInit_forGetAllRoles();
     	tfte.Init();
         //1.初始化Table
         var oTable = new TableInit();
@@ -59,8 +60,8 @@
         var oTableInit = new Object();
         //初始化Table
         oTableInit.Init = function () {
-            $('#tb_getAllRoles').bootstrapTable({
-                url: '/permission/getAllRoles',         //请求后台的URL（*）
+            $('#tb_getAllUsers').bootstrapTable({
+                url: '/permission/getAllUsers',         //请求后台的URL（*）
                 method: 'get',                      //请求方式（*）
                 dataType: 'json',  
                 toolbar: '#toolbar',                //工具按钮用哪个容器
@@ -82,7 +83,7 @@
                 strictSearch: true,
                 minimumCountColumns: 2,             //最少允许的列数
                 singleSelect: true,                 //是否单选模式
-                height: $(window).height()-150,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+                height: $(window).height()-100,   //table总高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
                 showToggle: false,                    //是否显示详细视图和列表视图的切换按钮
                 cardView: false,                    //是否显示详细视图
                 detailView: false,                   //是否显示父子表
@@ -108,17 +109,11 @@
                     title: '主键id'
                 },
                 {
-                    field: 'roleName',
-                    title: '角色名称', //align: 'center'
+                    field: 'userName',
+                    title: '用户名', //align: 'center'
                 	//events: operateEvents1
                 	//formatter: operateFormatter1
-                },
-                {
-                    field: 'description',
-                    title: '描述', //align: 'center'
-                	//events: operateEvents1
-                	//formatter: operateFormatter1
-                },
+                } 
                 ]
             });
         };
@@ -141,15 +136,15 @@
     
     function onCheck(row){
     	var opt = {
-		        url: "/permission/getPermissionsByRoleId?roleId="+row.id,
+		        url: "/permission/getRolesByUserId?userId="+row.id,
 		        silent: true,
 		        query:{
 		        }
 		    };
-    	$("#tb_getAllPermissions").bootstrapTable('refresh',opt);//带参数刷新
+    	$("#tb_getAllRoles").bootstrapTable('refresh',opt);//带参数刷新
     }
     function onUncheck(row){
-    	$("#tb_getAllPermissions input:checkbox").attr("checked", false); // 全不选
+    	$("#tb_getAllRoles input:checkbox").attr("checked", false); // 全不选
     }
     
     function getData_before(){
@@ -163,12 +158,12 @@
 		$("#loading").hide();
     }
     
-    var TableInit_forgetAllPermissions = function () {
+    var TableInit_forGetAllRoles = function () {
         var oTableInit = new Object();
         //初始化Table
         oTableInit.Init = function () {
-            $('#tb_getAllPermissions').bootstrapTable({
-                url: '/permission/getAllPermissions',         //请求后台的URL（*）
+            $('#tb_getAllRoles').bootstrapTable({
+                url: '/permission/getAllRoles',         //请求后台的URL（*）
                 method: 'get',                      //请求方式（*）
                 dataType: 'json',  
                 toolbar: '#toolbar',                //工具按钮用哪个容器
@@ -197,7 +192,7 @@
                 showColumns: false,                  //是否显示所有的列
                 uniqueId: "ID",                     //每一行的唯一标识，一般为主键列
                 showRefresh: false,                  //是否显示刷新按钮
-                clickToSelect: true,                //是否启用点击选中行
+                clickToSelect: false,                //是否启用点击选中行
                 paginationPreText: "上一页",
                 paginationNextText: "下一页",
                 columns: [{
@@ -215,8 +210,14 @@
                     title: '主键id'
                 },
                 {
-                    field: 'rankDesc',
-                    title: '权限描述', //align: 'center'
+                    field: 'roleName',
+                    title: '角色名称', //align: 'center'
+                	//events: operateEvents1
+                	//formatter: operateFormatter1
+                },   
+                {
+                    field: 'description',
+                    title: '描述', //align: 'center'
                 	//events: operateEvents1
                 	//formatter: operateFormatter1
                 },   
@@ -241,8 +242,8 @@
         return oTableInit;
     };
     function guanlian(){
-    	var arrselections1 = $("#tb_getAllRoles").bootstrapTable('getSelections'); // 
-    	var arrselections2 = $("#tb_getAllPermissions").bootstrapTable('getSelections'); // 
+    	var arrselections1 = $("#tb_getAllUsers").bootstrapTable('getSelections'); // 测试用例列表
+    	var arrselections2 = $("#tb_getAllRoles").bootstrapTable('getSelections'); // 方法链
         if (arrselections1.length > 1) {
             alert('只能选择一行进行编辑');
             return;
@@ -256,17 +257,17 @@
         	ms.push(arrselections2[i].id);
         }
         
-        var roleId = arrselections1[0].id;
+        var userId = arrselections1[0].id;
         //var methodChainOriginalIds = JSON.stringify(ms); // 大概是tomcat版本的原因，后台接收数组时报错
-        var permissionIds	=	"";
+        var roleIds	=	"";
         for(var i=0;i<ms.length;i++){
-        	permissionIds+=ms[i];
+        	roleIds+=ms[i];
         	if(i != ms.length-1){
-        		permissionIds+=",";
+        		roleIds+=",";
         	}
         }
-        $.post('/permission/roleLinkPermissions?roleId='+roleId
-        		+'&permissionIds='+permissionIds,
+        $.post('/permission/userLinkRoles?userId='+userId
+        		+'&roleIds='+roleIds,
 				function(json){
         			if(json.success == true){
         				alert("关联成功");
