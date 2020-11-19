@@ -3,6 +3,7 @@ package com.boc.accuratetest.controller;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,6 +19,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.jgit.api.Git;
@@ -90,8 +92,36 @@ public class ChangeCodeController {
 	@RequestMapping("index")
 	public String index(HttpSession session) {
 		//HttpServletRequest request = ( (ServletRequestAttributes)RequestContextHolder.getRequestAttributes() ).getRequest();
+		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		String productionTaskNumber = user.getProductionTaskNumber();
+		if(StringUtils.isEmpty(productionTaskNumber)) {
+			throw new NotSelectProductionTaskException("请选择一个生产任务编号");
+		}
 		return "changeCode_index";
 	}
+	/**
+	 * 	查看方法体变更详情
+	 * @param res
+	 * @param id
+	 */
+	@SecurityManagement(ChangeCodeRank.class)
+	@RequestMapping("body")
+	public void body(HttpServletResponse res,Integer id) {
+		ChangeCode changeCode = changeCodeBiz.getById(id);
+		PrintWriter pw =null;
+        res.setHeader("Content-Type","text/html;charset=UTF-8");
+        try {
+            pw = res.getWriter();
+            pw.write(changeCode.getMethodBody());
+            pw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            pw.close();
+        }
+	}
+	
 	/**
 	 * 	展示差异代码
 	 * @param pageNumber 页码
@@ -108,7 +138,7 @@ public class ChangeCodeController {
 		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
 		String productionTaskNumber = user.getProductionTaskNumber();
 		if(StringUtils.isEmpty(productionTaskNumber)) {
-			throw new NotSelectProductionTaskException("请选择一个生产任务编号");
+			return json;
 		}
 		List<ChangeCode> page = changeCodeBiz.page(pageNumber, pageSize, search,dataOfPart,productionTaskNumber);
 		Integer total = changeCodeBiz.findTotal(search,dataOfPart,productionTaskNumber);
@@ -317,8 +347,11 @@ public class ChangeCodeController {
 	@SecurityManagement(ChangeCodeRank.class)
 	@RequestMapping("getBranchList")
 	@ResponseBody
-	public JSONObject getBranchList(String git_url) {
-		git_url = git_url.trim();
+	public JSONObject getBranchList(String productionTaskNumber) { // 原为：git_url
+		productionTaskNumber = productionTaskNumber.trim();
+		List<ProductionTask> pts = productionTaskBiz.findBy(productionTaskNumber);
+		String git_url = pts.get(0).getGitUrl();
+		
 		JSONObject jsonRes = new JSONObject();
 		jsonRes.put("success", false);
 		ResponseEntity<String> response = null;
@@ -437,9 +470,23 @@ public class ChangeCodeController {
 	    HttpHeaders headers = new HttpHeaders();
 	    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 	    MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+	    // 字符串编码转换为gbk，python服务用的是gbk，不转中文会乱码
+	    String master_branch2 = "";
+	    String test_branch2 = "";
+	    byte[] bytes = null;
+		try {
+			bytes = master_branch.getBytes("utf-8");
+			master_branch2 = new String(bytes,"gbk");
+			
+			bytes = test_branch.getBytes("utf-8");
+			test_branch2 = new String(bytes,"gbk");
+		} catch (UnsupportedEncodingException e1) {
+			e1.printStackTrace();
+		}
+	    
 	    map.add("git_url", git_url);
-	    map.add("master", master_branch);
-	    map.add("dev", test_branch);
+	    map.add("master", master_branch2);
+	    map.add("dev", test_branch2);
 	    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 	    ResponseEntity<String> response = null;
 		try {
@@ -490,9 +537,9 @@ public class ChangeCodeController {
 			if(changeType.equals("delete"))cc.setChangeType((byte)2);
 			if(changeType.equals("change"))cc.setChangeType((byte)3);
 			String body = js.getString("content");
-			if(body.length() >= 4000) {
+			/*if(body.length() >= 4000) {
 				body = body.substring(0, 3999);
-			}
+			}*/
 			cc.setMethodBody(body);
 			ccs.add(cc);
 		}

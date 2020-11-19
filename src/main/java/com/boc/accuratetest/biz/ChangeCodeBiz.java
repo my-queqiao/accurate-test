@@ -18,4 +18,6 @@ public interface ChangeCodeBiz {
 	List<ChangeCode> findChangeCodeLinkTestExample(String productionTaskNumber);
 
 	void deleteByProductionTaskNumber(String productionTaskNumber);
+
+	ChangeCode getById(Integer id);
 }

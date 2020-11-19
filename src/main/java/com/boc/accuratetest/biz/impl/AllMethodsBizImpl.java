@@ -29,24 +29,16 @@ public class AllMethodsBizImpl implements AllMethodsBiz{
 		return list;
 	}
 	@Override
-	public Integer findTotal(String search) {
-		return allMethodsMapper.findTotal(search);
+	public List<AllMethods> statisticClassNumber(String productionTaskNumber) {
+		return allMethodsMapper.statisticClassNumber(productionTaskNumber);
 	}
 	@Override
-	public List<AllMethods> getAll() {
-		return allMethodsMapper.getAll();
+	public List<AllMethods> statisticMethodInfoInClass(String packageName,String productionTaskNumber) {
+		return allMethodsMapper.statisticMethodInfoInClass(packageName,productionTaskNumber);
 	}
 	@Override
-	public List<AllMethods> statisticClassNumber() {
-		return allMethodsMapper.statisticClassNumber();
-	}
-	@Override
-	public List<AllMethods> statisticMethodInfoInClass(String packageName) {
-		return allMethodsMapper.statisticMethodInfoInClass(packageName);
-	}
-	@Override
-	public List<AllMethods> methodInfoInClass(String packageName, String simpleClassName) {
-		return allMethodsMapper.methodInfoInClass(packageName,simpleClassName);
+	public List<AllMethods> methodInfoInClass(String packageName, String simpleClassName,String productionTaskNumber) {
+		return allMethodsMapper.methodInfoInClass(packageName,simpleClassName,productionTaskNumber);
 	}
 	
 }

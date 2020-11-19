@@ -10,53 +10,58 @@ public class AllMethods {
     private String methodName;
 
     private String paramType;
-    
+
+    private String productionTaskNumber;
     // 统计。（非数据库字段）
-    private Integer classNumber; // 每个包的各自类数量
-    private Integer testedclassNumber; // 每个包的各自已测试类数量
+    private Integer classNumber = 0; // 每个包的各自类数量
+    private Integer testedclassNumber = 0; // 每个包的各自已测试类数量
     
-    private Integer methodNumber; // 每个包、类中的方法数量
-    private Integer methodTestedNumber; // 每个包、类中的已测试方法数量
+    private Integer methodNumber = 0; // 每个包、类中的方法数量
+    private Integer methodTestedNumber = 0; // 每个包、类中的已测试方法数量
     
-    private Integer addFunNumber; // 每一个包、类中的新增方法数量
-    private Integer addFunTestedNumber; // 每个包、类中的新增方法已测试数量
+    private Integer addFunNumber = 0; // 每一个包、类中的新增方法数量
+    private Integer addFunTestedNumber = 0; // 每个包、类中的新增方法已测试数量
     
-    private Integer modifyFunNumber; // 每一个包、类中的新增方法数量
-    private Integer modifyFunTestedNumber; // 每个包、类中的新增方法已测试数量
+    private Integer modifyFunNumber = 0; // 每一个包、类中的新增方法数量
+    private Integer modifyFunTestedNumber = 0; // 每个包、类中的新增方法已测试数量
     
     private Integer changeType; // 是否为新增方法，变更类型
-    private String testedOrNot; // 
     
-    public Integer getModifyFunNumber() {
-		return modifyFunNumber;
+    // 分析报告页面
+	private Integer testExampleNumber = 0; // 关联案例
+	private Integer recommendTestExampleNumber = 0; // 推荐案例
+	private Integer executedTestExampleNumber = 0; // 已执行案例
+
+    public Integer getTestExampleNumber() {
+		return testExampleNumber;
 	}
 
-	public void setModifyFunNumber(Integer modifyFunNumber) {
-		this.modifyFunNumber = modifyFunNumber;
+	public void setTestExampleNumber(Integer testExampleNumber) {
+		this.testExampleNumber = testExampleNumber;
 	}
 
-	public Integer getModifyFunTestedNumber() {
-		return modifyFunTestedNumber;
+	public Integer getRecommendTestExampleNumber() {
+		return recommendTestExampleNumber;
 	}
 
-	public void setModifyFunTestedNumber(Integer modifyFunTestedNumber) {
-		this.modifyFunTestedNumber = modifyFunTestedNumber;
+	public void setRecommendTestExampleNumber(Integer recommendTestExampleNumber) {
+		this.recommendTestExampleNumber = recommendTestExampleNumber;
 	}
 
-	public Integer getMethodNumber() {
-		return methodNumber;
+	public Integer getExecutedTestExampleNumber() {
+		return executedTestExampleNumber;
 	}
 
-	public void setMethodNumber(Integer methodNumber) {
-		this.methodNumber = methodNumber;
-	}
-	
-	public Integer getMethodTestedNumber() {
-		return methodTestedNumber;
+	public void setExecutedTestExampleNumber(Integer executedTestExampleNumber) {
+		this.executedTestExampleNumber = executedTestExampleNumber;
 	}
 
-	public void setMethodTestedNumber(Integer methodTestedNumber) {
-		this.methodTestedNumber = methodTestedNumber;
+	public Integer getClassNumber() {
+		return classNumber;
+	}
+
+	public void setClassNumber(Integer classNumber) {
+		this.classNumber = classNumber;
 	}
 
 	public Integer getTestedclassNumber() {
@@ -67,12 +72,20 @@ public class AllMethods {
 		this.testedclassNumber = testedclassNumber;
 	}
 
-	public Integer getClassNumber() {
-		return classNumber;
+	public Integer getMethodNumber() {
+		return methodNumber;
 	}
 
-	public void setClassNumber(Integer classNumber) {
-		this.classNumber = classNumber;
+	public void setMethodNumber(Integer methodNumber) {
+		this.methodNumber = methodNumber;
+	}
+
+	public Integer getMethodTestedNumber() {
+		return methodTestedNumber;
+	}
+
+	public void setMethodTestedNumber(Integer methodTestedNumber) {
+		this.methodTestedNumber = methodTestedNumber;
 	}
 
 	public Integer getAddFunNumber() {
@@ -91,14 +104,22 @@ public class AllMethods {
 		this.addFunTestedNumber = addFunTestedNumber;
 	}
 
-	public String getTestedOrNot() {
-		return testedOrNot;
+	public Integer getModifyFunNumber() {
+		return modifyFunNumber;
 	}
 
-	public void setTestedOrNot(String testedOrNot) {
-		this.testedOrNot = testedOrNot;
+	public void setModifyFunNumber(Integer modifyFunNumber) {
+		this.modifyFunNumber = modifyFunNumber;
 	}
-	
+
+	public Integer getModifyFunTestedNumber() {
+		return modifyFunTestedNumber;
+	}
+
+	public void setModifyFunTestedNumber(Integer modifyFunTestedNumber) {
+		this.modifyFunTestedNumber = modifyFunTestedNumber;
+	}
+
 	public Integer getChangeType() {
 		return changeType;
 	}
@@ -145,5 +166,13 @@ public class AllMethods {
 
     public void setParamType(String paramType) {
         this.paramType = paramType == null ? null : paramType.trim();
+    }
+
+    public String getProductionTaskNumber() {
+        return productionTaskNumber;
+    }
+
+    public void setProductionTaskNumber(String productionTaskNumber) {
+        this.productionTaskNumber = productionTaskNumber == null ? null : productionTaskNumber.trim();
     }
 }

@@ -12,7 +12,7 @@
 	        </a>
 	      </li>
 	      <li class="nav-item d-none d-sm-inline-block">
-	        <a href="#" class="nav-link" id="childMenuName">首页</a>
+	        <a href="#" class="nav-link" id="childMenuName"></a>
 	      </li>
 	    </ul>
 	    <ul class="navbar-nav ml-auto">
@@ -27,17 +27,15 @@
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
               <span class="hidden-xs">${Session["loginUser"].userName ? default("尚未登陆")}</span>
             </a>
-            <ul class="dropdown-menu">
-              <!-- Menu Footer-->
-              <li class="user-footer">
-                <div class="pull-right">
-                  <a href="#" class="btn btn-default btn-flat" id="logout">退出</a>
-                </div>
+            <ul id="logout2" class="" style="display:none;position: absolute;list-style: none;
+						    width: 100px;
+						    margin-left: -53px;">
+              <!-- Menu Footer   dropdown-menu-->
+              <li class="">
+                  <a href="#" class="btn" id="logout">退出</a>
               </li>
             </ul>
-          </li>
-	      
-	      
+           </li>
 	    </ul>
 	  </nav>
 	  <!-- 顶部导航栏结束 -->
@@ -45,6 +43,18 @@
 $("#logout").click(function(){
 	window.location.href="${request.contextPath}/loginOut";	
 });
+
+$(document).click(function(){
+		 $('#logout2').hide();
+	 });
+$(".user-menu").click(function(event){
+		 event.stopPropagation();
+		 if($("#logout2").is(':visible')){
+			 $('#logout2').hide();
+		    }else{
+		    	$('#logout2').show();
+		    }
+		 });
 </script>	  
 </html>
 

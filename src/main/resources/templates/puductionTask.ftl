@@ -7,7 +7,7 @@
 		<title>精准测试</title>
   		<#include "includes/head.ftl">
 </head>
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini"> <!-- sidebar-collapse  sidebar-open-->
 <div class="wrapper">
   <#include "includes/head-menu-bar.ftl">
   <#include "includes/left-menu-bar.ftl">
@@ -48,7 +48,9 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <input id="productionTaskNumber" />
+                       	 生产任务编号：<input id="productionTaskNumber" style="width: 300px;" /><br/><br/>
+                        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+                                                                         地址：<input id="git_url" placeholder="http://127.0.0.1:8080/BCAS/BCAS.git" style="width: 300px;"/>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -202,10 +204,15 @@ $("#btn_selectProductionTaskNumber").click(function () {
 $("#btn_save_productionTaskNumber").click(function(){
 	var productionTaskNumber = $("#productionTaskNumber").val();
 	if(null == productionTaskNumber  || "" == productionTaskNumber) {
-		alert("不能为空");
+		alert("生产任务编号不能为空");
 		return;
 	}
-	$.post('/addProductionTaskNumber?productionTaskNumber='+productionTaskNumber,
+	var git_url = $("#git_url").val();
+	if(null == git_url  || "" == git_url) {
+		alert("git地址不能为空");
+		return;
+	}
+	$.post('/addProductionTaskNumber?productionTaskNumber='+productionTaskNumber+'&gitUrl='+git_url,
 			function(json){
 				//$("#loading").hide();
 				alert(json.msg);

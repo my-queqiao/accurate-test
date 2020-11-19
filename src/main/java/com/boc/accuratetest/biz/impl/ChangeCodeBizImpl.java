@@ -59,4 +59,9 @@ public class ChangeCodeBizImpl implements ChangeCodeBiz{
 		changeCodeMapper.deleteByExample(e);
 	}
 
+	@Override
+	public ChangeCode getById(Integer id) {
+		return changeCodeMapper.selectByPrimaryKey(id);
+	}
+
 }

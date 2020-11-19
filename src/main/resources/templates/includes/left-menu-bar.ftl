@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 	</head>
 	  <!-- 左侧导航栏开始 -->
-	 <aside class="main-sidebar sidebar-dark-primary elevation-4">
+	<aside class="main-sidebar sidebar-dark-primary elevation-4">
     <a href="#" class="brand-link">
       <img src="../img/C.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
       style="opacity: .8">
@@ -14,12 +14,12 @@
     <div class="sidebar" style="font-size: 16px;">
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column sidebar-menu" data-widget="treeview" role="menu" data-accordion="false">
-        	<li class="nav-item">
+        	<!-- <li class="nav-item">
 	            <a href="${request.contextPath}/index" class="nav-link">
 	              <i class="nav-icon fas fa-circle"></i>
 	              <p>首页</p>
 	            </a>
-	         </li>
+	        </li> -->
         	<li class="nav-item">
 	            <a href="${request.contextPath}/puductionTask" class="nav-link">
 	              <i class="nav-icon fas fa-briefcase"></i>
@@ -45,7 +45,7 @@
 	            </a>
 	        </li>
         	<li class="nav-item">
-	            <a href="${request.contextPath}/coverageReport/index" class="nav-link">
+	            <a href="${request.contextPath}/coverageReport/index" class="nav-link"> <!-- target="_blank" -->
 	              <i class="nav-icon fas fa-file"></i>
 	              <p>覆盖率报告</p>
 	            </a>
@@ -56,6 +56,18 @@
 	              <p>权限设置</p>
 	            </a>
 	        </li>
+        	<li class="nav-item">
+	            <a href="${request.contextPath}/analysisReport/index" class="nav-link">
+	              <i class="nav-icon fas fa-key"></i>
+	              <p>分析报告</p>
+	            </a>
+	        </li>
+        	<!-- <li class="nav-item">
+	            <a href="www.baidu.com" class="nav-link">
+	              <i class="nav-icon fas fa-key"></i>
+	              <p>挡板</p>
+	            </a>
+	        </li> -->
 	         
           <!-- <li class="nav-item has-treeview menu-close">
             <a href="#" class="nav-link active">
@@ -89,7 +101,6 @@
 $(function(){
         //console.log("12212121232423");
     $('.sidebar-menu li:not(.treeview) > a').on('click', function(){
-        console.log(this.href);
         var $parent = $(this).addClass('active');
         $parent.siblings('.treeview.active').find('> a').trigger('click');
         $parent.siblings().removeClass('active').find('li').removeClass('active');

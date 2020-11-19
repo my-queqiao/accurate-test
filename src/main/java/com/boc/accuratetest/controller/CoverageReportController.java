@@ -56,8 +56,13 @@ public class CoverageReportController {
 	 */
 	@SecurityManagement(CoverageReportRank.class)
 	@RequestMapping("index")
-	public String index() {
-		return "coverageReport";
+	public String index(HttpSession session) {
+		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		String productionTaskNumber = user.getProductionTaskNumber();
+		if(StringUtils.isEmpty(productionTaskNumber)) {
+			throw new NotSelectProductionTaskException("请选择一个生产任务编号");
+		}
+		return "coverageReport/coverageReport";
 	}
 	/**
 	 * 	覆盖率列表
@@ -69,11 +74,12 @@ public class CoverageReportController {
 	@SecurityManagement(CoverageReportRank.class)
 	@RequestMapping("getAll")
 	@ResponseBody
-	public JSONObject getAll(Integer pageNumber,Integer pageSize,String search) {
+	public JSONObject getAll(Integer pageNumber,Integer pageSize,String search,HttpSession session) {
 		JSONObject json = new JSONObject();
-		
+		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		String productionTaskNumber = user.getProductionTaskNumber();
 		// 统计每个包的各自类数量、方法数量、增加方法数量，及其已测试数量
-		List<AllMethods> statisticClassNumber = allMethodsBiz.statisticClassNumber();
+		List<AllMethods> statisticClassNumber = allMethodsBiz.statisticClassNumber(productionTaskNumber);
 		
 		json.put("rows", statisticClassNumber);
 		json.put("total", statisticClassNumber.size());
@@ -89,7 +95,7 @@ public class CoverageReportController {
 	@RequestMapping("toClassInfo")
 	public String toClassInfo(String packageName,Model model) {
 		model.addAttribute("packageName", packageName);
-		return "coverageClassInfo";
+		return "coverageReport/coverageClassInfo";
 	}
 	/**
 	 * 	获取指定包路径下的类信息
@@ -99,11 +105,12 @@ public class CoverageReportController {
 	@SecurityManagement(CoverageReportRank.class)
 	@RequestMapping("getClassInfo")
 	@ResponseBody
-	public JSONObject getClassInfo(String packageName) {
+	public JSONObject getClassInfo(String packageName,HttpSession session) {
 		JSONObject json = new JSONObject();
-		
+		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		String productionTaskNumber = user.getProductionTaskNumber();
 		// 统计每个包的各自类数量、方法数量、增加方法数量，及其已测试数量
-		List<AllMethods> statisticClassNumber = allMethodsBiz.statisticMethodInfoInClass(packageName);
+		List<AllMethods> statisticClassNumber = allMethodsBiz.statisticMethodInfoInClass(packageName,productionTaskNumber);
 		
 		json.put("rows", statisticClassNumber);
 		json.put("total", statisticClassNumber.size());
@@ -119,7 +126,7 @@ public class CoverageReportController {
 	@RequestMapping("toMethodInfo")
 	public String toMethodInfo(String className,Model model) {
 		model.addAttribute("className", className);
-		return "coverageMethodInfo";
+		return "coverageReport/coverageMethodInfo";
 	}
 	/**
 	 * 	获取指定类下面的方法名、并注明是否是新增方法、是否已测试
@@ -129,13 +136,14 @@ public class CoverageReportController {
 	@SecurityManagement(CoverageReportRank.class)
 	@RequestMapping("getMethodInfo")
 	@ResponseBody
-	public JSONObject getMethodInfo(String className) {
+	public JSONObject getMethodInfo(String className,HttpSession session) {
 		String packageName = className.substring(0, className.lastIndexOf("."));
 		String simpleClassName = className.substring(className.lastIndexOf(".")+1);
 		JSONObject json = new JSONObject();
-		
+		User user = (User)(session.getAttribute(ProductionTaskSession.loginUser));
+		String productionTaskNumber = user.getProductionTaskNumber();
 		// 统计每个包的各自类数量、方法数量、增加方法数量，及其已测试数量
-		List<AllMethods> methodInfos = allMethodsBiz.methodInfoInClass(packageName,simpleClassName);
+		List<AllMethods> methodInfos = allMethodsBiz.methodInfoInClass(packageName,simpleClassName,productionTaskNumber);
 		
 		json.put("rows", methodInfos);
 		json.put("total", methodInfos.size());

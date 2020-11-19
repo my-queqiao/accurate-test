@@ -80,7 +80,7 @@
     	$.post('/login?user='+user+'&password='+password,
 				function(json){
     		if(json.success == true){
-				window.location.href="${request.contextPath}/index";    			
+				window.location.href="${request.contextPath}/puductionTask";   			
     		}else{
     			alert(json.msg);
     		}

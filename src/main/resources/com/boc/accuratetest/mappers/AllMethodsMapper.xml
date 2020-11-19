@@ -7,10 +7,83 @@
     <result column="javabean_name" jdbcType="VARCHAR" property="javabeanName" />
     <result column="method_name" jdbcType="VARCHAR" property="methodName" />
     <result column="param_type" jdbcType="VARCHAR" property="paramType" />
+    <result column="production_task_number" jdbcType="VARCHAR" property="productionTaskNumber" />
   </resultMap>
-  <sql id="Base_Column_List">
-    id, package_name, javabean_name, method_name, param_type
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
   </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, package_name, javabean_name, method_name, param_type, production_task_number
+  </sql>
+  <select id="selectByExample" parameterType="com.boc.accuratetest.pojo.AllMethodsExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from all_methods
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
@@ -21,11 +94,19 @@
     delete from all_methods
     where id = #{id,jdbcType=INTEGER}
   </delete>
+  <delete id="deleteByExample" parameterType="com.boc.accuratetest.pojo.AllMethodsExample">
+    delete from all_methods
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
   <insert id="insert" parameterType="com.boc.accuratetest.pojo.AllMethods">
     insert into all_methods (id, package_name, javabean_name, 
-      method_name, param_type)
+      method_name, param_type, production_task_number
+      )
     values (#{id,jdbcType=INTEGER}, #{packageName,jdbcType=VARCHAR}, #{javabeanName,jdbcType=VARCHAR}, 
-      #{methodName,jdbcType=VARCHAR}, #{paramType,jdbcType=VARCHAR})
+      #{methodName,jdbcType=VARCHAR}, #{paramType,jdbcType=VARCHAR}, #{productionTaskNumber,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.boc.accuratetest.pojo.AllMethods">
     insert into all_methods
@@ -45,6 +126,9 @@
       <if test="paramType != null">
         param_type,
       </if>
+      <if test="productionTaskNumber != null">
+        production_task_number,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -62,8 +146,55 @@
       <if test="paramType != null">
         #{paramType,jdbcType=VARCHAR},
       </if>
+      <if test="productionTaskNumber != null">
+        #{productionTaskNumber,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
+  <select id="countByExample" parameterType="com.boc.accuratetest.pojo.AllMethodsExample" resultType="java.lang.Long">
+    select count(*) from all_methods
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update all_methods
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.packageName != null">
+        package_name = #{record.packageName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.javabeanName != null">
+        javabean_name = #{record.javabeanName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.methodName != null">
+        method_name = #{record.methodName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.paramType != null">
+        param_type = #{record.paramType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productionTaskNumber != null">
+        production_task_number = #{record.productionTaskNumber,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update all_methods
+    set id = #{record.id,jdbcType=INTEGER},
+      package_name = #{record.packageName,jdbcType=VARCHAR},
+      javabean_name = #{record.javabeanName,jdbcType=VARCHAR},
+      method_name = #{record.methodName,jdbcType=VARCHAR},
+      param_type = #{record.paramType,jdbcType=VARCHAR},
+      production_task_number = #{record.productionTaskNumber,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.boc.accuratetest.pojo.AllMethods">
     update all_methods
     <set>
@@ -79,6 +210,9 @@
       <if test="paramType != null">
         param_type = #{paramType,jdbcType=VARCHAR},
       </if>
+      <if test="productionTaskNumber != null">
+        production_task_number = #{productionTaskNumber,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -87,7 +221,8 @@
     set package_name = #{packageName,jdbcType=VARCHAR},
       javabean_name = #{javabeanName,jdbcType=VARCHAR},
       method_name = #{methodName,jdbcType=VARCHAR},
-      param_type = #{paramType,jdbcType=VARCHAR}
+      param_type = #{paramType,jdbcType=VARCHAR},
+      production_task_number = #{productionTaskNumber,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
   
@@ -106,53 +241,45 @@
     </if>
     limit #{limit} , #{pageSize}
   </select>
-  <select id="findTotal" resultType="java.lang.Integer">
-    select count(*) from all_methods
-    <if test="search != null">
-        where method_name = #{search,jdbcType=VARCHAR}
-    </if>
-  </select>
-  
-  <select id="getAll" resultMap="BaseResultMap">
-    select DISTINCT package_name,javabean_name,method_name,param_type from all_methods
-  </select>
-  
-  <select id="statisticClassNumber" resultMap="BaseResultMap">
+  <select id="statisticClassNumber" resultMap="BaseResultMap" parameterType="java.lang.String">
     SELECT m.package_name,m.classNumber,n.testedClassNumber ,o.methodNumber,p.methodTestedNumber,
     		q.addFunNumber,r.addFunTestedNumber,s.modifyFunNumber,u.modifyFunTestedNumber 
     from 
     	<!-- 从句1，每个包、及其各自类的数量 -->
 		(SELECT package_name, COUNT(DISTINCT package_name,javabean_name) as classNumber
-		 from all_methods
+		 from all_methods where production_task_number = #{productionTaskNumber}
 		GROUP BY package_name) m 
 	LEFT JOIN
-		<!-- 从句2，每个包、及其各自已测试类的数量 -->
+		<!-- 从句2，每个包、及其各自	已测试类的数量 -->
 		(SELECT a.package_name, COUNT(DISTINCT a.package_name,a.javabean_name) as testedClassNumber
 		 from all_methods a,tested_methods t
 		 WHERE a.package_name=t.package_name
 		 and a.javabean_name = t.javabean_name
+		 and a.production_task_number = #{productionTaskNumber}
+		 and t.production_task_number = #{productionTaskNumber}
 		GROUP BY a.package_name) n
 	on 	m.package_name = n.package_name
 	LEFT JOIN
-		<!-- 从句3，每个包、及其各自方法的数量 -->
+		<!-- 从句3，每个包、及其各自	方法的数量 -->
 		(SELECT package_name, COUNT(DISTINCT package_name,javabean_name,method_name,param_type) as methodNumber
-		from all_methods
+		from all_methods where production_task_number = #{productionTaskNumber}
 		GROUP BY package_name) o
 	on m.package_name = o.package_name
 	LEFT JOIN
-		<!-- 从句4，每个包、及其各自已测试方法的数量 -->
+		<!-- 从句4，每个包、及其各自	已测试方法的数量 -->
 		(SELECT package_name, COUNT(DISTINCT package_name,javabean_name,method_name,param_type) as methodTestedNumber
-		from tested_methods
+		from tested_methods where production_task_number = #{productionTaskNumber}
 		GROUP BY package_name) p
 	on m.package_name = p.package_name
 	LEFT JOIN
-		<!-- 从句5，每个包、及其各自新增方法的数量 -->
+		<!-- 从句5，每个包、及其各自	新增方法的数量 -->
 		(SELECT package_name, COUNT(DISTINCT package_name,javabean_name,method_name,param_type) as addFunNumber
 		from change_code
-		where change_type=1 GROUP BY package_name) q
+		where change_type=1 and production_task_number = #{productionTaskNumber}
+		GROUP BY package_name) q
 	on m.package_name = q.package_name
 	LEFT JOIN
-		<!-- 从句6，每个包、及其各自已测试新增方法的数量 -->
+		<!-- 从句6，每个包、及其各自	已测试新增方法的数量 -->
 		(SELECT c.package_name, COUNT(DISTINCT c.package_name,c.javabean_name,c.method_name,c.param_type) as addFunTestedNumber
 		from change_code c,tested_methods t
 		where c.package_name=t.package_name
@@ -160,16 +287,19 @@
       		and c.method_name=t.method_name
       		and c.param_type=t.param_type
       		and c.change_type=1 
+      		and c.production_task_number = #{productionTaskNumber}
+      		and t.production_task_number = #{productionTaskNumber}
 			GROUP BY c.package_name) r
 	on m.package_name = r.package_name 
 	LEFT JOIN
-		<!-- 从句7，每个包、及其各自新增方法的数量 -->
+		<!-- 从句7，每个包、及其各自	修改方法的数量 -->
 		(SELECT package_name, COUNT(DISTINCT package_name,javabean_name,method_name,param_type) as modifyFunNumber
 		from change_code
-		where change_type=3 GROUP BY package_name) s
+		where change_type=3 and production_task_number = #{productionTaskNumber}
+		GROUP BY package_name) s
 	on m.package_name = s.package_name
 	LEFT JOIN
-		<!-- 从句8，每个包、及其各自已测试新增方法的数量 -->
+		<!-- 从句8，每个包、及其各自	已测试修改方法的数量 -->
 		(SELECT c.package_name, COUNT(DISTINCT c.package_name,c.javabean_name,c.method_name,c.param_type) as modifyFunTestedNumber
 		from change_code c,tested_methods t 
 		where c.package_name=t.package_name
@@ -177,28 +307,34 @@
       		and c.method_name=t.method_name
       		and c.param_type=t.param_type
       		and c.change_type=3 
+      		and c.production_task_number = #{productionTaskNumber}
+      		and t.production_task_number = #{productionTaskNumber}
 			GROUP BY c.package_name) u
 	on m.package_name = u.package_name ORDER BY m.package_name
 ;
   </select>
-  <select id="statisticMethodInfoInClass" resultMap="BaseResultMap" parameterType="java.lang.String">
+  <select id="statisticMethodInfoInClass" resultMap="BaseResultMap">
 SELECT a.javabean_name,a.methodNumber,b.methodTestedNumber,c.addFunNumber,d.addFunTestedNumber,
 		e.modifyFunNumber,f.modifyFunTestedNumber  
 	FROM (SELECT javabean_name, COUNT(DISTINCT javabean_name,method_name,param_type) as methodNumber
-			from all_methods
-			WHERE package_name = #{packageName}
-				GROUP BY javabean_name) a
+			from all_methods 
+			WHERE package_name = #{packageName} 
+			and production_task_number = #{productionTaskNumber}
+			GROUP BY javabean_name) a
 LEFT JOIN
 		(SELECT javabean_name, COUNT(DISTINCT javabean_name,method_name,param_type) as methodTestedNumber
-		from tested_methods
-		WHERE package_name = #{packageName}
+		from tested_methods 
+		WHERE package_name = #{packageName} 
+		and production_task_number = #{productionTaskNumber}
 		GROUP BY javabean_name) b
 ON a.javabean_name = b.javabean_name
 LEFT JOIN
 		<!-- 从句3，每个类、及其各自新增方法的数量 -->
 		(SELECT javabean_name, COUNT(DISTINCT javabean_name,method_name,param_type) as addFunNumber
 		from change_code
-		where package_name = #{packageName} and change_type=1 GROUP BY javabean_name) c
+		where package_name = #{packageName} and change_type=1  
+		and production_task_number = #{productionTaskNumber}
+		GROUP BY javabean_name) c
 on a.javabean_name = c.javabean_name
 
 LEFT JOIN
@@ -206,47 +342,59 @@ LEFT JOIN
 		(SELECT c.javabean_name, COUNT(DISTINCT c.javabean_name,c.method_name,c.param_type) as addFunTestedNumber
 		from change_code c,tested_methods t
 		where c.package_name = #{packageName}
-			and c.javabean_name=t.javabean_name 
-      and c.method_name=t.method_name
-      and c.param_type=t.param_type
-      and c.change_type=1 
+			  and c.javabean_name=t.javabean_name 
+		      and c.method_name=t.method_name
+		      and c.param_type=t.param_type
+		      and c.change_type=1  
+		      and c.production_task_number = #{productionTaskNumber}
+		      and t.production_task_number = #{productionTaskNumber}
 		GROUP BY c.javabean_name) d
 		on a.javabean_name = d.javabean_name 
 LEFT JOIN
 		<!-- 从句5，每个类、及其各自修改方法的数量 -->
 		(SELECT javabean_name, COUNT(DISTINCT javabean_name,method_name,param_type) as modifyFunNumber
 		from change_code
-		where package_name = #{packageName} and change_type=3 GROUP BY javabean_name) e
+		where package_name = #{packageName} and change_type=3 
+		and production_task_number = #{productionTaskNumber}
+		GROUP BY javabean_name) e
 on a.javabean_name = e.javabean_name
 
 LEFT JOIN
 		<!-- 从句6，每个类、及其各自已测试修改方法的数量 -->
 		(SELECT c.javabean_name, COUNT(DISTINCT c.javabean_name,c.method_name,c.param_type) as modifyFunTestedNumber
 		from change_code c,tested_methods t
-		where c.package_name = #{packageName}
+		where c.package_name = #{packageName} 
 			and c.javabean_name=t.javabean_name 
-      and c.method_name=t.method_name
-      and c.param_type=t.param_type
-      and c.change_type=3 
-		GROUP BY c.javabean_name) f
+	      and c.method_name=t.method_name 
+	      and c.param_type=t.param_type 
+	      and c.change_type=3 
+	      and c.production_task_number = #{productionTaskNumber} 
+	      and t.production_task_number = #{productionTaskNumber} 
+		GROUP BY c.javabean_name
+		) f
 		on a.javabean_name = f.javabean_name ORDER BY a.javabean_name
 ;
   </select>
-  <select id="methodInfoInClass" resultMap="BaseResultMap" parameterType="java.lang.String">
-SELECT a.method_name,a.param_type,b.change_type as changeType, c.method_name as testedOrNot <!-- 查询结果中 c.method_name 如果有值，那这个方法就是经过了测试 -->
-from(SELECT DISTINCT method_name,param_type
-	from all_methods
-	WHERE package_name = #{packageName} and javabean_name = #{simpleClassName})a
-
-LEFT JOIN (SELECT DISTINCT method_name,param_type,change_type
-	from change_code
-	WHERE package_name = #{packageName} and javabean_name = #{simpleClassName})b
-ON a.method_name = b.method_name and a.param_type = b.param_type
-
-LEFT JOIN (SELECT DISTINCT method_name,param_type
-	from tested_methods
-	WHERE package_name = #{packageName} and javabean_name = #{simpleClassName})c
-on a.method_name = c.method_name and a.param_type = c.param_type
-;
+  <select id="methodInfoInClass" parameterType="java.lang.String" resultMap="BaseResultMap">
+	SELECT a.method_name,a.param_type,b.change_type as changeType, 
+	c.method_name as testedOrNot <!-- 查询结果中 c.method_name 如果有值，那这个方法就是经过了测试 -->
+	from(SELECT DISTINCT method_name,param_type
+		from all_methods
+		WHERE package_name = #{packageName} and javabean_name = #{simpleClassName}
+		and production_task_number = #{productionTaskNumber}
+		)a
+	
+	LEFT JOIN (SELECT DISTINCT method_name,param_type,change_type
+		from change_code
+		WHERE package_name = #{packageName} and javabean_name = #{simpleClassName}
+		and production_task_number = #{productionTaskNumber})b
+	ON a.method_name = b.method_name and a.param_type = b.param_type
+	
+	LEFT JOIN (SELECT DISTINCT method_name,param_type
+		from tested_methods
+		WHERE package_name = #{packageName} and javabean_name = #{simpleClassName}
+		and production_task_number = #{productionTaskNumber})c
+	on a.method_name = c.method_name and a.param_type = c.param_type
+	;
   </select>
 </mapper>

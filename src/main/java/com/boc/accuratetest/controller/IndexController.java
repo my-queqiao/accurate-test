@@ -172,8 +172,9 @@ public class IndexController {
 	@SecurityManagement(ProductionTaskNumberRank.class)
 	@RequestMapping("/addProductionTaskNumber")
 	@ResponseBody
-	public JSONObject addProductionTaskNumber(HttpSession session,String productionTaskNumber) {
+	public JSONObject addProductionTaskNumber(HttpSession session,String productionTaskNumber,String gitUrl) {
 		productionTaskNumber = productionTaskNumber.trim();
+		gitUrl = gitUrl.trim();
 		JSONObject json = new JSONObject();
 		json.put("success", false);
 		List<ProductionTask> findBy = productionTaskBiz.findBy(productionTaskNumber);
@@ -183,6 +184,7 @@ public class IndexController {
 		}
 		ProductionTask pt = new ProductionTask();
 		pt.setProductionTaskNumber(productionTaskNumber);
+		pt.setGitUrl(gitUrl);
 		productionTaskBiz.insert(pt);
 		json.put("msg", "添加成功");
 		json.put("success", true);

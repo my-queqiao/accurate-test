@@ -10,14 +10,10 @@ public interface AllMethodsBiz {
 
 	List<AllMethods> page(Integer pageNumber, Integer pageSize, String search);
 
-	Integer findTotal(String search);
+	List<AllMethods> statisticClassNumber(String productionTaskNumber);
 
-	List<AllMethods> getAll();
+	List<AllMethods> statisticMethodInfoInClass(String packageName,String productionTaskNumber);
 
-	List<AllMethods> statisticClassNumber();
-
-	List<AllMethods> statisticMethodInfoInClass(String packageName);
-
-	List<AllMethods> methodInfoInClass(String packageName, String simpleClassName);
+	List<AllMethods> methodInfoInClass(String packageName, String simpleClassName,String productionTaskNumber);
 
 }

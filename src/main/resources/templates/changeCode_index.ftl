@@ -19,13 +19,14 @@
           <div class="col-sm-12">    
         	 <form id="formSearch" class="form-horizontal">
                     <div class="form-group row" style="margin-top:-6px">
-                        <label class="control-label col-sm-1" for="txt_search_departmentname">git仓库</label>
+                        <label class="control-label col-sm-1" for="txt_search_departmentname">生产任务编号</label>
                         <div class="col-sm-3" style="width:30%;">
-                            <input type="text" class="form-control" id="git_url" onBlur=getBranchs(this)>
+                            <!-- <input type="text" class="form-control" id="git_url" onBlur=getBranchs(this)> -->
+                            <input type="text" class="form-control" id="productionTaskNumber" disabled>
                         </div>
                         <label class="control-label col-sm-1" for="txt_search_statu">稳定分支</label>
                         <div class="col-sm-2" style="width:12%;">
-                            <select id="master_branch" class="form-control">
+                            <select id="master_branch" class="form-control" onclick="getBranchs(this);">
 								<option value=""></option>
 							</select>
                         </div>
@@ -56,7 +57,7 @@
                 <span>总计：0个</span>
             </a>
             &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-            <a id="" class="btn btn-success" 
+            <a id="" class="btn btn-success"
             	href="${request.contextPath}/changeCode/recommend_testExample" target="_blank">
                 <span>推荐测试用例</span>
             </a>
@@ -66,7 +67,7 @@
             </a>
        	</div>
         <input id="dataOfPart" value="1" style="display:none;"/><!-- 用于列表点击下一页时传值	(点击button按钮时赋值) -->
-                	
+           
         </div>
      </div>
     </div>
@@ -105,7 +106,7 @@
 	    
         <div class="modal fade in" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2">
 	        <div class="modal-dialog" role="document">
-	            <div class="modal-content">
+	            <div class="modal-content" style="width:1000px;margin-left: -40%;">
 	                <div class="modal-header">
 	                    <h4 class="modal-title" id="myModalLabel2">方法详情</h4>
 	                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
@@ -145,9 +146,12 @@
 	    </div>
     <script>
     $("#childMenuName").html("变更代码");
-    var a = "${Session['loginUser'].productionTaskNumber ? default('')}";
-    if(a == ""){
-    	alert("请先选择生产任务编号");
+    var productionTaskNumber = "${Session['loginUser'].productionTaskNumber ? default('')}";
+    if(productionTaskNumber == ""){
+    	alert("请先选择生产任务编号"); // 后台处理过了，没有指定编号时，这儿不会执行
+    }
+    if(productionTaskNumber != ""){
+    	$("#productionTaskNumber").val(productionTaskNumber);
     }
     $(function () {
 
@@ -284,6 +288,9 @@
     		].join("");
     }
     function method_body_details(id){
+    	window.open("/changeCode/body?id="+id);
+    }
+    function method_body_details_feiqi(id){
     	for(j = 0; j < list.length; j++) {
     		if(list[j].id == id){
     			var md = list[j].methodBody;
@@ -477,14 +484,18 @@
 		$("#btn_query").attr("disabled", false);
 		$("#loading").hide();
     }
-    function getBranchs(obj){
-    	if(obj.value == ""){
-    		alert("git仓库不能为空");
+	var count = 0;
+    function getBranchs(obj){ // obj
+    	if(count >= 1){
     		return;
     	}
+    	/* if(obj.value == ""){
+    		alert("git仓库不能为空");
+    		return;
+    	} */
     	getData_before();
     	$.ajaxSettings.async = true; //异步,默认就是异步
-    	$.post('/changeCode/getBranchList?git_url='+obj.value,
+    	$.post('/changeCode/getBranchList?productionTaskNumber='+productionTaskNumber,
 				function(json){
     		getData_after();
     				if(json.success == false){
@@ -503,6 +514,7 @@
     			        });
     				}
 		});
+    	count++;
     }
     function zhishiku(){
     	
